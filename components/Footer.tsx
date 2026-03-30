@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Logo from "./Logo";
 import { FOOTER } from "@/lib/constants";
 
@@ -22,12 +23,21 @@ export default function Footer() {
             <ul className="space-y-3">
               {FOOTER.links.map((link) => (
                 <li key={link.label}>
-                  <a
-                    href={link.href}
-                    className="text-sm text-sand-400 hover:text-sand-100 transition-colors"
-                  >
-                    {link.label}
-                  </a>
+                  {link.href.startsWith("/") ? (
+                    <Link
+                      href={link.href}
+                      className="text-sm text-sand-400 hover:text-sand-100 transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  ) : (
+                    <a
+                      href={link.href}
+                      className="text-sm text-sand-400 hover:text-sand-100 transition-colors"
+                    >
+                      {link.label}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>

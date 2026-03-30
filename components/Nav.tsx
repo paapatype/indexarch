@@ -46,15 +46,25 @@ export default function Nav() {
 
         {/* Desktop Links */}
         <div className="hidden items-center gap-10 md:flex">
-          {NAV_LINKS.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              className="font-sans text-sm text-ink-muted transition-colors hover:text-ink"
-            >
-              {link.label}
-            </a>
-          ))}
+          {NAV_LINKS.map((link) =>
+            link.href.startsWith("/") ? (
+              <Link
+                key={link.label}
+                href={link.href}
+                className="font-sans text-sm text-ink-muted transition-colors hover:text-ink"
+              >
+                {link.label}
+              </Link>
+            ) : (
+              <a
+                key={link.label}
+                href={link.href}
+                className="font-sans text-sm text-ink-muted transition-colors hover:text-ink"
+              >
+                {link.label}
+              </a>
+            )
+          )}
           <Button variant="primary" href="#contact" className="text-sm px-5 py-2.5">
             Get Started
           </Button>

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "motion/react";
 import { fadeUp, staggerContainer, slideInLeft } from "@/lib/animations";
 import SectionLabel from "./ui/SectionLabel";
@@ -72,13 +73,14 @@ export default function CaseStudy() {
             </motion.div>
 
             {/* CTA */}
-            <motion.a
-              variants={fadeUp}
-              href={CASE_STUDY.cta.href}
-              className="inline-block mt-8 font-sans text-sm font-medium text-ink hover:text-accent transition-colors underline underline-offset-4 decoration-rule hover:decoration-accent"
-            >
-              {CASE_STUDY.cta.label}
-            </motion.a>
+            <motion.div variants={fadeUp}>
+              <Link
+                href={CASE_STUDY.cta.href}
+                className="inline-block mt-8 font-sans text-sm font-medium text-ink hover:text-accent transition-colors underline underline-offset-4 decoration-rule hover:decoration-accent"
+              >
+                {CASE_STUDY.cta.label}
+              </Link>
+            </motion.div>
           </motion.div>
         </div>
       </div>

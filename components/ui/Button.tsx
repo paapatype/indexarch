@@ -1,6 +1,7 @@
 "use client";
 
 import { type ButtonHTMLAttributes } from "react";
+import Link from "next/link";
 
 type Variant = "primary" | "secondary" | "ghost";
 
@@ -31,6 +32,14 @@ export default function Button({
   const classes = `${base} ${variants[variant]} ${className}`;
 
   if (href) {
+    // Use Next.js Link for internal paths (handles basePath), plain <a> for anchors
+    if (href.startsWith("/")) {
+      return (
+        <Link href={href} className={classes}>
+          {children}
+        </Link>
+      );
+    }
     return (
       <a href={href} className={classes}>
         {children}
