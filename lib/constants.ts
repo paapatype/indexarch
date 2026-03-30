@@ -2,7 +2,6 @@
 
 export const NAV_LINKS = [
   { label: "How It Works", href: "#process" },
-  { label: "Pricing", href: "#pricing" },
   { label: "Case Study", href: "#case-study" },
   { label: "Blog", href: "/blog" },
 ] as const;
@@ -12,16 +11,14 @@ export const NAV_LINKS = [
 export const HERO = {
   heading: "Your catalog is losing you deals.",
   subheading:
-    "Engineers spend 4.5 hours searching PDFs for a single spec. With Index, it takes 10 seconds.",
+    "Technical buyers spend 10+ hours a week digging through PDFs.\nWe cut that to minutes.",
   ctaPrimary: "See a Live Example",
   ctaSecondary: "How It Works ↓",
   stats: [
-    { value: "4.5 hrs", label: "Avg. time engineers spend searching PDFs" },
     {
-      value: "73%",
-      label: "Buyers prefer self-service product discovery",
+      value: "75%",
+      label: "B2B buyers prefer a rep-free buying experience",
     },
-    { value: "10 sec", label: "Time to find any spec with Index" },
   ],
 } as const;
 
@@ -33,24 +30,25 @@ export const PROBLEM = {
     {
       title: "Slow Response Times",
       description:
-        "Every inquiry takes 2–4 hours of back-and-forth just to confirm basic specs and availability.",
+        "Every inquiry takes 2\u20134\u00A0hours of back-and-forth just to confirm basic\u00A0specs and\u00A0availability.",
     },
     {
       title: "Unreadable PDFs",
       description:
-        "300-page catalogs that aren't searchable, aren't mobile-friendly, and definitely aren't impressive.",
+        "300-page catalogs that aren\u2019t searchable, aren\u2019t mobile-friendly, and definitely\u00A0aren\u2019t\u00A0impressive.",
     },
     {
       title: "Lost Buyers",
       description:
-        "Technical buyers leave your site in under 30 seconds when they can't find what they need.",
+        "Technical buyers leave your site in under 30\u00A0seconds when they can\u2019t find what\u00A0they\u00A0need.",
     },
   ],
   stat: {
     value: "86%",
     label:
-      "of B2B purchases stall when buyers can't find product information easily",
-    source: "Gartner B2B Buying Report",
+      "of B2B purchases stall during the buying process due to lack of clarity and information overload",
+    source: "Forrester",
+    sourceUrl: "https://www.forrester.com/press-newsroom/forrester-predictions-2025-b2b-marketing-sales/",
   },
 } as const;
 

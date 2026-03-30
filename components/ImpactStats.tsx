@@ -18,12 +18,13 @@ function parseNumeric(value: string): { prefix: string; num: number; suffix: str
 function CountUp({ value }: { value: string }) {
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-60px" });
-  const [display, setDisplay] = useState(value);
+  const parsed = parseNumeric(value);
+  const [numDisplay, setNumDisplay] = useState(
+    parsed ? `${parsed.prefix}${parsed.num}` : value
+  );
 
   useEffect(() => {
-    if (!isInView) return;
-    const parsed = parseNumeric(value);
-    if (!parsed) { setDisplay(value); return; }
+    if (!isInView || !parsed) return;
 
     const duration = 1400;
     const steps = 45;
@@ -37,14 +38,25 @@ function CountUp({ value }: { value: string }) {
       const formatted = parsed.num % 1 !== 0
         ? currentNum.toFixed(1)
         : Math.round(currentNum).toString();
-      setDisplay(`${parsed.prefix}${formatted}${parsed.suffix}`);
-      if (current >= steps) { clearInterval(timer); setDisplay(value); }
+      setNumDisplay(`${parsed.prefix}${formatted}`);
+      if (current >= steps) {
+        clearInterval(timer);
+        setNumDisplay(`${parsed.prefix}${parsed.num}`);
+      }
     }, stepTime);
 
     return () => clearInterval(timer);
   }, [isInView, value]);
 
-  return <span ref={ref}>{display}</span>;
+  // For values like 24/7 that shouldn't be split, render as-is
+  if (!parsed || parsed.suffix.includes("/")) return <span ref={ref}>{value}</span>;
+
+  return (
+    <span ref={ref} className="inline-flex items-baseline">
+      <span>{numDisplay}</span>
+      <span className="text-4xl lg:text-5xl ml-0.5 text-ink">{parsed.suffix}</span>
+    </span>
+  );
 }
 
 // Small geometric accents per quadrant

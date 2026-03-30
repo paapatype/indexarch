@@ -146,7 +146,7 @@ function DemoGuide() {
 
 export default function SolutionSection() {
   return (
-    <section className="py-section-sm lg:py-section bg-surface-sunken relative">
+    <section className="py-section-sm lg:py-section relative">
       <div className="mx-auto max-w-[var(--max-width)] px-6 lg:px-8">
         {/* Section Header — asymmetric */}
         <motion.div
@@ -222,14 +222,13 @@ export default function SolutionSection() {
             </p>
           </div>
 
-          {/* Guide — above the iframe */}
-          <div className="border border-rule border-b-0 bg-surface-raised px-5 py-4">
+          {/* Guide — above the iframe, hidden on mobile */}
+          <div className="hidden md:block border border-rule border-b-0 bg-surface-raised px-5 py-4">
             <DemoGuide />
           </div>
 
-          {/* Iframe container */}
-          <div className="relative border border-rule bg-surface-raised">
-            {/* Browser-style top bar */}
+          {/* Desktop: browser frame — hidden on mobile */}
+          <div className="hidden md:block relative border border-rule bg-surface-raised">
             <div className="flex items-center gap-2 px-4 py-3 border-b border-rule bg-sand-100">
               <div className="flex gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-sand-300" />
@@ -242,12 +241,23 @@ export default function SolutionSection() {
                 </div>
               </div>
             </div>
-
-            {/* Iframe */}
             <div className="relative w-full" style={{ height: "600px" }}>
               <iframe
                 src="https://paapatype.github.io/kayu-kov-catalogue/"
                 title="Interactive product catalog demo — filtering and search"
+                className="absolute inset-0 w-full h-full"
+                loading="lazy"
+                sandbox="allow-scripts allow-same-origin"
+              />
+            </div>
+          </div>
+
+          {/* Mobile: direct iframe — no chrome, clean view */}
+          <div className="md:hidden relative border border-rule bg-surface-raised rounded-lg overflow-hidden">
+            <div className="relative w-full" style={{ height: "70vh" }}>
+              <iframe
+                src="https://paapatype.github.io/kayu-kov-catalogue/"
+                title="Interactive product catalog demo — mobile view"
                 className="absolute inset-0 w-full h-full"
                 loading="lazy"
                 sandbox="allow-scripts allow-same-origin"

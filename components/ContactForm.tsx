@@ -15,6 +15,7 @@ interface FormData {
   productsCustom: string;
   industry: string;
   industryCustom: string;
+  message: string;
 }
 
 const initial: FormData = {
@@ -26,6 +27,7 @@ const initial: FormData = {
   productsCustom: "",
   industry: "",
   industryCustom: "",
+  message: "",
 };
 
 export default function ContactForm() {
@@ -53,7 +55,7 @@ export default function ContactForm() {
   };
 
   const set = (key: keyof FormData) => (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     setForm((f) => ({ ...f, [key]: e.target.value }));
     if (errors[key]) setErrors((errs) => ({ ...errs, [key]: undefined }));
@@ -93,48 +95,32 @@ export default function ContactForm() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
           {/* Left — Copy */}
           <motion.div
-            className="lg:col-span-5 lg:sticky lg:top-[calc(var(--header-height)+3rem)] lg:self-start"
+            className="lg:col-span-5 lg:sticky lg:top-[calc(var(--header-height)+3rem)] lg:self-center"
             variants={staggerContainer}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-80px" }}
           >
-            <motion.span
-              variants={fadeUp}
-              className="block font-mono text-xs tracking-widest uppercase text-ink-faint mb-6"
-            >
-              Get Started
-            </motion.span>
-
             <motion.h2
               variants={fadeUp}
-              className="font-serif text-2xl sm:text-3xl text-ink leading-snug"
+              className="font-serif text-4xl sm:text-5xl lg:text-6xl text-ink leading-[1.2]"
             >
               {CONTACT.heading}
             </motion.h2>
 
-            <motion.div
-              variants={fadeUp}
-              className="mt-8 w-10 border-t-2"
-              style={{ borderColor: "#8B3A2A" }}
-              aria-hidden="true"
-            />
-
             <motion.p
               variants={fadeUp}
-              className="mt-8 text-sm text-ink-muted leading-relaxed max-w-xs"
+              className="mt-8 text-base lg:text-lg text-ink-muted leading-relaxed max-w-md"
             >
               {CONTACT.subheading}
             </motion.p>
 
-            <motion.div
+            <motion.p
               variants={fadeUp}
-              className="mt-12 border-t border-rule pt-6"
+              className="mt-10 font-mono text-xs text-ink-faint tracking-wide leading-relaxed"
             >
-              <p className="font-mono text-xs text-ink-faint tracking-wide leading-relaxed">
-                {CONTACT.footnote}
-              </p>
-            </motion.div>
+              {CONTACT.footnote}
+            </motion.p>
           </motion.div>
 
           {/* Right — Form */}
@@ -283,6 +269,20 @@ export default function ContactForm() {
                     />
                   )}
                 </div>
+              </div>
+
+              {/* Message */}
+              <div className="mt-5">
+                <label htmlFor="message" className="block font-mono text-xs text-ink-muted tracking-wide uppercase mb-2">
+                  Anything else you&apos;d like to mention
+                </label>
+                <textarea
+                  id="message"
+                  value={form.message}
+                  onChange={set("message")}
+                  className={`${inputClass("message")} resize-vertical min-h-[80px]`}
+                  placeholder="Tell us about your project, timeline, or any specific requirements..."
+                />
               </div>
 
               <div className="mt-8">

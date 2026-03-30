@@ -62,7 +62,7 @@ export default function Nav() {
 
         {/* Mobile Hamburger */}
         <button
-          className="relative z-10 flex h-10 w-10 items-center justify-center md:hidden"
+          className="relative z-[70] flex h-10 w-10 items-center justify-center md:hidden"
           onClick={() => setMobileOpen(!mobileOpen)}
           aria-label={mobileOpen ? "Close menu" : "Open menu"}
           aria-expanded={mobileOpen}
@@ -94,10 +94,10 @@ export default function Nav() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
-              className="fixed inset-0 z-40 bg-surface md:hidden"
+              className="fixed inset-0 z-[60] bg-surface md:hidden"
               style={{ paddingTop: "var(--header-height)" }}
             >
-              <div className="flex flex-col items-start gap-8 p-8 pt-12">
+              <div className="flex flex-col items-start gap-10 p-8 pt-16">
                 {NAV_LINKS.map((link, i) => (
                   <motion.a
                     key={link.label}

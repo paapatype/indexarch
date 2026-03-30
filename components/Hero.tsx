@@ -37,21 +37,16 @@ export default function Hero() {
 
           <motion.h1
             variants={fadeUp}
-            className="font-serif text-4xl sm:text-5xl lg:text-6xl leading-[1.12] text-ink max-w-3xl"
+            className="font-serif text-[3.4rem] sm:text-[4.2rem] lg:text-[5.7rem] leading-[1.08] text-ink"
           >
-            Your catalogue is<br />losing you deals.
+            <span className="block">Your catalogue is</span>
+            <span className="block pl-7 sm:pl-10 lg:pl-14">losing you deals.</span>
           </motion.h1>
 
-          <motion.div
-            variants={fadeUp}
-            className="mt-6 w-12 border-t-2"
-            style={{ borderColor: "#8B3A2A" }}
-            aria-hidden="true"
-          />
 
           <motion.p
             variants={fadeUp}
-            className="mt-6 max-w-xl text-lg leading-relaxed text-ink-muted"
+            className="mt-12 lg:mt-16 max-w-xl text-lg leading-relaxed text-ink-muted whitespace-pre-line"
           >
             {HERO.subheading}
           </motion.p>
@@ -69,24 +64,6 @@ export default function Hero() {
           </motion.div>
         </motion.div>
 
-        {/* Stats Bar */}
-        <motion.div
-          className="grid grid-cols-1 sm:grid-cols-3 border border-rule"
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-60px" }}
-        >
-          {HERO.stats.map((stat) => (
-            <div
-              key={stat.value}
-              className="stat-cell border-b sm:border-b-0 sm:border-r border-rule last:border-r-0 last:border-b-0"
-            >
-              <div className="stat-number">{stat.value}</div>
-              <p className="stat-label">{stat.label}</p>
-            </div>
-          ))}
-        </motion.div>
       </div>
     </section>
   );
