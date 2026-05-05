@@ -108,19 +108,34 @@ export default function Nav() {
               style={{ paddingTop: "var(--header-height)" }}
             >
               <div className="flex flex-col items-start gap-10 p-8 pt-16">
-                {NAV_LINKS.map((link, i) => (
-                  <motion.a
-                    key={link.label}
-                    href={link.href}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.08, duration: 0.4 }}
-                    className="font-serif text-3xl text-ink"
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    {link.label}
-                  </motion.a>
-                ))}
+                {NAV_LINKS.map((link, i) => {
+                  const animation = {
+                    initial: { opacity: 0, x: -20 },
+                    animate: { opacity: 1, x: 0 },
+                    transition: { delay: i * 0.08, duration: 0.4 },
+                  };
+                  return link.href.startsWith("/") ? (
+                    <motion.div key={link.label} {...animation}>
+                      <Link
+                        href={link.href}
+                        className="font-serif text-3xl text-ink"
+                        onClick={() => setMobileOpen(false)}
+                      >
+                        {link.label}
+                      </Link>
+                    </motion.div>
+                  ) : (
+                    <motion.a
+                      key={link.label}
+                      href={link.href}
+                      {...animation}
+                      className="font-serif text-3xl text-ink"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      {link.label}
+                    </motion.a>
+                  );
+                })}
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
