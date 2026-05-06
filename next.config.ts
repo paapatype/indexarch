@@ -1,14 +1,14 @@
 import type { NextConfig } from "next";
 
-const isProd = process.env.NODE_ENV === "production";
+// GitHub Pages needs static export + repo basePath. Vercel doesn't.
+// The GitHub Actions workflow opts in by setting GITHUB_PAGES=true.
+const isPages = process.env.GITHUB_PAGES === "true";
 
 const nextConfig: NextConfig = {
-  output: isProd ? "export" : undefined,
-  basePath: isProd ? "/indexarch" : "",
+  output: isPages ? "export" : undefined,
+  basePath: isPages ? "/indexarch" : "",
   trailingSlash: true,
-  images: {
-    unoptimized: true,
-  },
+  images: isPages ? { unoptimized: true } : undefined,
 };
 
 export default nextConfig;
