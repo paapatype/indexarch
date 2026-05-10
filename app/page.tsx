@@ -5,7 +5,6 @@ import SolutionSection from "@/components/SolutionSection";
 import Methodology from "@/components/Methodology";
 import BeforeAfter from "@/components/BeforeAfter";
 import Process from "@/components/Process";
-import CaseStudy from "@/components/CaseStudy";
 import Industries from "@/components/Industries";
 import FAQ from "@/components/FAQ";
 import ContactForm from "@/components/ContactForm";
@@ -22,7 +21,6 @@ export default function Home() {
         <Methodology />
         <BeforeAfter />
         <Process />
-        <CaseStudy />
         <Industries />
         <FAQ />
         <ContactForm />

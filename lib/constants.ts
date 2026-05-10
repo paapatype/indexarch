@@ -2,7 +2,6 @@
 
 export const NAV_LINKS = [
   { label: "How It Works", href: "#how-it-works" },
-  { label: "Case Study", href: "#case-study" },
   { label: "Blog", href: "/blog" },
 ] as const;
 
@@ -77,20 +76,6 @@ export const SOLUTION = {
   ],
   deviceNote:
     "Works on mobile, tablet, and desktop. No app download required.",
-} as const;
-
-// ── Case Study ──
-
-export const CASE_STUDY = {
-  label: "Case Study",
-  heading: "40% reduction in architect back-and-forth",
-  body: "Kayu & Kov, a premium tiles manufacturer, replaced their 200-page PDF with an interactive 3D catalog. The result? Architects stopped emailing for specs—and started sending purchase orders.",
-  metrics: [
-    { before: "48hr response", after: "Instant access" },
-    { before: "Manual lookup", after: "+35% qualified inquiries" },
-    { before: "200-page PDF", after: "-40% email volume" },
-  ],
-  cta: { label: "Read full case study →", href: "/case-study" },
 } as const;
 
 // ── Impact Stats ──
@@ -365,8 +350,8 @@ export const BLOG_POSTS: BlogPost[] = [
     readTime: "8 min read",
     date: "Feb 10, 2026",
     author: {
-      name: "Arjun Patel",
-      initials: "AP",
+      name: "Sankalp Shetty",
+      initials: "SS",
       bio: "Founder at Index Studio. Helping manufacturers turn static catalogs into interactive sales tools. Previously at Tata Digital and McKinsey.",
     },
     content: [
@@ -411,8 +396,8 @@ export const BLOG_POSTS: BlogPost[] = [
     readTime: "5 min read",
     date: "Jan 28, 2026",
     author: {
-      name: "Arjun Patel",
-      initials: "AP",
+      name: "Sankalp Shetty",
+      initials: "SS",
       bio: "Founder at Index Studio. Helping manufacturers turn static catalogues into interactive sales tools. Previously at Tata Digital and McKinsey.",
     },
     content: [
@@ -448,8 +433,8 @@ export const BLOG_POSTS: BlogPost[] = [
     readTime: "10 min read",
     date: "Jan 15, 2026",
     author: {
-      name: "Arjun Patel",
-      initials: "AP",
+      name: "Sankalp Shetty",
+      initials: "SS",
       bio: "Founder at Index Studio. Helping manufacturers turn static catalogs into interactive sales tools. Previously at Tata Digital and McKinsey.",
     },
     content: [
@@ -480,8 +465,8 @@ export const BLOG_POSTS: BlogPost[] = [
     readTime: "7 min read",
     date: "Jan 5, 2026",
     author: {
-      name: "Arjun Patel",
-      initials: "AP",
+      name: "Sankalp Shetty",
+      initials: "SS",
       bio: "Founder at Index Studio. Helping manufacturers turn static catalogs into interactive sales tools. Previously at Tata Digital and McKinsey.",
     },
     content: [
@@ -509,9 +494,8 @@ export const FOOTER = {
       "We turn static PDF catalogs into interactive 3D experiences that help manufacturers sell more to technical buyers.",
   },
   links: [
-    { label: "How It Works", href: "#process" },
+    { label: "How It Works", href: "#how-it-works" },
     { label: "Pricing", href: "#pricing" },
-    { label: "Case Study", href: "#case-study" },
     { label: "Blog", href: "/blog" },
   ],
   contact: {

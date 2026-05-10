@@ -218,7 +218,7 @@ export default function SolutionSection() {
               </h3>
             </div>
             <p className="text-sm text-ink-muted max-w-sm">
-              An interactive catalog we built for a tiles manufacturer — 55 products with filtering, search, and detailed specs.
+              An interactive catalogue we built for a WPC profiles manufacturer — 55 products with filtering, search, and detailed specs.
             </p>
           </div>
 
