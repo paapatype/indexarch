@@ -58,7 +58,7 @@ export default function Hero() {
             <Button variant="primary" href="#contact">
               {HERO.ctaPrimary}
             </Button>
-            <Button variant="secondary" href="#process">
+            <Button variant="secondary" href="#how-it-works">
               {HERO.ctaSecondary}
             </Button>
           </motion.div>

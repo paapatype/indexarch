@@ -80,11 +80,15 @@ html.dark {
   --color-sand-400: #3D3530;
   --color-sand-500: #5C5249;
 
-  /* Ink → warm off-whites (text hierarchy, darkest = most prominent) */
+  /* Ink → warm off-whites (text hierarchy, darkest = most prominent).
+     ink-faint is bumped notably brighter than a symmetric inversion would
+     suggest, because the illustration system uses low-opacity strokes at
+     currentColor=ink-faint — at the symmetric value those vanish on pure
+     black (e.g. lost-buyers magnifier, response-time clock hands). */
   --color-ink: #F2EDE5;
   --color-ink-light: #D6CFC4;
   --color-ink-muted: #9C9388;
-  --color-ink-faint: #6B635A;
+  --color-ink-faint: #A89E90;
 
   /* Hairlines become very faint warm grey */
   --color-rule: #1F1B17;

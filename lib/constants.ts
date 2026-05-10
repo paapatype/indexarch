@@ -1,7 +1,7 @@
 // ── Navigation ──
 
 export const NAV_LINKS = [
-  { label: "How It Works", href: "#process" },
+  { label: "How It Works", href: "#how-it-works" },
   { label: "Case Study", href: "#case-study" },
   { label: "Blog", href: "/blog" },
 ] as const;
@@ -119,12 +119,60 @@ export const IMPACT = {
     "Based on average results across Index clients. Individual results may vary.",
 } as const;
 
+// ── Methodology (How It Works) ──
+
+export const METHODOLOGY = {
+  eyebrow: "How it works",
+  heading: "We don't replace your catalogue. We unpack it.",
+  subtitle:
+    "Every catalogue already contains the structure a buyer needs — quality tiers, technical specs, the visual cues people match against a brief. The PDF buries them. We pull them to the surface.",
+  beats: [
+    {
+      number: "01",
+      title: "Start with what you already have",
+      description:
+        "Send us your existing PDF catalogue, spec sheets, and product images. Nothing changes about your products. We work with the data you already document.",
+    },
+    {
+      number: "02",
+      title: "Map the variation",
+      description:
+        "55 profiles, 200 SKUs, 12 standards, 4 finishes — every catalogue has structure hiding in it. We map quality tiers, quantity breakpoints, and how variants relate, so a buyer can navigate them instead of reading them.",
+    },
+    {
+      number: "03",
+      title: "Find the technical hooks that close the deal",
+      description:
+        "Engineers and architects don't buy by name; they buy by spec. We identify the technical factors that drive the inquiry — load rating, dimension, material grade, certification — and put them at the front of how products are filtered and compared.",
+    },
+    {
+      number: "04",
+      title: "Pull out the visual identifiers",
+      description:
+        "A 3D rendering, a profile cross-section, a finish swatch — the visual cues a buyer matches against a project brief. We surface these consistently so the path from “I'm looking for X” to “I want to order Y” is one decision, not twelve.",
+    },
+  ],
+} as const;
+
+// ── Before / After (Kayu & Kov example) ──
+
+export const BEFORE_AFTER = {
+  eyebrow: "What it looks like in practice",
+  heading: "From a 4-page PDF to a catalogue you can search.",
+  body: "Kayu & Kov sent us this — 55 WPC profiles across 4 pages. Each row a product description, a rate, a 2D drawing, a 3D rendering. Useful, but only if you already know what you're looking for. We rebuilt it as a website where architects can filter by section type, dimension, and rate, see each profile in 3D, and place an order that arrives directly in your inbox.",
+  beforeLabel: "What they sent us",
+  beforeMeta: "PDF · 4 pages · 55 profiles",
+  afterLabel: "What we shipped",
+  afterMeta: "Web · filterable · order-ready",
+  cta: { label: "Read the full story →", href: "/blog/kayu-kov-cut-architect-emails" },
+} as const;
+
 // ── Process ──
 
 export const PROCESS = {
-  heading: "From PDF to 3D in 4 weeks",
+  heading: "From PDF to online sales engine in 4 weeks",
   subtitle:
-    "We handle everything. You just share your existing catalog and product data.",
+    "We handle the build end-to-end. You share your existing catalogue. Buyers browse, filter, and submit pre-qualified orders that drop directly into your inbox — ready to fulfil.",
   steps: [
     {
       number: "01",
@@ -357,33 +405,38 @@ export const BLOG_POSTS: BlogPost[] = [
   {
     slug: "kayu-kov-cut-architect-emails",
     tag: "Case Study",
-    title: "How Kayu & Kov Cut Architect Emails by 40%",
+    title: "Kayu & Kov asked for a PDF redesign. We built them a search engine.",
     excerpt:
-      "A premium tiles manufacturer replaced their PDF catalog and transformed their sales process overnight.",
-    readTime: "6 min read",
+      "A WPC profiles manufacturer came to us wanting a cleaner-looking catalogue. We told them why a website would do more for their architect customers — and shipped one in 4 weeks.",
+    readTime: "5 min read",
     date: "Jan 28, 2026",
     author: {
       name: "Arjun Patel",
       initials: "AP",
-      bio: "Founder at Index Studio. Helping manufacturers turn static catalogs into interactive sales tools. Previously at Tata Digital and McKinsey.",
+      bio: "Founder at Index Studio. Helping manufacturers turn static catalogues into interactive sales tools. Previously at Tata Digital and McKinsey.",
     },
     content: [
-      `Kayu & Kov is a premium tiles manufacturer based in Morbi, Gujarat, with over 180 SKUs across porcelain, vitrified, and ceramic categories. Their products are specified by architects across India and the Middle East.`,
-      `The problem? Their sales team was drowning in repetitive emails from architects asking for the same spec information—information that was buried in a 200-page PDF catalog.`,
-      `## The Before: Death by Email`,
-      `Before Index, Kayu & Kov's sales process looked like this: an architect would download their PDF, struggle to find the right tile specs, and email the sales team. The team would spend 2–4 hours finding the answer and responding. By the time they replied, the architect had often already specified a competitor's product.`,
-      `Their metrics told the story: 120 spec-related emails per month, 48-hour average response time, and only 15 qualified inquiries making it through the noise.`,
-      `## The Solution: Interactive 3D Catalog`,
-      `We built Kayu & Kov an interactive catalog with smart filtering by size, finish, material, and application. Architects could compare tiles side-by-side, view them in 3D, and submit pre-qualified inquiries with all specs already attached.`,
-      `The entire project took 5 weeks from kickoff to launch.`,
-      `## The Results`,
-      `Within 3 months of launch, the numbers spoke for themselves:`,
-      `- **Email volume dropped 40%**: From 120/month to 72/month. Architects were finding answers themselves.
-- **Response time went from 48 hours to instant**: Self-service meant no waiting.
-- **Qualified inquiries increased 47%**: From 15/month to 22/month. Architects who reached out were ready to buy.
-- **Sample requests nearly doubled**: From 8/month to 14/month. More engagement, more pipeline.`,
-      `## The Takeaway`,
-      `Kayu & Kov didn't change their products. They didn't hire more salespeople. They didn't run ads. They simply made it easier for architects to find and evaluate their tiles. The result was less noise, more signal, and a sales team that could focus on closing instead of clarifying.`,
+      `Kayu & Kov makes WPC — wood-plastic composite — profiles out of Bangalore. Fluted profiles, hollow boxes, sheet profiles, louvers, door frames. Their customers are architects and contractors who specify these into projects across India.`,
+      `They came to us with a 4-page PDF catalogue listing 55 profiles, and a simple ask: redesign the PDF so it looks better and is easier to read.`,
+      `We didn't redesign the PDF.`,
+      `## The conversation we had instead`,
+      `Looking at the catalogue, the problem wasn't that it looked bad. It looked fine — clean tables, 2D dimensions, 3D renderings, codes, rates per RFT. The problem was that this is how architects were expected to use it: open the PDF, scroll through 55 rows, find a profile that fits the section type, dimension, and rate they need, then email the sales team to confirm availability.`,
+      `For 55 profiles across 4 pages, this is roughly the worst possible interaction. Too many products to remember by name; too few categories to navigate by intuition; and every spec hidden inside a row that has to be read top-to-bottom before you know whether it's even relevant.`,
+      `So we made the case for replacing the PDF entirely.`,
+      `## What an architect actually needs`,
+      `Architects don't shop a catalogue the way a consumer shops a website. They come in with a brief — "I need a fluted profile around 145mm wide, ideally under ₹400 per RFT, with a 3D rendering I can drop into my visualisation." The job of a catalogue, for that user, is to let them filter to the matching profiles in seconds and see the visual identifier they need.`,
+      `A PDF can't do that. A website can. So we built one.`,
+      `## What we shipped`,
+      `In 4 weeks, Kayu & Kov got a live web catalogue covering all 55 profiles, with:`,
+      `- **Filter by section type** — sheets, hollow boxes, fluted profiles, louvers, door frames, rods, channels.
+- **Filter by dimension and rate** — narrow to "under ₹200, sheets above 100mm" in one click.
+- **Search by product code or description** — for the architects who already know what they're looking for.
+- **3D renderings on every product** — the same renderings from the PDF, but presented at a size where they're actually useful.
+- **One-click order request** — pre-fills product code, description, and rate. The sales team gets an email with everything they need to quote.`,
+      `It works on mobile, tablet, and desktop, because architects do half their spec work on phones in site meetings.`,
+      `## The takeaway`,
+      `The right answer to "redesign our PDF" wasn't a prettier PDF. It was a different shape of object entirely — one that matches how the customer actually uses the information. A catalogue isn't content to be read; it's a search problem to be solved. Once you see it that way, the redesign brief writes itself.`,
+      `If you have a catalogue that's drowning your team in spec emails, that's the conversation we'd want to have with you too.`,
     ],
   },
   {
