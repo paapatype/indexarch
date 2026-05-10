@@ -151,7 +151,7 @@ function PdfIcon({ hovered }: { hovered: boolean }) {
           }}
         >
           <div
-            className="w-8 h-10 border border-current rounded-sm bg-white flex flex-col justify-center px-1 gap-[2px]"
+            className="w-8 h-10 border border-current rounded-sm bg-surface-raised flex flex-col justify-center px-1 gap-[2px]"
             style={{ opacity: offset === 0 ? 1 : 0.7 }}
           >
             {hovered ? (
@@ -351,7 +351,7 @@ function ConveyorBelt({ messages }: { messages: string[] }) {
         {doubled.map((msg, i) => (
           <div
             key={`${msg}-${i}`}
-            className="bg-white border border-rule shadow-card px-6 py-5 lg:px-7 lg:py-6 rounded-xl rounded-bl-sm shrink-0"
+            className="bg-surface-raised border border-rule shadow-card px-6 py-5 lg:px-7 lg:py-6 rounded-xl rounded-bl-sm shrink-0"
           >
             <p className="font-serif text-base lg:text-lg text-ink leading-relaxed italic" style={{ textWrap: "balance" }}>
               &ldquo;{msg}&rdquo;

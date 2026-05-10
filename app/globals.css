@@ -65,6 +65,49 @@
   --header-height: 72px;
 }
 
+/* ── Dark Theme Overrides ──
+   Activated by adding `class="dark"` on <html>. Every color token flips so any
+   component already using `bg-surface`, `text-ink`, `border-rule`, etc. inverts
+   without code changes. Palette is warm (mirrors the sand/serif feel) rather
+   than cold flat-grey — text stays an off-white tinted toward the original
+   sand-100 instead of pure #FFF, and hairlines/cards stay warm. */
+html.dark {
+  /* Sands invert to dim warm-greys (darkest → lightest, mirroring light scale) */
+  --color-sand-50: #0A0908;
+  --color-sand-100: #0F0E0C;
+  --color-sand-200: #161310;
+  --color-sand-300: #221E18;
+  --color-sand-400: #3D3530;
+  --color-sand-500: #5C5249;
+
+  /* Ink → warm off-whites (text hierarchy, darkest = most prominent) */
+  --color-ink: #F2EDE5;
+  --color-ink-light: #D6CFC4;
+  --color-ink-muted: #9C9388;
+  --color-ink-faint: #6B635A;
+
+  /* Hairlines become very faint warm grey */
+  --color-rule: #1F1B17;
+  --color-rule-light: #16130F;
+
+  /* Accent inverts: warm off-white plays the role black plays in light mode */
+  --color-accent: #F2EDE5;
+  --color-accent-dark: #FFFFFF;
+  --color-signal: #22C55E;
+
+  /* Surfaces — pure black base, subtle warm-grey elevation for cards */
+  --color-surface: #000000;
+  --color-surface-raised: #0F0E0C;
+  --color-surface-sunken: #050504;
+  --color-surface-dark: #F2EDE5;
+
+  /* Shadows have to be much deeper on dark; pure-black bleed plus a faint
+     warm rim-light to keep cards from feeling cut-out */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.5), 0 4px 14px rgba(0, 0, 0, 0.4);
+  --shadow-card-hover: 0 2px 10px rgba(0, 0, 0, 0.6), 0 12px 32px rgba(0, 0, 0, 0.5);
+  --shadow-nav: 0 1px 0 rgba(242, 237, 229, 0.06);
+}
+
 /* ── Base Styles ── */
 
 html {
@@ -78,11 +121,12 @@ body {
   color: var(--color-ink);
   background-color: var(--color-surface);
   line-height: 1.6;
+  transition: background-color 0.4s var(--ease-out-expo), color 0.4s var(--ease-out-expo);
 }
 
 ::selection {
   background-color: var(--color-accent);
-  color: white;
+  color: var(--color-surface);
 }
 
 /* ── Grid Background Pattern ── */

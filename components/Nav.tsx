@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
 import Logo from "./Logo";
 import Button from "./ui/Button";
+import ThemeToggle from "./ThemeToggle";
 import { NAV_LINKS } from "@/lib/constants";
 
 export default function Nav() {
@@ -69,6 +70,7 @@ export default function Nav() {
             <Button variant="primary" href="#contact" className="text-sm px-5 py-2.5">
               Get Started
             </Button>
+            <ThemeToggle />
           </div>
 
           {/* Spacer to keep nav layout balanced on mobile (button is rendered outside) */}
@@ -147,15 +149,16 @@ export default function Nav() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.35 }}
+                className="flex items-center gap-4 mt-4"
               >
                 <Button
                   variant="primary"
                   href="#contact"
-                  className="mt-4"
                   onClick={() => setMobileOpen(false)}
                 >
                   Get Started
                 </Button>
+                <ThemeToggle />
               </motion.div>
             </div>
           </motion.div>
