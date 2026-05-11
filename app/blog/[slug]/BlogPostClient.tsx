@@ -1,14 +1,60 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "motion/react";
 import { fadeUp, staggerContainer } from "@/lib/animations";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import Button from "@/components/ui/Button";
 import BlogCard from "@/components/ui/BlogCard";
+import BlogDiagram from "@/components/ui/BlogDiagram";
 import type { BlogPost } from "@/lib/constants";
 
+function Figure({
+  src,
+  alt,
+  caption,
+}: {
+  src: string;
+  alt: string;
+  caption?: string;
+}) {
+  return (
+    <figure className="my-12">
+      <div className="relative aspect-[1440/900] w-full border border-rule bg-surface-sunken overflow-hidden">
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          sizes="(min-width: 1024px) 768px, 100vw"
+          className="object-cover"
+        />
+      </div>
+      {caption && (
+        <figcaption className="mt-3 font-mono text-xs tracking-wide text-ink-faint">
+          {caption}
+        </figcaption>
+      )}
+    </figure>
+  );
+}
+
 function renderContent(block: string) {
+  // Figure \u2014 markdown image syntax: ![alt](src) or ![alt](src "caption")
+  if (block.startsWith("![")) {
+    const m = block.match(/^!\[([^\]]*)\]\(([^"\s)]+)(?:\s+"([^"]+)")?\)\s*$/);
+    if (m) {
+      const [, alt, src, caption] = m;
+      return <Figure src={src} alt={alt} caption={caption} />;
+    }
+  }
+
+  // Inline diagram \u2014 [DIAGRAM:name]
+  if (block.startsWith("[DIAGRAM:")) {
+    const m = block.match(/^\[DIAGRAM:([a-z0-9-]+)\]\s*$/);
+    if (m) return <BlogDiagram name={m[1]} />;
+  }
+
   // Headings
   if (block.startsWith("## ")) {
     return (
@@ -110,6 +156,29 @@ export default function BlogPostClient({
           </div>
         </section>
 
+        {/* Cover image — wider than the body column, sits between the
+            post hero and the article copy. Only rendered when the post
+            declares one. */}
+        {post.coverImage && (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            className="mx-auto max-w-5xl px-6 lg:px-8 mb-12 lg:mb-16"
+          >
+            <div className="relative aspect-[16/8] w-full overflow-hidden border border-rule bg-surface-raised">
+              <Image
+                src={post.coverImage.src}
+                alt={post.coverImage.alt}
+                fill
+                sizes="(min-width: 1024px) 1024px, 100vw"
+                className="object-cover"
+                priority
+              />
+            </div>
+          </motion.div>
+        )}
+
         {/* Hairline */}
         <div className="mx-auto max-w-3xl px-6 lg:px-8">
           <div className="hairline-bottom" />
@@ -130,14 +199,14 @@ export default function BlogPostClient({
           {/* Post CTA */}
           <div className="mt-16 border border-rule p-8 lg:p-10 bg-surface-sunken text-center">
             <h3 className="font-serif text-2xl text-ink mb-3">
-              Ready to replace your PDF catalog?
+              Ready to replace your PDF catalogue?
             </h3>
             <p className="text-sm text-ink-muted mb-6 max-w-md mx-auto">
-              Get a free 10-product demo built with your actual products. No
-              cost, no commitment.
+              We&apos;ll build a free demo with 5 of your products. No contracts,
+              no credit card required.
             </p>
             <Button variant="primary" href="/#contact">
-              Get Free Demo →
+              Get a free 5-product demo
             </Button>
           </div>
 

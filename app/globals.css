@@ -63,6 +63,15 @@
   /* ── Layout ── */
   --max-width: 1200px;
   --header-height: 72px;
+
+  /* ── Methodology orb (light defaults) ──
+     Small, softly blurred, no glow. The bright glowing puck reads as
+     "weird" on cream — a softer dot blends in while still being visible.
+     Dark mode overrides below restore the sharp glowing puck. */
+  --orb-size: 0.42rem;
+  --orb-blur: blur(0.9px);
+  --orb-shadow: none;
+  --orb-opacity: 0.7;
 }
 
 /* ── Dark Theme Overrides ──
@@ -90,9 +99,13 @@ html.dark {
   --color-ink-muted: #9C9388;
   --color-ink-faint: #A89E90;
 
-  /* Hairlines become very faint warm grey */
+  /* Hairlines become very faint warm grey. rule-light is the colour the
+     hero tile-grid uses; symmetric inversion lands at #16130F which is
+     invisible on black, and #292420 was still hard to read once the
+     cursor light-source mask drops the baseline to 12%. Bumped to a
+     mid-warm-grey that still reads as quiet on black. */
   --color-rule: #1F1B17;
-  --color-rule-light: #16130F;
+  --color-rule-light: #3D352D;
 
   /* Accent inverts: warm off-white plays the role black plays in light mode */
   --color-accent: #F2EDE5;
@@ -110,6 +123,12 @@ html.dark {
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.5), 0 4px 14px rgba(0, 0, 0, 0.4);
   --shadow-card-hover: 0 2px 10px rgba(0, 0, 0, 0.6), 0 12px 32px rgba(0, 0, 0, 0.5);
   --shadow-nav: 0 1px 0 rgba(242, 237, 229, 0.06);
+
+  /* Methodology orb — dark theme: sharp glowing puck. */
+  --orb-size: 0.625rem;
+  --orb-blur: none;
+  --orb-shadow: 0 0 14px var(--color-ink), 0 0 28px var(--color-ink);
+  --orb-opacity: 1;
 }
 
 /* ── Base Styles ── */
@@ -125,7 +144,40 @@ body {
   color: var(--color-ink);
   background-color: var(--color-surface);
   line-height: 1.6;
-  transition: background-color 0.4s var(--ease-out-expo), color 0.4s var(--ease-out-expo);
+  /* Tuned to overlap the page-wide ThemeWave overlay so the body slowly
+     dissolves between themes underneath the gradient sweep. */
+  transition: background-color 2.4s var(--ease-out-expo), color 2.4s var(--ease-out-expo);
+}
+
+/* Universal theme-toggle ripple. ThemeWave.tsx adds the
+   `data-theme-transition` attribute on <html> for a few seconds when
+   the dark class flips. Main + footer briefly bump and blur — a tiny
+   vertical lift, a tiny skewX so the wave reads as horizontal motion,
+   plus a short motion-blur for cinematic feel. Two staggered runs on
+   footer create the "wave passing through" rhythm. */
+@keyframes theme-ripple-main {
+  0%   { filter: blur(0);     transform: translateY(0)    skewX(0); }
+  18%  { filter: blur(1.4px); transform: translateY(-3px) skewX(0.35deg); }
+  55%  { filter: blur(0.7px); transform: translateY(1px)  skewX(-0.18deg); }
+  100% { filter: blur(0);     transform: translateY(0)    skewX(0); }
+}
+@keyframes theme-ripple-footer {
+  0%   { filter: blur(0);     transform: translateY(0)    skewX(0); }
+  10%  { filter: blur(0);     transform: translateY(0)    skewX(0); }
+  30%  { filter: blur(1.2px); transform: translateY(-2px) skewX(0.3deg); }
+  65%  { filter: blur(0.6px); transform: translateY(1px)  skewX(-0.15deg); }
+  100% { filter: blur(0);     transform: translateY(0)    skewX(0); }
+}
+html[data-theme-transition="active"] main {
+  animation: theme-ripple-main 2s cubic-bezier(0.3, 0, 0.2, 1) both;
+  /* Anchor the skew so the wave reads as a horizontal pass instead of a flop */
+  transform-origin: 50% 0;
+  will-change: transform, filter;
+}
+html[data-theme-transition="active"] body > footer {
+  animation: theme-ripple-footer 2.2s cubic-bezier(0.3, 0, 0.2, 1) 0.1s both;
+  transform-origin: 50% 0;
+  will-change: transform, filter;
 }
 
 ::selection {

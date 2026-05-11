@@ -3,22 +3,14 @@
 import { motion } from "motion/react";
 import { fadeUp, staggerContainer } from "@/lib/animations";
 import Button from "./ui/Button";
+import TileGrid from "./TileGrid";
 import { HERO } from "@/lib/constants";
 
 export default function Hero() {
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Grid — starts from top, fades out toward bottom, behind everything */}
-      <div
-        className="absolute inset-0 pointer-events-none -z-10"
-        style={{
-          backgroundImage:
-            "linear-gradient(var(--color-rule-light) 1px, transparent 1px), linear-gradient(90deg, var(--color-rule-light) 1px, transparent 1px)",
-          backgroundSize: "48px 48px",
-          maskImage: "linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.15) 50%, transparent 80%)",
-          WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.15) 50%, transparent 80%)",
-        }}
-      />
+      {/* Grid — flips tile-by-tile on theme change, fades out toward bottom */}
+      <TileGrid className="-z-10" />
 
       <div className="mx-auto w-full max-w-[var(--max-width)] px-6 lg:px-8 pt-[var(--header-height)]">
         {/* Centered content */}

@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { motion } from "motion/react";
 import { fadeUp, staggerContainer } from "@/lib/animations";
 import Button from "./ui/Button";
+import TileGrid from "./TileGrid";
 import { CONTACT } from "@/lib/constants";
 
 interface FormData {
@@ -90,12 +91,19 @@ export default function ContactForm() {
   }
 
   return (
-    <section id="contact" className="py-section-sm lg:py-section grid-bg relative">
-      <div className="mx-auto max-w-[var(--max-width)] px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20">
-          {/* Left — Copy */}
+    <section
+      id="contact"
+      className="relative py-section-sm lg:py-section overflow-hidden"
+    >
+      {/* Background — same tile-grid + cursor light source as the hero,
+          so the page bookends with the same texture. */}
+      <TileGrid className="-z-10" />
+      <div className="relative mx-auto max-w-[var(--max-width)] px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-start">
+          {/* Left — Copy. items-start on the grid + no self-center so the
+              headline's first line aligns with the form box's top edge. */}
           <motion.div
-            className="lg:col-span-5 lg:sticky lg:top-[calc(var(--header-height)+3rem)] lg:self-center"
+            className="lg:col-span-5"
             variants={staggerContainer}
             initial="hidden"
             whileInView="visible"
@@ -113,13 +121,6 @@ export default function ContactForm() {
               className="mt-8 text-base lg:text-lg text-ink-muted leading-relaxed max-w-md"
             >
               {CONTACT.subheading}
-            </motion.p>
-
-            <motion.p
-              variants={fadeUp}
-              className="mt-10 font-mono text-xs text-ink-faint tracking-wide leading-relaxed"
-            >
-              {CONTACT.footnote}
             </motion.p>
           </motion.div>
 

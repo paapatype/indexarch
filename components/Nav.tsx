@@ -41,8 +41,18 @@ export default function Nav() {
           className="mx-auto flex h-full max-w-[var(--max-width)] items-center justify-between px-6 lg:px-8"
           aria-label="Main navigation"
         >
-          {/* Logo */}
-          <Link href="/" className="relative z-10">
+          {/* Logo — clicks scroll to top when already on the home page,
+              otherwise navigate normally. */}
+          <Link
+            href="/"
+            className="relative z-10"
+            onClick={(e) => {
+              if (typeof window !== "undefined" && window.location.pathname === "/") {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }
+            }}
+          >
             <Logo className="h-5 w-auto text-ink" />
           </Link>
 

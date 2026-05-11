@@ -14,108 +14,108 @@ interface BlogCardProps {
   compact?: boolean;
 }
 
-// Topic-specific tile illustrations — same line-art language as the rest
-// of the site (low-opacity strokes at currentColor, subtle motion). The
-// tag drives which one appears; unknown tags fall back to the layered
-// shape so any new post still gets art.
+// Topic-specific tile illustrations. One clear idea per tag, dead simple
+// line-art at consistent stroke weight so a glance is enough to read it.
+//   Strategy  — line graph trending down (the cost of a bad catalogue)
+//   Case Study — PDF → arrow → search bar (the K&K transformation)
+//   Technical — cube on a phone, rotation arc (interactive 3D)
+//   Industry  — hex bolt + signal arcs (fasteners going digital)
 function BlogTileArt({ tag }: { tag: string }) {
   const t = tag.toLowerCase();
   const className =
-    "w-32 h-20 lg:w-40 lg:h-24 text-ink-faint transition-transform duration-500 group-hover:scale-105";
+    "w-36 h-22 lg:w-44 lg:h-26 text-ink-faint transition-transform duration-500 group-hover:scale-[1.04] group-hover:text-ink";
+  const stroke = "currentColor";
 
   if (t === "case study") {
-    // Stack of profile cross-sections — nods to K&K's WPC profiles
     return (
-      <svg viewBox="0 0 200 120" fill="none" stroke="currentColor" strokeWidth="0.7" className={className} aria-hidden="true">
-        {/* Fluted profile, slight tilt */}
-        <g transform="translate(28 72) rotate(-6)" opacity="0.55">
-          <rect x="0" y="0" width="120" height="14" />
-          <line x1="20" y1="0" x2="20" y2="14" />
-          <line x1="40" y1="0" x2="40" y2="14" />
-          <line x1="60" y1="0" x2="60" y2="14" />
-          <line x1="80" y1="0" x2="80" y2="14" />
-          <line x1="100" y1="0" x2="100" y2="14" />
-        </g>
-        {/* Hollow box profile */}
-        <g transform="translate(36 50)" opacity="0.7">
-          <rect x="0" y="0" width="80" height="18" />
-          <rect x="6" y="4" width="32" height="10" opacity="0.5" />
-          <rect x="42" y="4" width="32" height="10" opacity="0.5" />
-        </g>
-        {/* C-channel */}
-        <g transform="translate(54 24)" opacity="0.55">
-          <path d="M0 0 L0 14 L40 14 L40 0 M6 0 L6 8 L34 8 L34 0" />
-        </g>
-        {/* Top index marker */}
-        <g opacity="0.4">
-          <line x1="20" y1="14" x2="180" y2="14" strokeWidth="0.4" />
-          <line x1="20" y1="14" x2="20" y2="10" strokeWidth="0.4" />
-          <line x1="180" y1="14" x2="180" y2="10" strokeWidth="0.4" />
-        </g>
+      <svg viewBox="0 0 200 120" fill="none" stroke={stroke} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+        {/* PDF on the left */}
+        <rect x="34" y="38" width="34" height="44" />
+        <line x1="42" y1="50" x2="60" y2="50" strokeWidth="0.7" opacity="0.55" />
+        <line x1="42" y1="56" x2="58" y2="56" strokeWidth="0.7" opacity="0.55" />
+        <line x1="42" y1="62" x2="60" y2="62" strokeWidth="0.7" opacity="0.55" />
+        <line x1="42" y1="68" x2="54" y2="68" strokeWidth="0.7" opacity="0.55" />
+        {/* dog ear */}
+        <path d="M62 38 L68 44 L62 44 Z" strokeWidth="0.9" opacity="0.7" />
+        {/* arrow */}
+        <line x1="78" y1="60" x2="100" y2="60" />
+        <polyline points="94,55 100,60 94,65" />
+        {/* Search bar on the right */}
+        <rect x="108" y="50" width="60" height="14" rx="7" />
+        <circle cx="116" cy="57" r="2.6" strokeWidth="0.9" />
+        <line x1="118" y1="59" x2="121" y2="62" strokeWidth="0.9" />
+        <line x1="126" y1="57" x2="158" y2="57" strokeWidth="0.7" opacity="0.45" />
+        {/* filter chips below the bar */}
+        <rect x="108" y="70" width="14" height="6" rx="3" strokeWidth="0.7" opacity="0.55" />
+        <rect x="126" y="70" width="14" height="6" rx="3" strokeWidth="0.7" opacity="0.55" />
+        <rect x="144" y="70" width="14" height="6" rx="3" strokeWidth="0.7" opacity="0.55" />
       </svg>
     );
   }
 
   if (t === "technical") {
-    // Wireframe cube — slowly rotating, suggests interactive 3D
     return (
-      <svg viewBox="0 0 200 120" fill="none" stroke="currentColor" strokeWidth="0.6" className={className} aria-hidden="true">
-        <motion.g
-          style={{ transformOrigin: "100px 60px" }}
-          animate={{ rotate: [0, 360] }}
-          transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
-        >
-          {/* Front face */}
-          <rect x="68" y="38" width="48" height="48" opacity="0.55" />
-          {/* Back face (offset) */}
-          <rect x="86" y="24" width="48" height="48" opacity="0.4" />
-          {/* Connecting edges */}
-          <line x1="68" y1="38" x2="86" y2="24" opacity="0.4" />
-          <line x1="116" y1="38" x2="134" y2="24" opacity="0.4" />
-          <line x1="68" y1="86" x2="86" y2="72" opacity="0.4" />
-          <line x1="116" y1="86" x2="134" y2="72" opacity="0.4" />
-        </motion.g>
-        {/* Spec annotations — static */}
-        <g opacity="0.35">
-          <line x1="42" y1="32" x2="58" y2="32" />
-          <line x1="42" y1="32" x2="42" y2="28" />
-          <line x1="42" y1="32" x2="46" y2="34" />
-          <line x1="146" y1="92" x2="160" y2="92" />
-          <line x1="160" y1="92" x2="160" y2="88" />
-          <line x1="160" y1="92" x2="156" y2="94" />
-        </g>
+      <svg viewBox="0 0 200 120" fill="none" stroke={stroke} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+        {/* Phone frame */}
+        <rect x="62" y="20" width="76" height="84" rx="6" />
+        <line x1="92" y1="26" x2="108" y2="26" strokeWidth="0.7" opacity="0.55" />
+        {/* Screen inset */}
+        <rect x="68" y="32" width="64" height="62" strokeWidth="0.7" opacity="0.4" />
+        {/* 3D cube on screen */}
+        <polygon points="86,52 100,44 114,52 114,70 100,78 86,70" strokeWidth="0.9" />
+        <line x1="86" y1="52" x2="100" y2="60" strokeWidth="0.7" opacity="0.5" />
+        <line x1="114" y1="52" x2="100" y2="60" strokeWidth="0.7" opacity="0.5" />
+        <line x1="100" y1="60" x2="100" y2="78" strokeWidth="0.7" opacity="0.5" />
+        {/* Rotation arc with arrow */}
+        <path d="M122 88 Q140 88 144 70" strokeWidth="0.9" opacity="0.75" />
+        <polyline points="139,75 144,70 148,75" strokeWidth="0.9" opacity="0.75" />
       </svg>
     );
   }
 
-  // Default + "strategy" — stack of PDF pages (the cost of static catalogues)
+  if (t === "industry") {
+    return (
+      <svg viewBox="0 0 200 120" fill="none" stroke={stroke} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+        {/* Hex bolt head */}
+        <polygon points="50,42 66,32 82,42 82,62 66,72 50,62" strokeWidth="1.1" />
+        <circle cx="66" cy="52" r="4" strokeWidth="0.7" opacity="0.5" />
+        {/* Threaded shaft */}
+        <line x1="66" y1="72" x2="66" y2="100" strokeWidth="1.1" />
+        <line x1="60" y1="78" x2="72" y2="78" strokeWidth="0.7" opacity="0.5" />
+        <line x1="60" y1="84" x2="72" y2="84" strokeWidth="0.7" opacity="0.5" />
+        <line x1="60" y1="90" x2="72" y2="90" strokeWidth="0.7" opacity="0.5" />
+        <line x1="60" y1="96" x2="72" y2="96" strokeWidth="0.7" opacity="0.5" />
+        {/* Wireless signal arcs on the right */}
+        <circle cx="118" cy="80" r="1.6" fill={stroke} />
+        <path d="M118 70 Q132 70 138 56" strokeWidth="0.9" opacity="0.85" />
+        <path d="M118 60 Q142 60 152 38" strokeWidth="0.9" opacity="0.6" />
+        <path d="M118 50 Q150 50 164 22" strokeWidth="0.9" opacity="0.4" />
+        {/* Subtle dashed gap between bolt and signal */}
+        <line x1="86" y1="58" x2="116" y2="76" strokeDasharray="2 3" strokeWidth="0.7" opacity="0.4" />
+      </svg>
+    );
+  }
+
+  // Default + "strategy" — line graph trending down
   return (
-    <svg viewBox="0 0 200 120" fill="none" stroke="currentColor" strokeWidth="0.7" className={className} aria-hidden="true">
-      {/* Back pages, fanned */}
-      <g transform="translate(56 24) rotate(-6)" opacity="0.4">
-        <rect x="0" y="0" width="56" height="74" />
-        <line x1="6" y1="10" x2="44" y2="10" strokeWidth="0.4" />
-        <line x1="6" y1="14" x2="40" y2="14" strokeWidth="0.4" />
-        <line x1="6" y1="18" x2="46" y2="18" strokeWidth="0.4" />
-      </g>
-      <g transform="translate(64 22) rotate(-2)" opacity="0.55">
-        <rect x="0" y="0" width="56" height="74" fill="currentColor" fillOpacity="0.04" />
-        <line x1="6" y1="10" x2="44" y2="10" strokeWidth="0.4" />
-        <line x1="6" y1="14" x2="40" y2="14" strokeWidth="0.4" />
-        <line x1="6" y1="18" x2="46" y2="18" strokeWidth="0.4" />
-      </g>
-      {/* Top page */}
-      <g transform="translate(72 20)" opacity="0.85">
-        <rect x="0" y="0" width="56" height="74" fill="currentColor" fillOpacity="0.05" />
-        <rect x="6" y="6" width="14" height="4" strokeWidth="0.4" opacity="0.6" />
-        <line x1="6" y1="16" x2="48" y2="16" strokeWidth="0.4" />
-        <line x1="6" y1="20" x2="44" y2="20" strokeWidth="0.4" />
-        <line x1="6" y1="24" x2="46" y2="24" strokeWidth="0.4" />
-        <rect x="6" y="30" width="44" height="14" strokeWidth="0.35" opacity="0.4" />
-        <line x1="6" y1="50" x2="48" y2="50" strokeWidth="0.4" opacity="0.6" />
-        <line x1="6" y1="54" x2="42" y2="54" strokeWidth="0.4" opacity="0.6" />
-        <line x1="6" y1="58" x2="46" y2="58" strokeWidth="0.4" opacity="0.6" />
-      </g>
+    <svg viewBox="0 0 200 120" fill="none" stroke={stroke} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
+      {/* axis */}
+      <line x1="40" y1="32" x2="40" y2="92" strokeWidth="0.7" opacity="0.4" />
+      <line x1="40" y1="92" x2="170" y2="92" strokeWidth="0.7" opacity="0.4" />
+      {/* y-axis tick marks */}
+      <line x1="38" y1="48" x2="40" y2="48" strokeWidth="0.6" opacity="0.4" />
+      <line x1="38" y1="64" x2="40" y2="64" strokeWidth="0.6" opacity="0.4" />
+      <line x1="38" y1="80" x2="40" y2="80" strokeWidth="0.6" opacity="0.4" />
+      {/* downward data line */}
+      <polyline points="50,42 78,52 106,62 134,76 162,88" strokeWidth="1.2" />
+      <circle cx="50" cy="42" r="1.8" fill={stroke} />
+      <circle cx="78" cy="52" r="1.8" fill={stroke} opacity="0.85" />
+      <circle cx="106" cy="62" r="1.8" fill={stroke} opacity="0.7" />
+      <circle cx="134" cy="76" r="1.8" fill={stroke} opacity="0.55" />
+      <circle cx="162" cy="88" r="1.8" fill={stroke} opacity="0.4" />
+      {/* down arrow at the trailing point */}
+      <line x1="162" y1="88" x2="172" y2="100" strokeWidth="1" opacity="0.7" />
+      <polyline points="167,98 172,100 170,95" strokeWidth="1" opacity="0.7" />
     </svg>
   );
 }

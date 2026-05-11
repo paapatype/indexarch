@@ -54,9 +54,10 @@ export const PROBLEM = {
 // ── Solution Section ──
 
 export const SOLUTION = {
-  heading: "What your 3D catalog does",
+  eyebrow: "What it does",
+  heading: "Your sales engine, not just a catalogue.",
   subheading:
-    "Everything your PDF can't. Interactive, filterable, and built for how engineers actually buy.",
+    "Built for how engineers and architects actually buy — search, compare, and submit a pre-qualified order without ever opening a PDF.",
   cards: [
     {
       title: "Smart Filtering",
@@ -108,9 +109,17 @@ export const IMPACT = {
 
 export const METHODOLOGY = {
   eyebrow: "How it works",
-  heading: "We don't replace your catalogue. We unpack it.",
-  subtitle:
-    "Every catalogue already contains the structure a buyer needs — quality tiers, technical specs, the visual cues people match against a brief. The PDF buries them. We pull them to the surface.",
+  // Two structural lines — the period anchors the line break.
+  headingLines: [
+    "We don't replace your catalogue.",
+    "We unpack it.",
+  ],
+  // Three structural lines, last one stands alone for emphasis.
+  subtitleLines: [
+    "Every catalogue already contains the structure a buyer needs — quality tiers, technical specs, the visual cues people match against a brief.",
+    "The PDF buries them.",
+    "We pull them to the surface.",
+  ],
   beats: [
     {
       number: "01",
@@ -148,7 +157,9 @@ export const BEFORE_AFTER = {
   beforeLabel: "What they sent us",
   beforeMeta: "PDF · 4 pages · 55 profiles",
   afterLabel: "What we shipped",
-  afterMeta: "Web · filterable · order-ready",
+  afterMeta: "filterable · order-ready",
+  afterCaption:
+    "An interactive catalogue we built for Kayu & Kov — 55 profiles, filtered by section type, dimension, and rate. Try it out below.",
   cta: { label: "Read the full story →", href: "/blog/kayu-kov-cut-architect-emails" },
 } as const;
 
@@ -297,9 +308,9 @@ export const FAQ = {
         "Absolutely. Every catalog is fully responsive and optimized for mobile, tablet, and desktop. Over 60% of B2B product searches now happen on mobile—your catalog will be ready.",
     },
     {
-      question: "What about the free 10-product demo?",
+      question: "What about the free 5-product demo?",
       answer:
-        "We build a fully functional demo with 10 of your products at no cost. You get to see exactly how your catalog will look and work before committing. No contracts, no obligations. If you love it, we scale it up.",
+        "We build a fully functional demo with 5 of your products at no cost. You get to see exactly how your catalogue will look and work before committing. No contracts, no obligations. If you love it, we scale it up.",
     },
   ],
 } as const;
@@ -309,10 +320,8 @@ export const FAQ = {
 export const CONTACT = {
   heading: "Stop losing deals to messy PDFs.",
   subheading:
-    "Get a free 10-product demo of your catalog. See the difference before you commit.",
-  submitLabel: "Get Free Demo →",
-  footnote:
-    "Free demo includes 10 products from your catalog. No contracts. No credit card required.",
+    "The free demo includes 5 products from your catalogue. No contracts, no credit card required.",
+  submitLabel: "Get a free 5-product demo",
   productOptions: ["1–50", "51–200", "201–500", "500+", "Other"],
   industryOptions: [
     "Fasteners",
@@ -337,6 +346,11 @@ export interface BlogPost {
     initials: string;
     bio: string;
   };
+  /** Optional hero illustration shown between the post header and body. */
+  coverImage?: {
+    src: string;
+    alt: string;
+  };
   content: string[];
 }
 
@@ -352,7 +366,7 @@ export const BLOG_POSTS: BlogPost[] = [
     author: {
       name: "Sankalp Shetty",
       initials: "SS",
-      bio: "Founder at Index Studio. Helping manufacturers turn static catalogs into interactive sales tools. Previously at Tata Digital and McKinsey.",
+      bio: "Founder of IndexArch. Helping manufacturers turn static catalogues into interactive sales tools.",
     },
     content: [
       `Here's a number that should concern every B2B manufacturer: **86% of B2B purchases stall** when buyers can't easily find the product information they need. And if your primary sales tool is a 200-page PDF catalog, you're almost certainly losing deals you don't even know about.`,
@@ -398,29 +412,42 @@ export const BLOG_POSTS: BlogPost[] = [
     author: {
       name: "Sankalp Shetty",
       initials: "SS",
-      bio: "Founder at Index Studio. Helping manufacturers turn static catalogues into interactive sales tools. Previously at Tata Digital and McKinsey.",
+      bio: "Founder of IndexArch. Helping manufacturers turn static catalogues into interactive sales tools.",
     },
     content: [
       `Kayu & Kov makes WPC — wood-plastic composite — profiles out of Bangalore. Fluted profiles, hollow boxes, sheet profiles, louvers, door frames. Their customers are architects and contractors who specify these into projects across India.`,
       `They came to us with a 4-page PDF catalogue listing 55 profiles, and a simple ask: redesign the PDF so it looks better and is easier to read.`,
+      `![The Kayu & Kov listed-price PDF — 55 profiles, four pages of dense tables, exactly as it landed in our inbox.](/kayu-kov/page-1.png "The catalogue they sent us. 55 profiles, four pages of tables.")`,
       `We didn't redesign the PDF.`,
       `## The conversation we had instead`,
-      `Looking at the catalogue, the problem wasn't that it looked bad. It looked fine — clean tables, 2D dimensions, 3D renderings, codes, rates per RFT. The problem was that this is how architects were expected to use it: open the PDF, scroll through 55 rows, find a profile that fits the section type, dimension, and rate they need, then email the sales team to confirm availability.`,
-      `For 55 profiles across 4 pages, this is roughly the worst possible interaction. Too many products to remember by name; too few categories to navigate by intuition; and every spec hidden inside a row that has to be read top-to-bottom before you know whether it's even relevant.`,
+      `Looking at the catalogue, the problem wasn't that it looked bad. It looked fine — clean tables, 2D dimensions, 3D renderings, codes, rates per RFT. The problem was *how* architects were expected to use it: open the PDF, scroll through 55 rows, find a profile that fits the section type, dimension, and rate they need, then email the sales team to confirm availability.`,
+      `For 55 profiles across four pages, this is roughly the worst possible interaction. Too many products to remember by name; too few categories to navigate by intuition; and every spec hidden inside a row that has to be read top-to-bottom before you know whether it's even relevant.`,
+      `[DIAGRAM:pdf-vs-tile]`,
       `So we made the case for replacing the PDF entirely.`,
       `## What an architect actually needs`,
-      `Architects don't shop a catalogue the way a consumer shops a website. They come in with a brief — "I need a fluted profile around 145mm wide, ideally under ₹400 per RFT, with a 3D rendering I can drop into my visualisation." The job of a catalogue, for that user, is to let them filter to the matching profiles in seconds and see the visual identifier they need.`,
+      `Architects don't shop a catalogue the way a consumer shops a website. They come in with a brief — *"I need a fluted profile around 145mm wide, ideally under ₹400 per RFT, with a 3D rendering I can drop into my visualisation."* The job of a catalogue, for that user, is to let them filter to the matching profiles in seconds and see the visual identifier they need.`,
+      `[DIAGRAM:brief-to-order]`,
       `A PDF can't do that. A website can. So we built one.`,
       `## What we shipped`,
-      `In 4 weeks, Kayu & Kov got a live web catalogue covering all 55 profiles, with:`,
-      `- **Filter by section type** — sheets, hollow boxes, fluted profiles, louvers, door frames, rods, channels.
-- **Filter by dimension and rate** — narrow to "under ₹200, sheets above 100mm" in one click.
-- **Search by product code or description** — for the architects who already know what they're looking for.
-- **3D renderings on every product** — the same renderings from the PDF, but presented at a size where they're actually useful.
-- **One-click order request** — pre-fills product code, description, and rate. The sales team gets an email with everything they need to quote.`,
-      `It works on mobile, tablet, and desktop, because architects do half their spec work on phones in site meetings.`,
+      `In four weeks, Kayu & Kov got a live web catalogue covering all 55 profiles. Same brand. Same renderings. New shape.`,
+      `![The Kayu & Kov catalogue homepage — filter chips for each section type, a search bar, and the 55 profiles in a grid below.](/kayu-kov/shots/01-overview.png "All 55 profiles, browsable in seconds. Filter chips across the top, product grid below.")`,
+      `Three moves did most of the work:`,
+      `- **Filter by section type** — sheets, hollow boxes, fluted profiles, louvers, door frames, rods, channels — as one-click chips along the top.
+- **Search by code, dimension, or description** — for the architects who already know what they're looking for.
+- **One-tap order on every card** — the sales team gets an email with product code, dimension, and rate pre-filled.`,
+      `### Search resolves a dimension instantly`,
+      `Architects often arrive with a number — "I need something around 145mm wide". Typing that into the search bar narrows 55 profiles down to the one that matches. No scrolling, no cross-referencing.`,
+      `![The catalogue with "145 x 18" typed into the search bar — 55 profiles narrowed down to a single Fluted Profile-3 result.](/kayu-kov/shots/03-search.png "Type a dimension; the catalogue resolves to a single profile.")`,
+      `### Filters cut 55 down to the family you care about`,
+      `For architects who don't have a specific number in mind yet — "show me what hollow boxes are available" — the filter chips do the same job categorically.`,
+      `![The catalogue with a category filter active, showing only profiles from one section family.](/kayu-kov/shots/04-filter.png "One chip narrows the grid to a single section type.")`,
+      `### Every card opens to a useful spec page`,
+      `When the architect has a candidate, tapping any card opens a full-size spec view: the 3D rendering at scale, full dimensions, code, rate, and the one-click order button. None of these existed in the PDF.`,
+      `![A product detail view showing a single profile at scale, with dimensions and the order button.](/kayu-kov/shots/05-detail.png "Tap any profile to see it at scale, with the order button right there.")`,
+      `Everything works on mobile too, because architects do half their spec work on phones in site meetings.`,
       `## The takeaway`,
-      `The right answer to "redesign our PDF" wasn't a prettier PDF. It was a different shape of object entirely — one that matches how the customer actually uses the information. A catalogue isn't content to be read; it's a search problem to be solved. Once you see it that way, the redesign brief writes itself.`,
+      `The right answer to "redesign our PDF" wasn't a prettier PDF. It was a different shape of object entirely — one that matches how the customer actually uses the information.`,
+      `A catalogue isn't content to be read; it's a search problem to be solved. Once you see it that way, the redesign brief writes itself.`,
       `If you have a catalogue that's drowning your team in spec emails, that's the conversation we'd want to have with you too.`,
     ],
   },
@@ -435,7 +462,7 @@ export const BLOG_POSTS: BlogPost[] = [
     author: {
       name: "Sankalp Shetty",
       initials: "SS",
-      bio: "Founder at Index Studio. Helping manufacturers turn static catalogs into interactive sales tools. Previously at Tata Digital and McKinsey.",
+      bio: "Founder of IndexArch. Helping manufacturers turn static catalogues into interactive sales tools.",
     },
     content: [
       `The phrase "3D product catalog" gets thrown around a lot in manufacturing circles. But there's a massive gap between a spinning 3D model on a webpage and a catalog that actually helps engineers find products, compare specs, and place orders.`,
@@ -464,10 +491,16 @@ export const BLOG_POSTS: BlogPost[] = [
       "Why fastener manufacturers are losing export deals to competitors with better digital catalogs.",
     readTime: "7 min read",
     date: "Jan 5, 2026",
+    // coverImage is intentionally omitted until the hero illustration
+    // file lands at public/blog/fastener-hero.png — uncomment then.
+    // coverImage: {
+    //   src: "/blog/fastener-hero.png",
+    //   alt: "A 3D bolt linking continents on a world map, alongside a browser frame showing a fastener product page with ISO/DIN/ANSI standards badges and search, compare, download, and 3D viewer actions.",
+    // },
     author: {
       name: "Sankalp Shetty",
       initials: "SS",
-      bio: "Founder at Index Studio. Helping manufacturers turn static catalogs into interactive sales tools. Previously at Tata Digital and McKinsey.",
+      bio: "Founder of IndexArch. Helping manufacturers turn static catalogues into interactive sales tools.",
     },
     content: [
       `India is the world's third-largest fastener producer. We manufacture everything from standard hex bolts to aerospace-grade specialty fasteners. But when it comes to how we present these products to international buyers, we're stuck in the 1990s.`,
@@ -503,5 +536,5 @@ export const FOOTER = {
     phone: "+91 98765 43210",
     location: "Mumbai, India",
   },
-  copyright: "© 2026 Index Studio. All rights reserved. Built with care in India.",
+  copyright: "© 2026 IndexArch. All rights reserved. Built with care in India.",
 } as const;

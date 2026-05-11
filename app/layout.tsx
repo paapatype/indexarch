@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Libre_Baskerville, DM_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import ThemeWave from "@/components/ThemeWave";
 
 const libreBaskerville = Libre_Baskerville({
   subsets: ["latin"],
@@ -72,7 +73,10 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <ThemeWave />
+        {children}
+      </body>
     </html>
   );
 }

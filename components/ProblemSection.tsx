@@ -238,11 +238,11 @@ function LostBuyerCardInteractive({ card }: { card: { title: string; description
       onMouseLeave={() => setHovered(false)}
       onMouseMove={handleMouseMove}
     >
-      {/* Icon — visible when not hovered */}
-      <div
-        className="h-14 w-14 shrink-0 text-ink-faint mb-6 transition-opacity duration-300"
-        style={{ opacity: hovered ? 0 : 1 }}
-      >
+      {/* Static icon — stays visible on hover too; the cursor-following
+          lens just overlays on top. Previously this faded to opacity 0,
+          which combined with theme-blind hardcoded colours on the lens
+          handle/ring made the whole structure disappear on dark mode. */}
+      <div className="h-14 w-14 shrink-0 text-ink-faint mb-6">
         <MagnifyingGlassIcon />
       </div>
 
@@ -263,35 +263,42 @@ function LostBuyerCardInteractive({ card }: { card: { title: string; description
             zIndex: 20,
           }}
         >
-          {/* Blur lens — the circle with backdrop blur */}
+          {/* Blur lens — circle with backdrop blur. Border rides
+              currentColor (text-ink-faint on the wrapper) so it adapts
+              to theme: dark warm-grey on cream, warm off-white on black. */}
           <div
+            className="text-ink-muted"
             style={{
               width: lensRadius * 2,
               height: lensRadius * 2,
               borderRadius: "50%",
               backdropFilter: "blur(5px)",
               WebkitBackdropFilter: "blur(5px)",
-              border: "1.5px solid rgba(26,26,26,0.18)",
-              background: "rgba(255,255,255,0.04)",
-              boxShadow: "0 0 0 0.5px rgba(26,26,26,0.06), inset 0 0 8px rgba(255,255,255,0.1)",
+              border: "1.5px solid currentColor",
+              background: "transparent",
+              boxShadow: "inset 0 0 8px rgba(255,255,255,0.08)",
             }}
           />
-          {/* Handle — starts at the edge of the circle, extends outward */}
+          {/* Handle — starts at the edge of the circle, extends outward.
+              currentColor so it reads in both themes. */}
           <div
+            className="text-ink-muted"
             style={{
               position: "absolute",
               left: lensRadius + lensRadius * 0.7,
               top: lensRadius + lensRadius * 0.7,
               width: lensRadius * 0.9,
-              height: 2,
-              background: "rgba(26,26,26,0.22)",
+              height: 2.5,
+              background: "currentColor",
               borderRadius: 2,
               transform: "rotate(45deg)",
               transformOrigin: "0 0",
+              opacity: 0.75,
             }}
           />
           {/* Inner ring detail */}
           <div
+            className="text-ink-faint"
             style={{
               position: "absolute",
               left: 3,
@@ -299,7 +306,8 @@ function LostBuyerCardInteractive({ card }: { card: { title: string; description
               width: lensRadius * 2 - 6,
               height: lensRadius * 2 - 6,
               borderRadius: "50%",
-              border: "0.5px solid rgba(26,26,26,0.06)",
+              border: "0.5px solid currentColor",
+              opacity: 0.5,
             }}
           />
         </div>
