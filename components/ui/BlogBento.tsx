@@ -749,20 +749,20 @@ const InquiriesIllustration = () => (
       <line className="anim-inquiry-form-field anim-inquiry-form-field-5" x1="113" y1="98" x2="190" y2="98" />
 
       {/* ── Submit-confirmation cell ──
-          A dedicated bordered box for the checkmark at the bottom-
-          right of the form. 6-unit padding above (from field 5 at
-          y=98), 6-unit right margin (right edge at x=226 vs form
-          edge at x=232), 6-unit bottom margin (bottom at y=118 vs
-          form bottom at y=124). Box stroke held at a quiet opacity
-          so the cell feels "ready to be filled" rather than loud. */}
-      <rect x="198" y="104" width="28" height="14" opacity="0.55" />
+          Square (18×18) bordered box for the checkmark at the bottom-
+          right of the form. Square proportions mean the tick can sit
+          centred without looking awkward in a wide rectangle. The
+          right edge has an 8-unit margin from the form edge (form at
+          x=232, box right at x=224); the bottom edge has a 4-unit
+          margin (form bottom at y=124, box bottom at y=120). */}
+      <rect x="206" y="102" width="18" height="18" opacity="0.55" />
 
-      {/* Checkmark — centred inside the cell (cell centre ≈ (212, 111)).
-          Path length ≈ 16.5, so stroke-dasharray:17 in the CSS draws
-          the whole stroke cleanly to dashoffset 0. */}
+      {/* Checkmark — sits centred inside the square cell (centre
+          ≈ (215, 111)). Path length ≈ 12.7, so stroke-dasharray:13 in
+          the CSS draws the whole stroke cleanly to dashoffset 0. */}
       <polyline
         className="anim-inquiry-check"
-        points="205,110 210,113 218,106"
+        points="211,112 214,115 220,108"
         strokeWidth="1.6"
       />
     </g>

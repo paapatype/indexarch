@@ -151,62 +151,243 @@ const DIAGRAMS: Record<string, { caption: string; svg: React.ReactElement }> = {
   },
 
   // Architect's mental flow: brief → filter → order.
+  // Eight-second editorial animation driven entirely by CSS keyframes
+  // scoped to `blog-diagram-bto` in globals.css. The story:
+  //   brief requirement lines draw in → indexing packet travels to the
+  //   filter interface → filter chips activate one by one → the ribbed
+  //   WPC profile card resolves as the match (corner brackets + non-
+  //   matches dim) → selected packet travels to the order card →
+  //   product row populates → form fields draw in → submit-confirmation
+  //   tick draws inside its badge → hold → reset → loop.
   "brief-to-order": {
     caption:
       "How an architect actually uses the catalogue: come in with a brief, narrow to a match, send the order.",
     svg: (
-      <svg viewBox="0 0 480 200" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="w-full h-auto max-h-[260px]">
-        {/* STEP 1 — Brief: speech bubble with text lines */}
-        <g transform="translate(20 50)">
-          <path d="M0 16 Q0 4 12 4 L100 4 Q112 4 112 16 L112 56 Q112 68 100 68 L24 68 L14 80 L18 68 L12 68 Q0 68 0 56 Z" strokeWidth="1.1" />
-          <line x1="12" y1="22" x2="100" y2="22" strokeWidth="0.7" opacity="0.6" />
-          <line x1="12" y1="32" x2="92" y2="32" strokeWidth="0.7" opacity="0.6" />
-          <line x1="12" y1="42" x2="98" y2="42" strokeWidth="0.7" opacity="0.6" />
-          <line x1="12" y1="52" x2="80" y2="52" strokeWidth="0.7" opacity="0.6" />
-          <text x="56" y="98" fontSize="8" fontFamily="ui-monospace, monospace" fill="currentColor" textAnchor="middle">01 · BRIEF</text>
+      <svg
+        viewBox="0 0 480 200"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="w-full h-auto max-h-[260px] blog-diagram-bto"
+      >
+        {/* ── STAGE 1: BRIEF — speech-bubble card ── */}
+        <path
+          className="bto-brief-card"
+          d="M16,40 L124,40 Q130,40 130,46 L130,108 Q130,114 124,114 L34,114 L24,124 L26,114 L16,114 Q10,114 10,108 L10,46 Q10,40 16,40 Z"
+          strokeWidth="1.1"
+        />
+        {/* Header (always visible — quiet) */}
+        <line x1="20" y1="50" x2="58" y2="50" strokeWidth="1" opacity="0.65" />
+        <line x1="20" y1="54" x2="42" y2="54" strokeWidth="0.5" opacity="0.4" />
+        {/* Requirement lines — stagger draw-in via stroke-dashoffset */}
+        <line className="bto-brief-line bto-brief-line-1" x1="20" y1="66" x2="120" y2="66" />
+        <line className="bto-brief-line bto-brief-line-2" x1="20" y1="74" x2="108" y2="74" />
+        <line className="bto-brief-line bto-brief-line-3" x1="20" y1="82" x2="115" y2="82" />
+        {/* Requirement chips (size / finish / profile) */}
+        <rect className="bto-brief-chip bto-brief-chip-1" x="20" y="94" width="22" height="9" rx="2" />
+        <rect className="bto-brief-chip bto-brief-chip-2" x="46" y="94" width="28" height="9" rx="2" />
+        <rect className="bto-brief-chip bto-brief-chip-3" x="78" y="94" width="32" height="9" rx="2" />
+
+        {/* ── Connector 1: brief → filter ── */}
+        <line
+          className="bto-connector bto-connector-1"
+          x1="140"
+          y1="78"
+          x2="160"
+          y2="78"
+          strokeWidth="0.7"
+          strokeDasharray="3 2"
+        />
+        {/* Packet 1 — small dot moving from brief to filter */}
+        <circle
+          className="bto-packet bto-packet-1"
+          cx="0"
+          cy="0"
+          r="2"
+          fill="currentColor"
+        />
+
+        {/* ── STAGE 2: FILTER — catalogue interface ── */}
+        <rect
+          className="bto-filter-card"
+          x="162"
+          y="40"
+          width="158"
+          height="74"
+          strokeWidth="1.1"
+        />
+
+        {/* Filter chips row */}
+        <rect x="168" y="46" width="28" height="9" rx="2" strokeWidth="0.7" opacity="0.65" />
+        <rect className="bto-filter-chip-active bto-filter-chip-1" x="168" y="46" width="28" height="9" rx="2" />
+
+        <rect x="200" y="46" width="28" height="9" rx="2" strokeWidth="0.7" opacity="0.65" />
+        <rect className="bto-filter-chip-active bto-filter-chip-2" x="200" y="46" width="28" height="9" rx="2" />
+
+        <rect x="232" y="46" width="28" height="9" rx="2" strokeWidth="0.7" opacity="0.65" />
+        <rect className="bto-filter-chip-active bto-filter-chip-3" x="232" y="46" width="28" height="9" rx="2" />
+
+        <rect x="264" y="46" width="28" height="9" rx="2" strokeWidth="0.7" opacity="0.65" />
+        <rect className="bto-filter-chip-active bto-filter-chip-4" x="264" y="46" width="28" height="9" rx="2" />
+
+        {/* Profile cards — 2×2 grid */}
+        {/* Card 1 (top-left) — fluted */}
+        <g className="bto-card bto-card-1">
+          <rect x="168" y="60" width="70" height="22" strokeWidth="0.85" />
+          <polyline
+            points="178,78 178,66 180,66 180,68 182,66 184,68 186,66 188,68 190,66 192,68 194,66 196,68 198,66 200,68 202,66 204,68 206,66 208,68 210,66 212,68 214,66 216,68 218,66 220,68 222,66 224,68 226,66 226,78 178,78"
+            strokeWidth="0.5"
+            opacity="0.6"
+          />
+        </g>
+        {/* Card 2 (top-right) — hollow box */}
+        <g className="bto-card bto-card-2">
+          <rect x="244" y="60" width="70" height="22" strokeWidth="0.85" />
+          <rect x="265" y="64" width="28" height="14" strokeWidth="0.6" opacity="0.65" />
+          <rect x="270" y="68" width="18" height="6" strokeWidth="0.45" opacity="0.45" />
+        </g>
+        {/* Card 3 (bottom-left) — RIBBED (the match) */}
+        <g className="bto-card-match">
+          <rect x="168" y="86" width="70" height="22" strokeWidth="0.85" />
+          <rect x="176" y="90" width="54" height="14" strokeWidth="0.6" opacity="0.8" />
+          <line x1="180" y1="92" x2="180" y2="102" strokeWidth="0.4" opacity="0.55" />
+          <line x1="184" y1="92" x2="184" y2="102" strokeWidth="0.4" opacity="0.55" />
+          <line x1="188" y1="92" x2="188" y2="102" strokeWidth="0.4" opacity="0.55" />
+          <line x1="192" y1="92" x2="192" y2="102" strokeWidth="0.4" opacity="0.55" />
+          <line x1="196" y1="92" x2="196" y2="102" strokeWidth="0.4" opacity="0.55" />
+          <line x1="200" y1="92" x2="200" y2="102" strokeWidth="0.4" opacity="0.55" />
+          <line x1="204" y1="92" x2="204" y2="102" strokeWidth="0.4" opacity="0.55" />
+          <line x1="208" y1="92" x2="208" y2="102" strokeWidth="0.4" opacity="0.55" />
+          <line x1="212" y1="92" x2="212" y2="102" strokeWidth="0.4" opacity="0.55" />
+          <line x1="216" y1="92" x2="216" y2="102" strokeWidth="0.4" opacity="0.55" />
+          <line x1="220" y1="92" x2="220" y2="102" strokeWidth="0.4" opacity="0.55" />
+          <line x1="224" y1="92" x2="224" y2="102" strokeWidth="0.4" opacity="0.55" />
+        </g>
+        {/* Card 4 (bottom-right) — louver */}
+        <g className="bto-card bto-card-4">
+          <rect x="244" y="86" width="70" height="22" strokeWidth="0.85" />
+          <line x1="252" y1="91" x2="306" y2="89" strokeWidth="0.4" opacity="0.6" />
+          <line x1="252" y1="95" x2="306" y2="93" strokeWidth="0.4" opacity="0.6" />
+          <line x1="252" y1="99" x2="306" y2="97" strokeWidth="0.4" opacity="0.6" />
+          <line x1="252" y1="103" x2="306" y2="101" strokeWidth="0.4" opacity="0.6" />
         </g>
 
-        {/* Arrow 1 */}
-        <g opacity="0.55">
-          <line x1="148" y1="86" x2="178" y2="86" strokeWidth="1.1" />
-          <polyline points="170,80 178,86 170,92" strokeWidth="1.1" />
+        {/* Focus brackets around match card (3 units outside its corners) */}
+        <g className="bto-brackets">
+          <polyline points="165,91 165,83 173,83" strokeWidth="0.9" />
+          <polyline points="233,83 241,83 241,91" strokeWidth="0.9" />
+          <polyline points="165,103 165,111 173,111" strokeWidth="0.9" />
+          <polyline points="233,111 241,111 241,103" strokeWidth="0.9" />
         </g>
 
-        {/* STEP 2 — Filter: chips + a few results */}
-        <g transform="translate(186 50)">
-          <rect x="0" y="0" width="120" height="72" rx="3" strokeWidth="1.1" />
-          {/* Filter chips */}
-          <rect x="8" y="8" width="22" height="9" rx="4.5" strokeWidth="0.7" fill="currentColor" fillOpacity="0.18" />
-          <rect x="34" y="8" width="22" height="9" rx="4.5" strokeWidth="0.7" opacity="0.6" />
-          <rect x="60" y="8" width="22" height="9" rx="4.5" strokeWidth="0.7" opacity="0.6" />
-          <rect x="86" y="8" width="22" height="9" rx="4.5" strokeWidth="0.7" opacity="0.6" />
-          {/* Results grid */}
-          <rect x="8" y="24" width="32" height="20" rx="1.5" strokeWidth="0.7" opacity="0.7" />
-          <polygon points="14,32 22,28 30,32 30,40 22,44 14,40" strokeWidth="0.6" opacity="0.5" />
-          <rect x="44" y="24" width="32" height="20" rx="1.5" strokeWidth="0.7" opacity="0.6" />
-          <rect x="80" y="24" width="32" height="20" rx="1.5" strokeWidth="0.7" opacity="0.45" />
-          {/* Spec lines */}
-          <line x1="8" y1="50" x2="40" y2="50" strokeWidth="0.6" opacity="0.5" />
-          <line x1="8" y1="56" x2="32" y2="56" strokeWidth="0.5" opacity="0.4" />
-          <line x1="8" y1="62" x2="36" y2="62" strokeWidth="0.5" opacity="0.4" />
-          <text x="60" y="98" fontSize="8" fontFamily="ui-monospace, monospace" fill="currentColor" textAnchor="middle">02 · FILTER</text>
+        {/* ── Connector 2: filter → order ── */}
+        <line
+          className="bto-connector bto-connector-2"
+          x1="322"
+          y1="78"
+          x2="344"
+          y2="78"
+          strokeWidth="0.7"
+          strokeDasharray="3 2"
+        />
+        <circle
+          className="bto-packet bto-packet-2"
+          cx="0"
+          cy="0"
+          r="2"
+          fill="currentColor"
+        />
+
+        {/* ── STAGE 3: ORDER — enquiry sheet ── */}
+        <rect
+          className="bto-order-card"
+          x="346"
+          y="40"
+          width="124"
+          height="74"
+          strokeWidth="1.1"
+        />
+        {/* Letterhead */}
+        <line x1="354" y1="50" x2="430" y2="50" strokeWidth="0.7" opacity="0.6" />
+        <line x1="354" y1="53" x2="400" y2="53" strokeWidth="0.5" opacity="0.4" />
+
+        {/* Selected-product row — only populates once packet arrives */}
+        <g className="bto-order-product">
+          <rect x="354" y="58" width="108" height="14" strokeWidth="0.7" />
+          {/* Tiny ribbed thumbnail */}
+          <rect x="358" y="61" width="14" height="8" strokeWidth="0.5" opacity="0.7" />
+          <line x1="360" y1="62" x2="360" y2="68" strokeWidth="0.3" opacity="0.5" />
+          <line x1="362" y1="62" x2="362" y2="68" strokeWidth="0.3" opacity="0.5" />
+          <line x1="364" y1="62" x2="364" y2="68" strokeWidth="0.3" opacity="0.5" />
+          <line x1="366" y1="62" x2="366" y2="68" strokeWidth="0.3" opacity="0.5" />
+          <line x1="368" y1="62" x2="368" y2="68" strokeWidth="0.3" opacity="0.5" />
+          <line x1="370" y1="62" x2="370" y2="68" strokeWidth="0.3" opacity="0.5" />
+          {/* Inline spec lines */}
+          <line x1="376" y1="63" x2="448" y2="63" strokeWidth="0.4" opacity="0.55" />
+          <line x1="376" y1="68" x2="420" y2="68" strokeWidth="0.4" opacity="0.4" />
         </g>
 
-        {/* Arrow 2 */}
-        <g opacity="0.55">
-          <line x1="314" y1="86" x2="344" y2="86" strokeWidth="1.1" />
-          <polyline points="336,80 344,86 336,92" strokeWidth="1.1" />
+        {/* Form fields — stagger draw-in via stroke-dashoffset */}
+        <line className="bto-order-field bto-order-field-1" x1="354" y1="80" x2="448" y2="80" strokeWidth="0.55" />
+        <line className="bto-order-field bto-order-field-2" x1="354" y1="86" x2="432" y2="86" strokeWidth="0.55" />
+        <line className="bto-order-field bto-order-field-3" x1="354" y1="92" x2="458" y2="92" strokeWidth="0.55" />
+        <line className="bto-order-field bto-order-field-4" x1="354" y1="98" x2="420" y2="98" strokeWidth="0.55" />
+
+        {/* Submit-confirmation badge + check */}
+        <g className="bto-check-group">
+          <circle
+            className="bto-check-badge"
+            cx="450"
+            cy="106"
+            r="6.5"
+            strokeWidth="0.9"
+          />
+          <polyline
+            className="bto-check-mark"
+            points="446,106 449,109 454,103"
+            strokeWidth="1.3"
+          />
         </g>
 
-        {/* STEP 3 — Order: envelope + tick */}
-        <g transform="translate(352 50)">
-          <rect x="0" y="14" width="108" height="56" rx="3" strokeWidth="1.1" />
-          <polyline points="0,14 54,52 108,14" strokeWidth="0.9" opacity="0.6" />
-          {/* Tick / confirmation badge */}
-          <circle cx="92" cy="60" r="14" fill="currentColor" fillOpacity="0.18" strokeWidth="0.9" />
-          <polyline points="86,60 91,65 99,55" strokeWidth="1.4" />
-          <text x="54" y="98" fontSize="8" fontFamily="ui-monospace, monospace" fill="currentColor" textAnchor="middle">03 · ORDER</text>
-        </g>
+        {/* ── Stage labels ── */}
+        <text
+          className="bto-label bto-label-brief"
+          x="70"
+          y="148"
+          fontSize="7.5"
+          fontFamily="ui-monospace, monospace"
+          letterSpacing="1.6"
+          textAnchor="middle"
+          fill="currentColor"
+        >
+          01 · BRIEF
+        </text>
+        <text
+          className="bto-label bto-label-filter"
+          x="241"
+          y="148"
+          fontSize="7.5"
+          fontFamily="ui-monospace, monospace"
+          letterSpacing="1.6"
+          textAnchor="middle"
+          fill="currentColor"
+        >
+          02 · FILTER
+        </text>
+        <text
+          className="bto-label bto-label-order"
+          x="408"
+          y="148"
+          fontSize="7.5"
+          fontFamily="ui-monospace, monospace"
+          letterSpacing="1.6"
+          textAnchor="middle"
+          fill="currentColor"
+        >
+          03 · ORDER
+        </text>
       </svg>
     ),
   },

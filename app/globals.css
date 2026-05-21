@@ -735,16 +735,16 @@ html[data-theme-transition="active"] body > footer {
 }
 
 /* Checkmark — appears at the end of each card's slot, drawn inside
-   the dedicated confirmation cell at the form's bottom-right. New
-   polyline length is ~16.5, so the offset travels 17 → 0. */
+   the square confirmation cell at the form's bottom-right. Polyline
+   length ≈ 12.7, so the offset travels 13 → 0. */
 @keyframes blog-anim-inquiry-check {
-  0%, 25%   { stroke-dashoffset: 17; opacity: 0; }
+  0%, 25%   { stroke-dashoffset: 13; opacity: 0; }
   28%, 30%  { stroke-dashoffset: 0; opacity: 1; }
-  31%, 58%  { stroke-dashoffset: 17; opacity: 0; }
+  31%, 58%  { stroke-dashoffset: 13; opacity: 0; }
   61%, 63%  { stroke-dashoffset: 0; opacity: 1; }
-  64%, 91%  { stroke-dashoffset: 17; opacity: 0; }
+  64%, 91%  { stroke-dashoffset: 13; opacity: 0; }
   94%, 96%  { stroke-dashoffset: 0; opacity: 1; }
-  97%, 100% { stroke-dashoffset: 17; opacity: 0; }
+  97%, 100% { stroke-dashoffset: 13; opacity: 0; }
 }
 
 .feature-animation--inquiry .anim-inquiry-highlight {
@@ -785,8 +785,8 @@ html[data-theme-transition="active"] body > footer {
 .feature-animation--inquiry .anim-inquiry-form-field-5 { animation-delay: 0.48s; }
 .feature-animation--inquiry .anim-inquiry-check {
   fill: none;
-  stroke-dasharray: 17;
-  stroke-dashoffset: 17;
+  stroke-dasharray: 13;
+  stroke-dashoffset: 13;
   opacity: 0;
   animation: blog-anim-inquiry-check 24s ease-in-out infinite;
 }
@@ -930,6 +930,314 @@ html[data-theme-transition="active"] body > footer {
   .feature-animation--analytics .anim-analytics-dot {
     opacity: 1 !important;
     transform: scale(1) !important;
+  }
+}
+
+/* ── Blog diagram: "brief → filter → order" workflow ──────────────────
+   Eight-second editorial loop attached to the SVG with the
+   `.blog-diagram-bto` class in `components/ui/BlogDiagram.tsx`. The
+   keyframes choreograph one continuous workflow:
+
+   Timeline (% of 8 s):
+      0–4    idle (everything quiet)
+      6–18   brief: requirement lines draw in (staggered)
+     10–22   brief: requirement chips fade in
+     18–25   connector 1 dashed line draws toward filter
+     22–32   packet 1 dot travels brief → filter
+     28–48   filter chips activate one by one (warm-bronze fill)
+     44–55   non-matching cards dim, focus brackets appear on the match
+     50–58   connector 2 dashed line draws toward order
+     54–63   packet 2 dot travels filter → order
+     60–72   order: selected-product row populates + form fields draw
+     70–80   submit-confirmation badge + check stroke in
+     80–92   hold final state
+     92–100  fade everything back to idle for clean loop
+
+   Labels (BRIEF / FILTER / ORDER) shift between 0.55 and 1.0
+   fill-opacity to mark each stage as active. */
+
+.blog-diagram-bto .bto-brief-line {
+  stroke-width: 0.7;
+  stroke-dasharray: 110;
+  stroke-dashoffset: 110;
+  opacity: 0;
+  animation: bto-brief-line 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.blog-diagram-bto .bto-brief-line-1 { animation-delay: 0s; }
+.blog-diagram-bto .bto-brief-line-2 { animation-delay: 0.08s; }
+.blog-diagram-bto .bto-brief-line-3 { animation-delay: 0.16s; }
+
+@keyframes bto-brief-line {
+  0%, 4% { stroke-dashoffset: 110; opacity: 0; }
+  14%, 92% { stroke-dashoffset: 0; opacity: 0.62; }
+  98%, 100% { stroke-dashoffset: 110; opacity: 0; }
+}
+
+.blog-diagram-bto .bto-brief-chip {
+  fill: currentColor;
+  fill-opacity: 0;
+  stroke-width: 0.65;
+  opacity: 0;
+  animation: bto-brief-chip 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.blog-diagram-bto .bto-brief-chip-1 { animation-delay: 0.10s; }
+.blog-diagram-bto .bto-brief-chip-2 { animation-delay: 0.16s; }
+.blog-diagram-bto .bto-brief-chip-3 { animation-delay: 0.22s; }
+
+@keyframes bto-brief-chip {
+  0%, 10% { fill-opacity: 0; opacity: 0; }
+  18%, 92% { fill-opacity: 0.10; opacity: 0.7; }
+  98%, 100% { fill-opacity: 0; opacity: 0; }
+}
+
+.blog-diagram-bto .bto-connector {
+  stroke-dasharray: 22;
+  stroke-dashoffset: 22;
+  opacity: 0;
+}
+.blog-diagram-bto .bto-connector-1 {
+  animation: bto-connector-1 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.blog-diagram-bto .bto-connector-2 {
+  animation: bto-connector-2 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+@keyframes bto-connector-1 {
+  0%, 18% { stroke-dashoffset: 22; opacity: 0; }
+  26%, 92% { stroke-dashoffset: 0; opacity: 0.5; }
+  98%, 100% { stroke-dashoffset: 22; opacity: 0; }
+}
+@keyframes bto-connector-2 {
+  0%, 48% { stroke-dashoffset: 22; opacity: 0; }
+  56%, 92% { stroke-dashoffset: 0; opacity: 0.5; }
+  98%, 100% { stroke-dashoffset: 22; opacity: 0; }
+}
+
+.blog-diagram-bto .bto-packet {
+  fill: var(--color-trail-head);
+  opacity: 0;
+}
+.blog-diagram-bto .bto-packet-1 {
+  animation: bto-packet-1 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.blog-diagram-bto .bto-packet-2 {
+  animation: bto-packet-2 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+@keyframes bto-packet-1 {
+  0%, 22% { transform: translate(140px, 78px); opacity: 0; }
+  24% { transform: translate(140px, 78px); opacity: 1; }
+  31% { transform: translate(160px, 78px); opacity: 1; }
+  34% { transform: translate(160px, 78px); opacity: 0; }
+  100% { transform: translate(140px, 78px); opacity: 0; }
+}
+@keyframes bto-packet-2 {
+  0%, 52% { transform: translate(322px, 78px); opacity: 0; }
+  54% { transform: translate(322px, 78px); opacity: 1; }
+  61% { transform: translate(344px, 78px); opacity: 1; }
+  64% { transform: translate(344px, 78px); opacity: 0; }
+  100% { transform: translate(322px, 78px); opacity: 0; }
+}
+
+.blog-diagram-bto .bto-filter-chip-active {
+  fill: var(--color-trail-head);
+  fill-opacity: 0;
+  stroke: none;
+}
+.blog-diagram-bto .bto-filter-chip-1 {
+  animation: bto-filter-chip-1 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.blog-diagram-bto .bto-filter-chip-2 {
+  animation: bto-filter-chip-2 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.blog-diagram-bto .bto-filter-chip-3 {
+  animation: bto-filter-chip-3 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.blog-diagram-bto .bto-filter-chip-4 {
+  animation: bto-filter-chip-4 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+@keyframes bto-filter-chip-1 {
+  0%, 28% { fill-opacity: 0; }
+  33%, 92% { fill-opacity: 0.22; }
+  98%, 100% { fill-opacity: 0; }
+}
+@keyframes bto-filter-chip-2 {
+  0%, 32% { fill-opacity: 0; }
+  37%, 92% { fill-opacity: 0.22; }
+  98%, 100% { fill-opacity: 0; }
+}
+@keyframes bto-filter-chip-3 {
+  0%, 36% { fill-opacity: 0; }
+  41%, 92% { fill-opacity: 0.22; }
+  98%, 100% { fill-opacity: 0; }
+}
+@keyframes bto-filter-chip-4 {
+  0%, 40% { fill-opacity: 0; }
+  45%, 92% { fill-opacity: 0.22; }
+  98%, 100% { fill-opacity: 0; }
+}
+
+.blog-diagram-bto .bto-card-1,
+.blog-diagram-bto .bto-card-2,
+.blog-diagram-bto .bto-card-4 {
+  animation: bto-card-dim 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+@keyframes bto-card-dim {
+  0%, 44% { opacity: 1; }
+  52%, 92% { opacity: 0.35; }
+  98%, 100% { opacity: 1; }
+}
+
+.blog-diagram-bto .bto-brackets {
+  stroke: var(--color-trail-head);
+  opacity: 0;
+  animation: bto-brackets 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+@keyframes bto-brackets {
+  0%, 44% { opacity: 0; }
+  52%, 92% { opacity: 0.95; }
+  98%, 100% { opacity: 0; }
+}
+
+.blog-diagram-bto .bto-order-product {
+  opacity: 0;
+  animation: bto-order-product 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+@keyframes bto-order-product {
+  0%, 60% { opacity: 0; }
+  66%, 92% { opacity: 1; }
+  98%, 100% { opacity: 0; }
+}
+
+.blog-diagram-bto .bto-order-field {
+  stroke-dasharray: 110;
+  stroke-dashoffset: 110;
+  opacity: 0;
+  animation: bto-order-field 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.blog-diagram-bto .bto-order-field-1 { animation-delay: 0s; }
+.blog-diagram-bto .bto-order-field-2 { animation-delay: 0.05s; }
+.blog-diagram-bto .bto-order-field-3 { animation-delay: 0.10s; }
+.blog-diagram-bto .bto-order-field-4 { animation-delay: 0.15s; }
+
+@keyframes bto-order-field {
+  0%, 64% { stroke-dashoffset: 110; opacity: 0; }
+  72%, 92% { stroke-dashoffset: 0; opacity: 0.55; }
+  98%, 100% { stroke-dashoffset: 110; opacity: 0; }
+}
+
+.blog-diagram-bto .bto-check-badge {
+  fill: var(--color-trail-head);
+  fill-opacity: 0.18;
+  stroke: var(--color-trail-head);
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  transform: scale(0);
+  opacity: 0;
+  animation: bto-check-badge 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+@keyframes bto-check-badge {
+  0%, 70% { transform: scale(0); opacity: 0; }
+  76%, 92% { transform: scale(1); opacity: 1; }
+  98%, 100% { transform: scale(0); opacity: 0; }
+}
+
+.blog-diagram-bto .bto-check-mark {
+  stroke: var(--color-trail-head);
+  stroke-dasharray: 16;
+  stroke-dashoffset: 16;
+  opacity: 0;
+  animation: bto-check-mark 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+@keyframes bto-check-mark {
+  0%, 74% { stroke-dashoffset: 16; opacity: 0; }
+  80%, 92% { stroke-dashoffset: 0; opacity: 1; }
+  98%, 100% { stroke-dashoffset: 16; opacity: 0; }
+}
+
+.blog-diagram-bto .bto-label {
+  fill-opacity: 0.55;
+}
+.blog-diagram-bto .bto-label-brief {
+  animation: bto-label-brief 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.blog-diagram-bto .bto-label-filter {
+  animation: bto-label-filter 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.blog-diagram-bto .bto-label-order {
+  animation: bto-label-order 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+@keyframes bto-label-brief {
+  0%, 6% { fill-opacity: 0.55; }
+  14%, 26% { fill-opacity: 1; }
+  34%, 100% { fill-opacity: 0.55; }
+}
+@keyframes bto-label-filter {
+  0%, 30% { fill-opacity: 0.55; }
+  38%, 54% { fill-opacity: 1; }
+  62%, 100% { fill-opacity: 0.55; }
+}
+@keyframes bto-label-order {
+  0%, 64% { fill-opacity: 0.55; }
+  72%, 92% { fill-opacity: 1; }
+  98%, 100% { fill-opacity: 0.55; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blog-diagram-bto [class*="bto-"] {
+    animation: none !important;
+  }
+  /* Composed final state: full workflow visible as a still diagram. */
+  .blog-diagram-bto .bto-brief-line {
+    stroke-dashoffset: 0 !important;
+    opacity: 0.62 !important;
+  }
+  .blog-diagram-bto .bto-brief-chip {
+    fill-opacity: 0.10 !important;
+    opacity: 0.7 !important;
+  }
+  .blog-diagram-bto .bto-connector {
+    stroke-dashoffset: 0 !important;
+    opacity: 0.5 !important;
+  }
+  .blog-diagram-bto .bto-packet {
+    opacity: 0 !important;
+  }
+  .blog-diagram-bto .bto-filter-chip-active {
+    fill-opacity: 0.22 !important;
+  }
+  .blog-diagram-bto .bto-card-1,
+  .blog-diagram-bto .bto-card-2,
+  .blog-diagram-bto .bto-card-4 {
+    opacity: 0.35 !important;
+  }
+  .blog-diagram-bto .bto-brackets {
+    opacity: 0.95 !important;
+  }
+  .blog-diagram-bto .bto-order-product {
+    opacity: 1 !important;
+  }
+  .blog-diagram-bto .bto-order-field {
+    stroke-dashoffset: 0 !important;
+    opacity: 0.55 !important;
+  }
+  .blog-diagram-bto .bto-check-badge {
+    transform: scale(1) !important;
+    opacity: 1 !important;
+  }
+  .blog-diagram-bto .bto-check-mark {
+    stroke-dashoffset: 0 !important;
+    opacity: 1 !important;
+  }
+  .blog-diagram-bto .bto-label {
+    fill-opacity: 1 !important;
   }
 }
 

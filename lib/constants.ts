@@ -532,6 +532,7 @@ export const BLOG_POSTS: BlogPost[] = [
     },
     content: [
       `Kayu & Kov makes WPC — wood-plastic composite — profiles out of Bangalore. Fluted profiles, hollow boxes, sheet profiles, louvers, door frames. Their customers are architects and contractors who specify these into projects across India.`,
+      `[CTA:Visit kayuandkov.com →|https://www.kayuandkov.com]`,
       `They came to us with a 4-page PDF catalogue listing 55 profiles, and a simple ask: redesign the PDF so it looks better and is easier to read.`,
       `![The Kayu & Kov listed-price PDF — 55 profiles, four pages of dense tables, exactly as it landed in our inbox.](/kayu-kov/page-1.png "The catalogue they sent us. 55 profiles, four pages of tables.")`,
       `We didn't redesign the PDF.`,

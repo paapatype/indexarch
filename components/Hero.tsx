@@ -47,7 +47,7 @@ export default function Hero() {
             variants={fadeUp}
             className="mt-10 flex flex-wrap justify-center gap-4"
           >
-            <Button variant="primary" href="#contact">
+            <Button variant="primary" href="#example">
               {HERO.ctaPrimary}
             </Button>
             <Button variant="secondary" href="#how-it-works">

@@ -85,6 +85,30 @@ function renderContent(block: string) {
     }
   }
 
+  // Inline CTA button \u2014 `[CTA:Label text \u2192|https://url]`. Renders an
+  // editorial bordered link that opens in a new tab. Used in blog
+  // bodies to surface a live demo / external reference without
+  // breaking the prose flow.
+  if (block.startsWith("[CTA:")) {
+    const m = block.match(/^\[CTA:([^|]+)\|([^\]]+)\]\s*$/);
+    if (m) {
+      const label = m[1].trim();
+      const href = m[2].trim();
+      return (
+        <div className="my-8">
+          <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 border border-rule bg-surface-raised px-5 py-3 font-mono text-xs tracking-[0.18em] uppercase text-ink hover:border-[var(--color-trail-frame)] hover:text-[var(--color-trail-head)] transition-colors duration-200"
+          >
+            {label}
+          </a>
+        </div>
+      );
+    }
+  }
+
   // Headings
   if (block.startsWith("## ")) {
     return (
