@@ -23,7 +23,7 @@ interface BlogCardProps {
 function BlogTileArt({ tag }: { tag: string }) {
   const t = tag.toLowerCase();
   const className =
-    "w-36 h-22 lg:w-44 lg:h-26 text-ink-faint transition-transform duration-500 group-hover:scale-[1.04] group-hover:text-ink";
+    "w-44 h-28 lg:w-56 lg:h-32 text-ink-faint transition-transform duration-500 group-hover:scale-[1.04] group-hover:text-ink";
   const stroke = "currentColor";
 
   if (t === "case study") {
@@ -55,20 +55,127 @@ function BlogTileArt({ tag }: { tag: string }) {
 
   if (t === "technical") {
     return (
-      <svg viewBox="0 0 200 120" fill="none" stroke={stroke} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
-        {/* Phone frame */}
-        <rect x="62" y="20" width="76" height="84" rx="6" />
-        <line x1="92" y1="26" x2="108" y2="26" strokeWidth="0.7" opacity="0.55" />
-        {/* Screen inset */}
-        <rect x="68" y="32" width="64" height="62" strokeWidth="0.7" opacity="0.4" />
-        {/* 3D cube on screen */}
-        <polygon points="86,52 100,44 114,52 114,70 100,78 86,70" strokeWidth="0.9" />
-        <line x1="86" y1="52" x2="100" y2="60" strokeWidth="0.7" opacity="0.5" />
-        <line x1="114" y1="52" x2="100" y2="60" strokeWidth="0.7" opacity="0.5" />
-        <line x1="100" y1="60" x2="100" y2="78" strokeWidth="0.7" opacity="0.5" />
-        {/* Rotation arc with arrow */}
-        <path d="M122 88 Q140 88 144 70" strokeWidth="0.9" opacity="0.75" />
-        <polyline points="139,75 144,70 148,75" strokeWidth="0.9" opacity="0.75" />
+      <svg
+        viewBox="0 0 200 120"
+        fill="none"
+        stroke={stroke}
+        strokeWidth="1"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={`${className} blog-cover-technical`}
+        aria-hidden="true"
+      >
+        {/* ── Faint axis guides — quiet construction marks ── */}
+        <line x1="100" y1="6" x2="100" y2="114" strokeWidth="0.5" strokeDasharray="2 4" opacity="0.18" />
+        <line x1="6" y1="60" x2="194" y2="60" strokeWidth="0.5" strokeDasharray="2 4" opacity="0.18" />
+
+        {/* ── Central product — sits under examination. Subtle isometric
+            block with interior wireframe lines that brighten during the
+            "3D" beat. Wrapped in a group so the whole product can rotate
+            a few degrees around its centre (100, 60). ── */}
+        <g className="bct-product">
+          {/* Front face */}
+          <rect x="84" y="46" width="32" height="28" strokeWidth="1.1" />
+          {/* Top face — perspective */}
+          <polyline points="84,46 92,38 124,38 116,46" strokeWidth="0.85" opacity="0.6" />
+          {/* Right face — perspective */}
+          <polyline points="116,46 124,38 124,66 116,74" strokeWidth="0.85" opacity="0.6" />
+          {/* Interior wireframe */}
+          <line x1="84" y1="60" x2="116" y2="60" strokeWidth="0.6" opacity="0.3" className="bct-product-wire" />
+          <line x1="100" y1="46" x2="100" y2="74" strokeWidth="0.6" opacity="0.3" className="bct-product-wire" />
+          <line x1="92" y1="38" x2="92" y2="46" strokeWidth="0.6" opacity="0.25" className="bct-product-wire" />
+          <line x1="100" y1="46" x2="108" y2="38" strokeWidth="0.6" opacity="0.25" className="bct-product-wire" />
+        </g>
+
+        {/* Focus ring — pulses around the central product during 3D beat */}
+        <circle
+          className="bct-focus-ring"
+          cx="100"
+          cy="60"
+          r="22"
+          strokeWidth="0.8"
+        />
+
+        {/* ── SPEC panel (top-left): tiny spec table rows. ── */}
+        <g className="bct-panel bct-panel-spec">
+          <rect x="14" y="20" width="34" height="24" />
+          <line x1="19" y1="26" x2="43" y2="26" strokeWidth="0.55" opacity="0.55" />
+          <line x1="19" y1="31" x2="38" y2="31" strokeWidth="0.55" opacity="0.55" />
+          <line x1="19" y1="36" x2="43" y2="36" strokeWidth="0.55" opacity="0.55" />
+          <line x1="19" y1="41" x2="34" y2="41" strokeWidth="0.55" opacity="0.4" />
+          {/* Dimension tick on the right */}
+          <line x1="45" y1="26" x2="45" y2="41" strokeWidth="0.45" opacity="0.35" />
+          <line x1="43.5" y1="26" x2="46.5" y2="26" strokeWidth="0.45" opacity="0.35" />
+          <line x1="43.5" y1="41" x2="46.5" y2="41" strokeWidth="0.45" opacity="0.35" />
+        </g>
+        <g className="bct-brackets bct-brackets-spec">
+          <polyline points="11,23 11,17 17,17" strokeWidth="0.9" />
+          <polyline points="45,17 51,17 51,23" strokeWidth="0.9" />
+          <polyline points="11,41 11,47 17,47" strokeWidth="0.9" />
+          <polyline points="45,47 51,47 51,41" strokeWidth="0.9" />
+        </g>
+
+        {/* ── SURFACE panel (top-right): diagonal grain/finish hatching. ── */}
+        <g className="bct-panel bct-panel-surface">
+          <rect x="152" y="20" width="34" height="24" />
+          <line x1="156" y1="40" x2="160" y2="24" strokeWidth="0.5" opacity="0.5" />
+          <line x1="162" y1="40" x2="166" y2="24" strokeWidth="0.5" opacity="0.5" />
+          <line x1="168" y1="40" x2="172" y2="24" strokeWidth="0.5" opacity="0.5" />
+          <line x1="174" y1="40" x2="178" y2="24" strokeWidth="0.5" opacity="0.5" />
+          <line x1="180" y1="40" x2="184" y2="24" strokeWidth="0.5" opacity="0.5" />
+          {/* Small swatch corner marker */}
+          <circle cx="156" cy="40" r="0.9" fill="currentColor" opacity="0.4" />
+        </g>
+        <g className="bct-brackets bct-brackets-surface">
+          <polyline points="149,23 149,17 155,17" strokeWidth="0.9" />
+          <polyline points="183,17 189,17 189,23" strokeWidth="0.9" />
+          <polyline points="149,41 149,47 155,47" strokeWidth="0.9" />
+          <polyline points="183,47 189,47 189,41" strokeWidth="0.9" />
+        </g>
+
+        {/* ── SECTION panel (bottom-left): T-profile cross-section with
+            dimension tick. ── */}
+        <g className="bct-panel bct-panel-section">
+          <rect x="14" y="76" width="34" height="24" />
+          {/* T-profile silhouette */}
+          <polyline
+            points="21,82 41,82 41,86 33,86 33,94 29,94 29,86 21,86 21,82"
+            strokeWidth="0.7"
+            opacity="0.75"
+          />
+          {/* Dimension callout below */}
+          <line x1="21" y1="97" x2="41" y2="97" strokeWidth="0.45" opacity="0.4" />
+          <line x1="21" y1="95.5" x2="21" y2="98.5" strokeWidth="0.45" opacity="0.4" />
+          <line x1="41" y1="95.5" x2="41" y2="98.5" strokeWidth="0.45" opacity="0.4" />
+        </g>
+        <g className="bct-brackets bct-brackets-section">
+          <polyline points="11,79 11,73 17,73" strokeWidth="0.9" />
+          <polyline points="45,73 51,73 51,79" strokeWidth="0.9" />
+          <polyline points="11,97 11,103 17,103" strokeWidth="0.9" />
+          <polyline points="45,103 51,103 51,97" strokeWidth="0.9" />
+        </g>
+
+        {/* ── LAYOUT panel (bottom-right): pin grid inside a connector
+            ghost circle — represents electrical / hardware layouts. ── */}
+        <g className="bct-panel bct-panel-layout">
+          <rect x="152" y="76" width="34" height="24" />
+          {/* Connector outline */}
+          <circle cx="169" cy="88" r="10" strokeWidth="0.55" opacity="0.45" />
+          {/* Pin grid — 5 dots */}
+          <circle cx="165" cy="84" r="0.9" fill="currentColor" opacity="0.65" />
+          <circle cx="173" cy="84" r="0.9" fill="currentColor" opacity="0.65" />
+          <circle cx="161" cy="88" r="0.9" fill="currentColor" opacity="0.65" />
+          <circle cx="169" cy="88" r="0.9" fill="currentColor" opacity="0.65" />
+          <circle cx="177" cy="88" r="0.9" fill="currentColor" opacity="0.65" />
+          <circle cx="165" cy="92" r="0.9" fill="currentColor" opacity="0.65" />
+          <circle cx="173" cy="92" r="0.9" fill="currentColor" opacity="0.65" />
+        </g>
+        <g className="bct-brackets bct-brackets-layout">
+          <polyline points="149,79 149,73 155,73" strokeWidth="0.9" />
+          <polyline points="183,73 189,73 189,79" strokeWidth="0.9" />
+          <polyline points="149,97 149,103 155,103" strokeWidth="0.9" />
+          <polyline points="183,103 189,103 189,97" strokeWidth="0.9" />
+        </g>
       </svg>
     );
   }

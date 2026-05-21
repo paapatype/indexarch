@@ -241,6 +241,1027 @@ html[data-theme-transition="active"] body > footer {
   border-bottom: 1px solid var(--color-rule);
 }
 
+/* ── Industry belts (Who-it's-for marquee) ────────────────────────────
+   Three horizontal rows of category tiles that drift slowly in
+   alternating directions. The belt wrapper clips overflow and applies
+   a soft mask on both edges so tiles fade in/out instead of crashing
+   into the copy on the left and the section border on the right.
+   The track holds two copies of the tile list; the animation translates
+   from 0 → -50% (or back), which lines copy 2 up exactly where copy 1
+   started — giving a seamless infinite loop. Hovering a belt pauses
+   only that belt so the user can read a tile without freezing the
+   whole panel. Per-belt speed + direction are set inline from the
+   SolutionSection component (so they're easy to tune there). */
+
+.industry-belt {
+  overflow: hidden;
+  /* Width of the soft fade on each edge. Bump this if the copy column
+     gets wider or if you want tiles to disappear further from the edge. */
+  --industry-fade-w: 72px;
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 var(--industry-fade-w),
+    #000 calc(100% - var(--industry-fade-w)),
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 var(--industry-fade-w),
+    #000 calc(100% - var(--industry-fade-w)),
+    transparent 100%
+  );
+}
+
+.industry-track {
+  display: flex;
+  gap: 0.5rem;
+  width: max-content;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+@keyframes industry-belt-left {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes industry-belt-right {
+  from {
+    transform: translate3d(-50%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.industry-belt:hover .industry-track {
+  animation-play-state: paused;
+}
+
+/* Reduced motion — stop the marquee, wrap chips naturally, drop the
+   mask, and hide the rendered duplicates so each label only appears
+   once. */
+@media (prefers-reduced-motion: reduce) {
+  .industry-track {
+    animation: none !important;
+    transform: none !important;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .industry-track > [aria-hidden="true"] {
+    display: none;
+  }
+
+  .industry-belt {
+    overflow: visible !important;
+    mask-image: none !important;
+    -webkit-mask-image: none !important;
+  }
+}
+
+/* ── Blog bento micro-animations ─────────────────────────────────────
+   Each animation is built inside the corresponding `.feature-animation`
+   SVG in components/ui/BlogBento.tsx. Keyframes loop ~6–8s linear so
+   the feel is editorial, not flashy. Reduced motion freezes them at
+   a representative frame so the illustration still reads. */
+
+/* 1. Smart filtering — premium 6.5 s loop. Every motion is driven by
+   the cubic-bezier(0.22, 1, 0.36, 1) "elegant ease-out" curve so the
+   cursor, dropdown, and tile responses all share a luxury feel. The
+   complete chain reads as one cause-and-effect sentence:
+     cursor approaches → click → dropdown unfolds → options stagger in
+     → cursor moves to option → hover warms → click + check draws →
+     dropdown closes with selected value → matches lift/glow, misses
+     dim/blur (cascaded) → hold → reset → loop.
+
+   Timeline (% of 6.5 s):
+       0– 4   cursor enters
+       4–21   cursor curves in to dropdown (waypoints, not a straight line)
+      22–24   click pulse + dropdown lift + ring 1 expand
+      25–32   options panel unfolds + options stagger in
+      32–40   cursor descends to option 2
+      40–43   hover warms middle option
+      43–46   click pulse + ring 2 + check mark draws on row
+      46–50   panel closes, selected value replaces placeholder
+      50–60   tile cascade: matches lift+glow+brackets, misses dim+blur
+      60–88   hold (filtered state visible)
+      88–96   gentle reset (tiles + value bar return to neutral)
+      92–100  cursor exits
+*/
+
+/* Cursor — curved approach via waypoints, then two click pulses. */
+@keyframes blog-anim-filter-cursor {
+  0%  { transform: translate(170px, 110px) scale(1); opacity: 0; }
+  4%  { transform: translate(170px, 110px) scale(1); opacity: 1; }
+  10% { transform: translate(128px, 72px)  scale(1); opacity: 1; }
+  16% { transform: translate(86px, 42px)   scale(1); opacity: 1; }
+  21% { transform: translate(40px, 25px)   scale(1); opacity: 1; }
+  22% { transform: translate(40px, 25px)   scale(0.84); opacity: 1; }
+  24% { transform: translate(40px, 25px)   scale(1); opacity: 1; }
+  32% { transform: translate(40px, 25px)   scale(1); opacity: 1; }
+  36% { transform: translate(40px, 48px)   scale(1); opacity: 1; }
+  40% { transform: translate(40px, 68px)   scale(1); opacity: 1; }
+  43% { transform: translate(40px, 68px)   scale(0.84); opacity: 1; }
+  45% { transform: translate(40px, 68px)   scale(1); opacity: 1; }
+  88% { transform: translate(40px, 68px)   scale(1); opacity: 1; }
+  92% { transform: translate(40px, 68px)   scale(1); opacity: 0; }
+  100%{ transform: translate(170px, 110px) scale(1); opacity: 0; }
+}
+
+/* Dropdown button — micro-lift on each click moment. */
+@keyframes blog-anim-filter-button-press {
+  0%, 21% { transform: translateY(0); }
+  22%, 26% { transform: translateY(-1px); }
+  30%, 100% { transform: translateY(0); }
+}
+
+/* Click rings — fire at the two click moments. Both use transform:scale
+   from the circle's centre so the ring grows symmetrically. */
+@keyframes blog-anim-filter-ring-1 {
+  0%, 21% { transform: scale(1); opacity: 0; }
+  22%     { transform: scale(1); opacity: 0.5; }
+  27%     { transform: scale(14); opacity: 0; }
+  28%, 100% { transform: scale(1); opacity: 0; }
+}
+@keyframes blog-anim-filter-ring-2 {
+  0%, 42% { transform: scale(1); opacity: 0; }
+  43%     { transform: scale(1); opacity: 0.5; }
+  48%     { transform: scale(14); opacity: 0; }
+  49%, 100% { transform: scale(1); opacity: 0; }
+}
+
+/* Options panel — drops down + scales from top edge + fades in. */
+@keyframes blog-anim-filter-options-open {
+  0%, 23% { opacity: 0; transform: translateY(-6px) scaleY(0.96); }
+  30%, 46% { opacity: 1; transform: translateY(0) scaleY(1); }
+  50%, 100% { opacity: 0; transform: translateY(-6px) scaleY(0.96); }
+}
+
+/* Chevron flips 180° while the panel is open. */
+@keyframes blog-anim-filter-chevron-open {
+  0%, 23% { transform: rotate(0deg); }
+  30%, 46% { transform: rotate(180deg); }
+  50%, 100% { transform: rotate(0deg); }
+}
+
+/* Each option fades in with a -2px slide; the per-option delay below
+   cascades them sequentially. */
+@keyframes blog-anim-filter-option-stagger {
+  0%, 25% { opacity: 0; transform: translateY(-2px); }
+  32%, 46% { opacity: 1; transform: translateY(0); }
+  50%, 100% { opacity: 0; transform: translateY(-2px); }
+}
+
+/* Middle option hover highlight — warm translucent fill. */
+@keyframes blog-anim-filter-option-hover {
+  0%, 38% { fill-opacity: 0; }
+  41%, 46% { fill-opacity: 0.22; }
+  50%, 100% { fill-opacity: 0; }
+}
+
+/* Check mark on the selected row — strokes in once clicked. */
+@keyframes blog-anim-filter-option-check {
+  0%, 44% { stroke-dashoffset: 14; opacity: 0; }
+  47%, 49% { stroke-dashoffset: 0; opacity: 1; }
+  50%, 100% { stroke-dashoffset: 14; opacity: 0; }
+}
+
+/* Value bars in the dropdown — crossfade at the click moment. */
+@keyframes blog-anim-filter-placeholder {
+  0%, 45% { opacity: 0.45; }
+  50%, 87% { opacity: 0; }
+  92%, 100% { opacity: 0.45; }
+}
+@keyframes blog-anim-filter-selected {
+  0%, 45% { opacity: 0; }
+  50%, 87% { opacity: 1; }
+  92%, 100% { opacity: 0; }
+}
+
+/* Matching tiles — lift up by 3 px (whole group transforms). */
+@keyframes blog-anim-filter-tile-lift {
+  0%, 50% { transform: translateY(0); }
+  60%, 87% { transform: translateY(-3px); }
+  92%, 100% { transform: translateY(0); }
+}
+
+/* Matching tile fill + stroke — warm glow appears under the lift. */
+@keyframes blog-anim-filter-tile-glow {
+  0%, 50% { fill-opacity: 0; stroke-opacity: 0.5; }
+  60%, 87% { fill-opacity: 0.18; stroke-opacity: 1; }
+  92%, 100% { fill-opacity: 0; stroke-opacity: 0.5; }
+}
+
+/* Corner bracket on each matching tile — drawn after the glow. */
+@keyframes blog-anim-filter-bracket {
+  0%, 56% { opacity: 0; }
+  66%, 87% { opacity: 0.85; }
+  92%, 100% { opacity: 0; }
+}
+
+/* Non-matching tiles — dim + very soft blur. */
+@keyframes blog-anim-filter-tile-miss {
+  0%, 50% { opacity: 1; filter: blur(0); }
+  60%, 87% { opacity: 0.28; filter: blur(0.3px); }
+  92%, 100% { opacity: 1; filter: blur(0); }
+}
+
+/* ── Selectors ─────────────────────────────────────────────────── */
+
+.feature-animation--filter .anim-filter-cursor {
+  animation: blog-anim-filter-cursor 6.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.feature-animation--filter .anim-filter-button {
+  animation: blog-anim-filter-button-press 6.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.feature-animation--filter .anim-filter-ring {
+  fill: currentColor;
+  stroke: none;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+.feature-animation--filter .anim-filter-ring-1 {
+  animation: blog-anim-filter-ring-1 6.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.feature-animation--filter .anim-filter-ring-2 {
+  animation: blog-anim-filter-ring-2 6.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.feature-animation--filter .anim-filter-options {
+  opacity: 0;
+  transform-origin: 53px 45px; /* explicit pivot at panel's top-centre */
+  animation: blog-anim-filter-options-open 6.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.feature-animation--filter .anim-filter-chevron {
+  transform-origin: 0 0;
+  animation: blog-anim-filter-chevron-open 6.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.feature-animation--filter .anim-filter-option {
+  opacity: 0;
+  animation: blog-anim-filter-option-stagger 6.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.feature-animation--filter .anim-filter-option-1 { animation-delay: 0s;    }
+.feature-animation--filter .anim-filter-option-2 { animation-delay: 0.05s; }
+.feature-animation--filter .anim-filter-option-3 { animation-delay: 0.10s; }
+
+.feature-animation--filter .anim-filter-option-hover {
+  fill: currentColor;
+  fill-opacity: 0;
+  stroke: none;
+  animation: blog-anim-filter-option-hover 6.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.feature-animation--filter .anim-filter-option-check {
+  fill: none;
+  stroke: var(--color-trail-head);
+  stroke-width: 1.3;
+  stroke-dasharray: 14;
+  stroke-dashoffset: 14;
+  opacity: 0;
+  animation: blog-anim-filter-option-check 6.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.feature-animation--filter .anim-filter-placeholder-bar {
+  opacity: 0.45;
+  animation: blog-anim-filter-placeholder 6.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.feature-animation--filter .anim-filter-selected-bar {
+  opacity: 0;
+  animation: blog-anim-filter-selected 6.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+/* Matching tiles — three layers per tile cascade with their own delays
+   so the row "fills in" rather than snapping all at once. */
+.feature-animation--filter [class*="anim-filter-tile-hit-group"] {
+  animation: blog-anim-filter-tile-lift 6.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.feature-animation--filter .anim-filter-tile-hit-group-1 { animation-delay: 0s;    }
+.feature-animation--filter .anim-filter-tile-hit-group-2 { animation-delay: 0.07s; }
+.feature-animation--filter .anim-filter-tile-hit-group-3 { animation-delay: 0.14s; }
+
+.feature-animation--filter .anim-filter-tile-hit-rect {
+  fill: currentColor;
+  fill-opacity: 0;
+  stroke-opacity: 0.5;
+  animation: blog-anim-filter-tile-glow 6.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.feature-animation--filter .anim-filter-tile-hit-group-1 .anim-filter-tile-hit-rect { animation-delay: 0s;    }
+.feature-animation--filter .anim-filter-tile-hit-group-2 .anim-filter-tile-hit-rect { animation-delay: 0.07s; }
+.feature-animation--filter .anim-filter-tile-hit-group-3 .anim-filter-tile-hit-rect { animation-delay: 0.14s; }
+
+.feature-animation--filter .anim-filter-bracket {
+  stroke: var(--color-trail-head);
+  stroke-width: 1.5;
+  opacity: 0;
+  animation: blog-anim-filter-bracket 6.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.feature-animation--filter .anim-filter-bracket-1 { animation-delay: 0.04s; }
+.feature-animation--filter .anim-filter-bracket-2 { animation-delay: 0.11s; }
+.feature-animation--filter .anim-filter-bracket-3 { animation-delay: 0.18s; }
+
+/* Non-matching tiles — dim + blur, staggered slightly behind the hits
+   so the cascade reads as "matches resolve first, then misses recede". */
+.feature-animation--filter [class*="anim-filter-tile-miss-group"] {
+  animation: blog-anim-filter-tile-miss 6.5s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.feature-animation--filter .anim-filter-tile-miss-group-1 { animation-delay: 0.04s; }
+.feature-animation--filter .anim-filter-tile-miss-group-2 { animation-delay: 0.11s; }
+.feature-animation--filter .anim-filter-tile-miss-group-3 { animation-delay: 0.18s; }
+
+/* 2. Side-by-side comparison — spec rows draw in via stroke-dasharray;
+   shared rows (1 + 3) hold at higher opacity, differing rows (2 + 4)
+   at lower opacity so the eye reads "match vs diverge". */
+@keyframes blog-anim-compare-row-shared {
+  0%, 4% { stroke-dashoffset: 80; opacity: 0; }
+  20%, 86% { stroke-dashoffset: 0; opacity: 0.75; }
+  94%, 100% { stroke-dashoffset: 80; opacity: 0; }
+}
+@keyframes blog-anim-compare-row-diff {
+  0%, 4% { stroke-dashoffset: 80; opacity: 0; }
+  20%, 86% { stroke-dashoffset: 0; opacity: 0.42; }
+  94%, 100% { stroke-dashoffset: 80; opacity: 0; }
+}
+
+.feature-animation--compare .anim-compare-row {
+  stroke-dasharray: 80;
+  stroke-dashoffset: 80;
+  opacity: 0;
+}
+.feature-animation--compare .anim-compare-row-shared {
+  animation: blog-anim-compare-row-shared 7s ease-in-out infinite;
+}
+.feature-animation--compare .anim-compare-row-diff {
+  animation: blog-anim-compare-row-diff 7s ease-in-out infinite;
+}
+/* Stagger so rows feel like they're drawing top-to-bottom. */
+.feature-animation--compare .anim-compare-row-1 { animation-delay: 0s; }
+.feature-animation--compare .anim-compare-row-2 { animation-delay: 0.18s; }
+.feature-animation--compare .anim-compare-row-3 { animation-delay: 0.36s; }
+.feature-animation--compare .anim-compare-row-4 { animation-delay: 0.54s; }
+
+/* 3. Mobile-first — three pre-sized catalogue cards (one per device)
+   crossfade. Only one is visible at a time, parked in the correct
+   device's content area at the correct size. */
+@keyframes blog-anim-mobile-card-desktop {
+  0%, 28% { opacity: 1; }
+  34%, 92% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes blog-anim-mobile-card-tablet {
+  0%, 28% { opacity: 0; }
+  34%, 60% { opacity: 1; }
+  66%, 100% { opacity: 0; }
+}
+@keyframes blog-anim-mobile-card-phone {
+  0%, 60% { opacity: 0; }
+  66%, 92% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.feature-animation--mobile .anim-mobile-card-desktop {
+  animation: blog-anim-mobile-card-desktop 8s ease-in-out infinite;
+}
+.feature-animation--mobile .anim-mobile-card-tablet {
+  animation: blog-anim-mobile-card-tablet 8s ease-in-out infinite;
+}
+.feature-animation--mobile .anim-mobile-card-phone {
+  animation: blog-anim-mobile-card-phone 8s ease-in-out infinite;
+}
+
+/* 4. Pre-qualified enquiries — three-card rotation over a 24 s cycle.
+   Each 8 s slot: source card highlights → travelling card slides to
+   the form → form populates → checkmark → reset. Percentages below
+   are computed relative to the 24 s total: card 1 = 0–33.33 %, card
+   2 = 33.33–66.66 %, card 3 = 66.66–100 %. */
+
+/* Source-card highlight overlays */
+@keyframes blog-anim-inquiry-highlight-1 {
+  0%, 1% { fill-opacity: 0; stroke-opacity: 0.5; }
+  3%, 30% { fill-opacity: 0.22; stroke-opacity: 1; }
+  31%, 100% { fill-opacity: 0; stroke-opacity: 0.5; }
+}
+@keyframes blog-anim-inquiry-highlight-2 {
+  0%, 34% { fill-opacity: 0; stroke-opacity: 0.5; }
+  36%, 63% { fill-opacity: 0.22; stroke-opacity: 1; }
+  64%, 100% { fill-opacity: 0; stroke-opacity: 0.5; }
+}
+@keyframes blog-anim-inquiry-highlight-3 {
+  0%, 67% { fill-opacity: 0; stroke-opacity: 0.5; }
+  69%, 96% { fill-opacity: 0.22; stroke-opacity: 1; }
+  97%, 100% { fill-opacity: 0; stroke-opacity: 0.5; }
+}
+
+/* Travelling card — three slides per cycle, one per source card.
+   Each slot lands the traveller INSIDE the form at (114, 28) — the
+   top-left of the selected-product row — then crossfades with the
+   form-row at that exact position so the card visually morphs into
+   the row instead of halting at the form border and vanishing. */
+@keyframes blog-anim-inquiry-traveller {
+  /* Card 1's slot (0–33%) */
+  0%, 3%   { transform: translate(8px, 12px); opacity: 0; }
+  5%, 7%   { transform: translate(8px, 12px); opacity: 1; }
+  /* Travel into the form's interior and dock at the form-row's
+     top-left corner. */
+  11%, 13% { transform: translate(114px, 28px); opacity: 1; }
+  /* Crossfade out at the docked position while the form-row fades
+     in (handled by blog-anim-inquiry-form-row). */
+  15%      { transform: translate(114px, 28px); opacity: 0; }
+
+  /* Card 2's slot (33–67%) */
+  33%      { transform: translate(8px, 52px); opacity: 0; }
+  36%, 38% { transform: translate(8px, 52px); opacity: 1; }
+  44%, 46% { transform: translate(114px, 28px); opacity: 1; }
+  48%      { transform: translate(114px, 28px); opacity: 0; }
+
+  /* Card 3's slot (67–100%) */
+  66%      { transform: translate(8px, 92px); opacity: 0; }
+  70%, 72% { transform: translate(8px, 92px); opacity: 1; }
+  77%, 79% { transform: translate(114px, 28px); opacity: 1; }
+  81%      { transform: translate(114px, 28px); opacity: 0; }
+
+  100%     { transform: translate(8px, 12px); opacity: 0; }
+}
+
+/* Form's "selected product" row — fade-in window is timed so its
+   rise overlaps with the traveller's fade-out at the docking position
+   (traveller at (114, 28) opacity 1 → 0 over 13–15 %, this row
+   opacity 0 → 1 over 11–15 %). Net effect: the card MORPHS into the
+   row in place rather than disappearing then reappearing. */
+@keyframes blog-anim-inquiry-form-row {
+  0%, 11% { opacity: 0; }
+  15%, 30% { opacity: 1; }
+  31%, 44% { opacity: 0; }
+  48%, 63% { opacity: 1; }
+  64%, 77% { opacity: 0; }
+  81%, 96% { opacity: 1; }
+  97%, 100% { opacity: 0; }
+}
+
+/* Form fields — slight per-field stagger so they cascade in rather
+   than all appearing at once. The base keyframe handles the
+   draw-in/hold/reset; per-field delays come from the index modifiers. */
+@keyframes blog-anim-inquiry-form-field {
+  0%, 16% { stroke-dashoffset: 120; opacity: 0; }
+  22%, 30% { stroke-dashoffset: 0; opacity: 0.5; }
+  31%, 49% { stroke-dashoffset: 120; opacity: 0; }
+  55%, 63% { stroke-dashoffset: 0; opacity: 0.5; }
+  64%, 82% { stroke-dashoffset: 120; opacity: 0; }
+  88%, 96% { stroke-dashoffset: 0; opacity: 0.5; }
+  97%, 100% { stroke-dashoffset: 120; opacity: 0; }
+}
+
+/* Checkmark — appears at the end of each card's slot, drawn inside
+   the dedicated confirmation cell at the form's bottom-right. New
+   polyline length is ~16.5, so the offset travels 17 → 0. */
+@keyframes blog-anim-inquiry-check {
+  0%, 25%   { stroke-dashoffset: 17; opacity: 0; }
+  28%, 30%  { stroke-dashoffset: 0; opacity: 1; }
+  31%, 58%  { stroke-dashoffset: 17; opacity: 0; }
+  61%, 63%  { stroke-dashoffset: 0; opacity: 1; }
+  64%, 91%  { stroke-dashoffset: 17; opacity: 0; }
+  94%, 96%  { stroke-dashoffset: 0; opacity: 1; }
+  97%, 100% { stroke-dashoffset: 17; opacity: 0; }
+}
+
+.feature-animation--inquiry .anim-inquiry-highlight {
+  fill: currentColor;
+  fill-opacity: 0;
+  stroke-opacity: 0.5;
+}
+.feature-animation--inquiry .anim-inquiry-highlight-1 {
+  animation: blog-anim-inquiry-highlight-1 24s ease-in-out infinite;
+}
+.feature-animation--inquiry .anim-inquiry-highlight-2 {
+  animation: blog-anim-inquiry-highlight-2 24s ease-in-out infinite;
+}
+.feature-animation--inquiry .anim-inquiry-highlight-3 {
+  animation: blog-anim-inquiry-highlight-3 24s ease-in-out infinite;
+}
+.feature-animation--inquiry .anim-inquiry-traveller {
+  fill: currentColor;
+  fill-opacity: 0.18;
+  transform: translate(8px, 12px);
+  opacity: 0;
+  animation: blog-anim-inquiry-traveller 24s ease-in-out infinite;
+}
+.feature-animation--inquiry .anim-inquiry-form-row-1 {
+  opacity: 0;
+  animation: blog-anim-inquiry-form-row 24s ease-in-out infinite;
+}
+.feature-animation--inquiry .anim-inquiry-form-field {
+  stroke-dasharray: 120;
+  stroke-dashoffset: 120;
+  opacity: 0;
+  animation: blog-anim-inquiry-form-field 24s ease-in-out infinite;
+}
+.feature-animation--inquiry .anim-inquiry-form-field-1 { animation-delay: 0s; }
+.feature-animation--inquiry .anim-inquiry-form-field-2 { animation-delay: 0.12s; }
+.feature-animation--inquiry .anim-inquiry-form-field-3 { animation-delay: 0.24s; }
+.feature-animation--inquiry .anim-inquiry-form-field-4 { animation-delay: 0.36s; }
+.feature-animation--inquiry .anim-inquiry-form-field-5 { animation-delay: 0.48s; }
+.feature-animation--inquiry .anim-inquiry-check {
+  fill: none;
+  stroke-dasharray: 17;
+  stroke-dashoffset: 17;
+  opacity: 0;
+  animation: blog-anim-inquiry-check 24s ease-in-out infinite;
+}
+
+/* 5. Analytics — dots pop in left-to-right, then a polyline traces
+   between them. */
+@keyframes blog-anim-analytics-line {
+  0%, 30% { stroke-dashoffset: 240; opacity: 0.55; }
+  85% { stroke-dashoffset: 0; opacity: 0.85; }
+  100% { stroke-dashoffset: 240; opacity: 0.55; }
+}
+@keyframes blog-anim-analytics-dot {
+  0%, 25% { opacity: 0; transform: scale(0.4); }
+  40%, 90% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.4); }
+}
+
+.feature-animation--analytics .anim-analytics-line {
+  stroke-dasharray: 240;
+  stroke-dashoffset: 240;
+  animation: blog-anim-analytics-line 7s ease-in-out infinite;
+}
+.feature-animation--analytics .anim-analytics-dot {
+  opacity: 0;
+  transform-origin: center;
+  animation: blog-anim-analytics-dot 7s ease-in-out infinite;
+}
+.feature-animation--analytics .anim-analytics-dot-1 { animation-delay: 0s; }
+.feature-animation--analytics .anim-analytics-dot-2 { animation-delay: 0.4s; }
+.feature-animation--analytics .anim-analytics-dot-3 { animation-delay: 0.8s; }
+.feature-animation--analytics .anim-analytics-dot-4 { animation-delay: 1.2s; }
+.feature-animation--analytics .anim-analytics-dot-5 { animation-delay: 1.6s; }
+.feature-animation--analytics .anim-analytics-dot-6 { animation-delay: 2s; }
+
+/* Subtle hover lift across all bento cards in the blog body. */
+.blog-bento-card {
+  transition:
+    background-color 320ms ease,
+    border-color 320ms ease;
+}
+.blog-bento-card:hover {
+  background-color: color-mix(in oklab, var(--color-surface), var(--color-surface-raised) 30%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feature-animation *,
+  .feature-animation [class*="anim-"] {
+    animation: none !important;
+  }
+
+  /* Filter — closed dropdown showing the selected value, three matching
+     tiles lifted + glowing with brackets visible, three misses dimmed
+     and softly blurred. Cursor + click rings + options + check all
+     hidden. Reads as "filter has been applied → these are the matches". */
+  .feature-animation--filter .anim-filter-cursor,
+  .feature-animation--filter .anim-filter-ring,
+  .feature-animation--filter .anim-filter-options {
+    opacity: 0 !important;
+  }
+  .feature-animation--filter .anim-filter-button {
+    transform: translateY(0) !important;
+  }
+  .feature-animation--filter .anim-filter-chevron {
+    transform: rotate(0deg) !important;
+  }
+  .feature-animation--filter .anim-filter-placeholder-bar {
+    opacity: 0 !important;
+  }
+  .feature-animation--filter .anim-filter-selected-bar {
+    opacity: 1 !important;
+  }
+  .feature-animation--filter [class*="anim-filter-tile-hit-group"] {
+    transform: translateY(-3px) !important;
+  }
+  .feature-animation--filter .anim-filter-tile-hit-rect {
+    fill-opacity: 0.18 !important;
+    stroke-opacity: 1 !important;
+  }
+  .feature-animation--filter .anim-filter-bracket {
+    opacity: 0.85 !important;
+  }
+  .feature-animation--filter [class*="anim-filter-tile-miss-group"] {
+    opacity: 0.28 !important;
+    filter: blur(0.3px) !important;
+  }
+
+  /* Comparison — both cards fully drawn with all spec rows visible at
+     their correct opacities (shared brighter, differing dimmer). */
+  .feature-animation--compare .anim-compare-row {
+    stroke-dashoffset: 0 !important;
+  }
+  .feature-animation--compare .anim-compare-row-shared {
+    opacity: 0.75 !important;
+  }
+  .feature-animation--compare .anim-compare-row-diff {
+    opacity: 0.42 !important;
+  }
+
+  /* Mobile — only the tablet card visible at its correct tablet size,
+     centred in the tablet outline. */
+  .feature-animation--mobile .anim-mobile-card-desktop,
+  .feature-animation--mobile .anim-mobile-card-phone {
+    opacity: 0 !important;
+  }
+  .feature-animation--mobile .anim-mobile-card-tablet {
+    opacity: 1 !important;
+  }
+
+  /* Enquiries — card 1 highlighted, traveller hidden, form fully
+     populated with the checkmark visible. Story still reads even
+     without motion. */
+  .feature-animation--inquiry .anim-inquiry-highlight-1 {
+    fill-opacity: 0.22 !important;
+    stroke-opacity: 1 !important;
+  }
+  .feature-animation--inquiry .anim-inquiry-highlight-2,
+  .feature-animation--inquiry .anim-inquiry-highlight-3 {
+    fill-opacity: 0 !important;
+    stroke-opacity: 0.5 !important;
+  }
+  .feature-animation--inquiry .anim-inquiry-traveller {
+    opacity: 0 !important;
+  }
+  .feature-animation--inquiry .anim-inquiry-form-row-1 {
+    opacity: 1 !important;
+  }
+  .feature-animation--inquiry .anim-inquiry-form-field {
+    stroke-dashoffset: 0 !important;
+    opacity: 0.5 !important;
+  }
+  .feature-animation--inquiry .anim-inquiry-check {
+    stroke-dashoffset: 0 !important;
+    opacity: 1 !important;
+  }
+
+  /* Analytics — line fully drawn, all dots visible (unchanged). */
+  .feature-animation--analytics .anim-analytics-line {
+    stroke-dashoffset: 0 !important;
+    opacity: 0.7 !important;
+  }
+  .feature-animation--analytics .anim-analytics-dot {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+  }
+}
+
+/* ── Blog cover (Technical tag): "visual discovery lens" ──────────────
+   Eight-second editorial loop that cycles the focus through four
+   visual-treatment panels (SPEC → SURFACE → SECTION → LAYOUT) and a
+   final 3D beat on the central product. Each panel gets a brighter
+   stroke + matching warm-accent corner brackets during its 1.6 s slot.
+   The central product holds a quiet wireframe state until the 3D beat,
+   when it gains a soft focus ring and a -3° → +3° sway.
+
+   Timeline (% of 8 s):
+     0–20    SPEC active
+    20–40    SURFACE active
+    40–60    SECTION active
+    60–80    LAYOUT active
+    80–100   3D beat — focus ring pulses, central product sways gently
+*/
+
+.blog-cover-technical .bct-product {
+  transform-origin: 100px 60px;
+  animation: bct-product-3d 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.blog-cover-technical .bct-product-wire {
+  animation: bct-product-wire 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.blog-cover-technical .bct-focus-ring {
+  fill: none;
+  stroke: var(--color-trail-head);
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: bct-focus-ring 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+/* Panels at rest sit at quiet 0.45 opacity; each takes its turn at 1.0. */
+.blog-cover-technical .bct-panel {
+  opacity: 0.45;
+}
+.blog-cover-technical .bct-panel-spec {
+  animation: bct-active-spec 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.blog-cover-technical .bct-panel-surface {
+  animation: bct-active-surface 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.blog-cover-technical .bct-panel-section {
+  animation: bct-active-section 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.blog-cover-technical .bct-panel-layout {
+  animation: bct-active-layout 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+/* Corner brackets sit invisible by default; only appear during their
+   panel's active slot, drawn in a warm accent so the active mode reads
+   as deliberately "selected". */
+.blog-cover-technical .bct-brackets {
+  stroke: var(--color-trail-head);
+  opacity: 0;
+}
+.blog-cover-technical .bct-brackets-spec {
+  animation: bct-brackets-spec 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.blog-cover-technical .bct-brackets-surface {
+  animation: bct-brackets-surface 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.blog-cover-technical .bct-brackets-section {
+  animation: bct-brackets-section 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+.blog-cover-technical .bct-brackets-layout {
+  animation: bct-brackets-layout 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+@keyframes bct-active-spec {
+  0%, 2% { opacity: 1; }
+  18%, 100% { opacity: 0.45; }
+}
+@keyframes bct-active-surface {
+  0%, 18% { opacity: 0.45; }
+  22%, 38% { opacity: 1; }
+  40%, 100% { opacity: 0.45; }
+}
+@keyframes bct-active-section {
+  0%, 38% { opacity: 0.45; }
+  42%, 58% { opacity: 1; }
+  60%, 100% { opacity: 0.45; }
+}
+@keyframes bct-active-layout {
+  0%, 58% { opacity: 0.45; }
+  62%, 78% { opacity: 1; }
+  80%, 100% { opacity: 0.45; }
+}
+
+@keyframes bct-brackets-spec {
+  0%, 2% { opacity: 0.85; }
+  16% { opacity: 0; }
+  18%, 100% { opacity: 0; }
+}
+@keyframes bct-brackets-surface {
+  0%, 18% { opacity: 0; }
+  22% { opacity: 0.85; }
+  36% { opacity: 0.85; }
+  40%, 100% { opacity: 0; }
+}
+@keyframes bct-brackets-section {
+  0%, 38% { opacity: 0; }
+  42% { opacity: 0.85; }
+  56% { opacity: 0.85; }
+  60%, 100% { opacity: 0; }
+}
+@keyframes bct-brackets-layout {
+  0%, 58% { opacity: 0; }
+  62% { opacity: 0.85; }
+  76% { opacity: 0.85; }
+  80%, 100% { opacity: 0; }
+}
+
+/* Central product — quiet at rest; during the 3D beat it sways a few
+   degrees and the wireframe lines brighten. */
+@keyframes bct-product-3d {
+  0%, 78% { transform: rotate(0deg); }
+  84% { transform: rotate(-2.5deg); }
+  92% { transform: rotate(2.5deg); }
+  98%, 100% { transform: rotate(0deg); }
+}
+@keyframes bct-product-wire {
+  0%, 78% { opacity: 0.3; }
+  84%, 94% { opacity: 0.75; }
+  98%, 100% { opacity: 0.3; }
+}
+
+/* Focus ring — fades in + grows during the 3D beat, then fades. */
+@keyframes bct-focus-ring {
+  0%, 78% { opacity: 0; transform: scale(0.85); }
+  84% { opacity: 0.55; transform: scale(1); }
+  94% { opacity: 0.35; transform: scale(1.18); }
+  98%, 100% { opacity: 0; transform: scale(1.22); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blog-cover-technical .bct-panel,
+  .blog-cover-technical .bct-brackets,
+  .blog-cover-technical .bct-product,
+  .blog-cover-technical .bct-product-wire,
+  .blog-cover-technical .bct-focus-ring {
+    animation: none !important;
+  }
+  /* Composed final state: all four panels at medium opacity with their
+     brackets visible at low strength, central product wireframe at
+     rest, focus ring lightly visible. */
+  .blog-cover-technical .bct-panel {
+    opacity: 0.7 !important;
+  }
+  .blog-cover-technical .bct-brackets {
+    opacity: 0.4 !important;
+  }
+  .blog-cover-technical .bct-product {
+    transform: rotate(0deg) !important;
+  }
+  .blog-cover-technical .bct-product-wire {
+    opacity: 0.45 !important;
+  }
+  .blog-cover-technical .bct-focus-ring {
+    opacity: 0.18 !important;
+    transform: scale(1) !important;
+  }
+}
+
+/* ── Result cards (Methodology "The Result" row) ──────────────────────
+   Three invisible-at-rest tiles that bevel up on hover/focus and
+   reveal a slow champagne trail running around the perimeter. CSS
+   handles the entire effect — no React state — so the experience is
+   instant and works for keyboard focus too.
+
+   Tunables (search for these to edit):
+   - --result-card-bevel-top      → top/left highlight strength
+   - --result-card-bevel-bottom   → bottom/right shadow strength
+   - --result-card-hover-bg       → resting → hover background tint
+   - --result-card-shadow         → drop shadow under lifted tile
+   - .result-card__trail / __head → trail brightness, width, duration
+   - @keyframes result-trail      → speed of the loop (animation-duration)
+*/
+
+:root {
+  /* Light mode — cream surface, subtle dark tint + crisp top highlight. */
+  --result-card-hover-bg: rgba(31, 22, 18, 0.035);
+  --result-card-bevel-top: rgba(252, 247, 234, 0.65);
+  --result-card-bevel-bottom: rgba(31, 22, 18, 0.16);
+  --result-card-shadow: 0 18px 32px -22px rgba(31, 22, 18, 0.28);
+}
+
+html.dark {
+  /* Dark mode — black surface, very faint warm fill + warm rim light. */
+  --result-card-hover-bg: rgba(232, 226, 214, 0.022);
+  --result-card-bevel-top: rgba(232, 226, 214, 0.07);
+  --result-card-bevel-bottom: rgba(0, 0, 0, 0.45);
+  --result-card-shadow: 0 20px 36px -22px rgba(0, 0, 0, 0.6);
+}
+
+.result-card {
+  position: relative;
+  padding: 1.25rem 1.5rem 1.5rem;
+  background-color: transparent;
+  outline: none;
+  cursor: default;
+  transition:
+    transform 380ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 380ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 380ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 380ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.result-card:hover,
+.result-card:focus-visible {
+  transform: translateY(-4px);
+  background-color: var(--result-card-hover-bg);
+  /* Bevel — inset top/left highlight + bottom/right shadow + a soft
+     drop shadow underneath. Together they create the impression of a
+     thin panel catching light. */
+  box-shadow:
+    inset 0 1px 0 var(--result-card-bevel-top),
+    inset 1px 0 0 var(--result-card-bevel-top),
+    inset 0 -1px 0 var(--result-card-bevel-bottom),
+    inset -1px 0 0 var(--result-card-bevel-bottom),
+    var(--result-card-shadow);
+}
+
+/* Border SVG sits absolutely above the card. overflow: visible so
+   stroke ends aren't clipped at the perimeter. */
+.result-card__border {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+/* Layer 1 — soft static border that fades in on hover. */
+.result-card__border-base {
+  stroke: var(--color-trail-frame);
+  stroke-width: 1;
+  opacity: 0;
+  transition: opacity 380ms ease;
+  vector-effect: non-scaling-stroke;
+}
+.result-card:hover .result-card__border-base,
+.result-card:focus-visible .result-card__border-base {
+  opacity: 0.32;
+}
+
+/* Layer 2 — wider, dimmer trail that lags the head. CSS-driven dash
+   animation runs continuously so when opacity fades in the loop is
+   already in motion. */
+.result-card__border-trail {
+  stroke: var(--color-trail-tail);
+  stroke-width: 1.1;
+  stroke-linecap: round;
+  stroke-dasharray: 22 78;
+  opacity: 0;
+  transition: opacity 380ms ease;
+  animation: result-trail 6.5s linear infinite;
+  vector-effect: non-scaling-stroke;
+}
+.result-card:hover .result-card__border-trail,
+.result-card:focus-visible .result-card__border-trail {
+  opacity: 0.6;
+}
+
+/* Layer 3 — short bright head segment. Same dashoffset animation as
+   the trail so the bright head sits at the leading edge of the streak. */
+.result-card__border-head {
+  stroke: var(--color-trail-head);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-dasharray: 3 97;
+  opacity: 0;
+  transition: opacity 380ms ease;
+  animation: result-trail 6.5s linear infinite;
+  vector-effect: non-scaling-stroke;
+}
+.result-card:hover .result-card__border-head,
+.result-card:focus-visible .result-card__border-head {
+  opacity: 1;
+}
+
+@keyframes result-trail {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -100;
+  }
+}
+
+/* Icon and copy brighten subtly on hover so the card "wakes up". */
+.result-card__icon {
+  color: var(--color-ink-muted);
+  transition: color 380ms ease;
+}
+.result-card:hover .result-card__icon,
+.result-card:focus-visible .result-card__icon {
+  color: var(--color-ink);
+}
+.result-card__body {
+  transition: color 380ms ease;
+}
+.result-card:hover .result-card__body,
+.result-card:focus-visible .result-card__body {
+  color: var(--color-ink-light);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .result-card,
+  .result-card__border-base,
+  .result-card__border-trail,
+  .result-card__border-head,
+  .result-card__icon,
+  .result-card__body {
+    transition: opacity 200ms ease, background-color 200ms ease,
+      color 200ms ease !important;
+    transform: none !important;
+  }
+  .result-card:hover,
+  .result-card:focus-visible {
+    transform: none !important;
+  }
+  /* No looping trail — just reveal a fuller static border on hover. */
+  .result-card__border-trail,
+  .result-card__border-head {
+    animation: none !important;
+    stroke-dasharray: none !important;
+    stroke-dashoffset: 0 !important;
+  }
+  .result-card:hover .result-card__border-trail,
+  .result-card:focus-visible .result-card__border-trail {
+    opacity: 0.35;
+  }
+  .result-card:hover .result-card__border-head,
+  .result-card:focus-visible .result-card__border-head {
+    opacity: 0.55;
+  }
+}
+
 /* ── Pull Quote ── */
 
 .pull-quote {

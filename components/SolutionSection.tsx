@@ -4,7 +4,8 @@ import { motion } from "motion/react";
 import { fadeUp, staggerContainer } from "@/lib/animations";
 import { SOLUTION, INDUSTRIES } from "@/lib/constants";
 
-// ─── Feature icons (Smart Filtering, Compare, Pre-Qualified) ──────
+// ─── Feature icons (Smart Filtering, Compare, Pre-qualified Enquiries)
+// Thin-line SVGs that match the rest of the site's editorial icon set.
 
 const featureIcons = [
   <svg key="filter" viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-full h-full">
@@ -36,63 +37,86 @@ const featureIcons = [
   </svg>,
 ];
 
-// ─── Industry icons ───────────────────────────────────────────────
+// ─── Industry belt (Who-it's-for marquee) ────────────────────────────
+//
+// A single horizontal row that scrolls infinitely. Tiles are rendered
+// twice so a translateX(-50%) loop hands the second copy back to where
+// the first started — seamless. CSS (.industry-belt / .industry-track)
+// supplies the overflow clip, mask fades, pause-on-hover, and the
+// reduce-motion fallback that wraps tiles statically.
+//
+// Per-belt `direction` and `duration` are passed inline so they're easy
+// to tune from one place in the SolutionSection render.
 
-const industryIcons = [
-  // Fasteners — hexagonal bolt head
-  <svg key="fastener" viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-full h-full">
-    <polygon points="32,8 52,18 52,38 32,48 12,38 12,18" />
-    <circle cx="32" cy="28" r="10" />
-    <line x1="32" y1="48" x2="32" y2="58" />
-    <line x1="26" y1="52" x2="38" y2="52" />
-    <line x1="26" y1="55" x2="38" y2="55" />
-  </svg>,
-  // Tiles — grid of squares with depth
-  <svg key="tiles" viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-full h-full">
-    <rect x="8" y="8" width="22" height="22" />
-    <rect x="34" y="8" width="22" height="22" />
-    <rect x="8" y="34" width="22" height="22" />
-    <rect x="34" y="34" width="22" height="22" />
-    <line x1="8" y1="19" x2="30" y2="19" opacity="0.4" />
-    <line x1="19" y1="8" x2="19" y2="30" opacity="0.4" />
-    <line x1="45" y1="34" x2="45" y2="56" opacity="0.4" />
-  </svg>,
-  // Profiles — cross-section
-  <svg key="profile" viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-full h-full">
-    <rect x="8" y="16" width="48" height="8" />
-    <rect x="16" y="24" width="8" height="24" />
-    <rect x="40" y="24" width="8" height="24" />
-    <rect x="8" y="48" width="48" height="8" />
-    <line x1="24" y1="28" x2="40" y2="28" strokeDasharray="2 3" opacity="0.5" />
-    <line x1="24" y1="36" x2="40" y2="36" strokeDasharray="2 3" opacity="0.5" />
-    <line x1="24" y1="44" x2="40" y2="44" strokeDasharray="2 3" opacity="0.5" />
-  </svg>,
-  // Connectors — circular connector with pins
-  <svg key="connector" viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-full h-full">
-    <circle cx="32" cy="32" r="22" />
-    <circle cx="32" cy="32" r="16" />
-    <circle cx="32" cy="22" r="2.5" />
-    <circle cx="24" cy="28" r="2.5" />
-    <circle cx="40" cy="28" r="2.5" />
-    <circle cx="26" cy="37" r="2.5" />
-    <circle cx="38" cy="37" r="2.5" />
-    <circle cx="32" cy="43" r="2" />
-    <line x1="20" y1="10" x2="16" y2="6" strokeWidth="1" opacity="0.4" />
-    <line x1="44" y1="10" x2="48" y2="6" strokeWidth="1" opacity="0.4" />
-  </svg>,
-];
+interface IndustryBeltProps {
+  items: readonly string[];
+  direction: "left" | "right";
+  duration: number; // seconds for one full loop
+}
 
-// ─── Section ──────────────────────────────────────────────────────
+function IndustryBelt({ items, direction, duration }: IndustryBeltProps) {
+  return (
+    <div className="industry-belt">
+      <div
+        className="industry-track"
+        style={{
+          animationName:
+            direction === "left" ? "industry-belt-left" : "industry-belt-right",
+          animationDuration: `${duration}s`,
+        }}
+      >
+        {items.map((label) => (
+          <IndustryTile key={`a-${label}`} label={label} />
+        ))}
+        {/* Second copy — aria-hidden so screen readers don't announce
+            duplicate labels, and CSS hides this whole set in reduced
+            motion mode. */}
+        {items.map((label) => (
+          <IndustryTile key={`b-${label}`} label={label} duplicate />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function IndustryTile({
+  label,
+  duplicate = false,
+}: {
+  label: string;
+  duplicate?: boolean;
+}) {
+  // Hover state: warmer border, warmer text, faintly warm translucent
+  // background fill. Stays within the IndexArch palette.
+  return (
+    <span
+      role={duplicate ? "presentation" : "listitem"}
+      aria-hidden={duplicate || undefined}
+      className="inline-flex shrink-0 items-center border border-rule px-3 py-1.5 font-mono text-[10.5px] tracking-[0.16em] uppercase text-ink-muted whitespace-nowrap cursor-default transition-colors duration-200 hover:border-ink-faint hover:text-ink hover:bg-surface-raised/50"
+    >
+      {label}
+    </span>
+  );
+}
+
+// ─── Section ──────────────────────────────────────────────────────────
+// One composed offer-section that reads in a single glance:
+//   header (eyebrow + headline + intro paragraph)
+//   ──────────────────────────────────────────────
+//   3 features in one row (hairline verticals between)
+//   ──────────────────────────────────────────────
+//   Who-it's-for line + industry chips
+//
+// Replaces the prior two-half bento, which spread the same information
+// across roughly twice the vertical height.
 
 export default function SolutionSection() {
   return (
-    <section className="relative py-section hairline-top">
+    <section className="relative py-section-sm lg:py-24 hairline-top">
       <div className="mx-auto max-w-[var(--max-width)] px-6 lg:px-8">
-        {/* Unified header — "what it does" + "who it's for" framed as
-            one statement. Asymmetric grid like the methodology header
-            so the typography reads consistently across the page. */}
+        {/* ── Header — asymmetric editorial grid ──────────────────── */}
         <motion.div
-          className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-16 mb-16 lg:mb-20 items-start"
+          className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-16 mb-8 lg:mb-10 items-start"
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
@@ -108,7 +132,7 @@ export default function SolutionSection() {
           </motion.div>
           <motion.p
             variants={fadeUp}
-            className="lg:col-span-5 lg:pt-8 text-base lg:text-lg text-ink-muted leading-relaxed max-w-md"
+            className="lg:col-span-5 lg:pt-7 text-base lg:text-lg text-ink-muted leading-relaxed max-w-md"
             style={{ textWrap: "pretty" as never }}
           >
             Built for how engineers and architects actually buy — and
@@ -118,92 +142,93 @@ export default function SolutionSection() {
           </motion.p>
         </motion.div>
 
-        {/* Two halves: LEFT — what it does (3 features). RIGHT — who
-            it's for (4 industries). A vertical hairline divides them
-            so the section reads as "the system on the left, the
-            audience on the right". */}
+        {/* ── Offer panel — features + who-it's-for in one frame ───
+            Outer border ties the two rows together so the section
+            reads as ONE composed product offer. */}
         <motion.div
-          className="grid grid-cols-1 lg:grid-cols-2 gap-px bg-rule border border-rule"
+          className="border border-rule"
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-60px" }}
         >
-          {/* LEFT HALF — What it does */}
-          <motion.div
-            variants={fadeUp}
-            className="bg-surface p-10 lg:p-12 flex flex-col"
-          >
-            <span className="block font-mono text-xs tracking-widest uppercase text-ink-faint mb-10 lg:mb-12">
-              What it does
-            </span>
-            <div className="flex flex-col gap-10 lg:gap-12">
-              {SOLUTION.cards.map((card, i) => (
-                <article
-                  key={card.title}
-                  className={`flex flex-col gap-3 ${
-                    i > 0 ? "pt-10 lg:pt-12 border-t border-rule" : ""
-                  }`}
+          {/* Feature row — 3 items in a single horizontal line on
+              desktop, vertical-stacked on mobile. `gap-px bg-rule`
+              creates clean 1px hairlines between cells; the parent's
+              border supplies the outer frame. */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-rule">
+            {SOLUTION.cards.map((card, i) => (
+              <motion.article
+                variants={fadeUp}
+                key={card.title}
+                className="bg-surface p-6 lg:p-8 flex flex-col gap-3"
+              >
+                <div className="h-8 w-8 mb-1 text-ink-faint">
+                  {featureIcons[i]}
+                </div>
+                <h3 className="font-serif text-lg lg:text-xl text-ink leading-snug">
+                  {card.title}
+                </h3>
+                <p
+                  className="text-sm text-ink-muted leading-relaxed"
+                  style={{ textWrap: "pretty" as never }}
                 >
-                  <div className="h-9 w-9 mb-2 text-ink-faint">
-                    {featureIcons[i]}
-                  </div>
-                  <h3 className="font-serif text-xl lg:text-2xl text-ink leading-snug">
-                    {card.title}
-                  </h3>
-                  <p
-                    className="text-sm lg:text-base text-ink-muted leading-relaxed"
-                    style={{ textWrap: "pretty" as never }}
-                  >
-                    {card.description}
-                  </p>
-                </article>
-              ))}
-            </div>
-          </motion.div>
+                  {card.description}
+                </p>
+              </motion.article>
+            ))}
+          </div>
 
-          {/* RIGHT HALF — Who it's for */}
+          {/* Who-it's-for row — lives inside the same outer panel,
+              separated by a hairline. Eyebrow + line sit on the left
+              (col-span-4 ≈ 33% width). Three slowly-drifting marquee
+              belts of category tiles fill the right (col-span-8 ≈ 67%).
+              The mask on each belt fades tiles in/out so they never
+              visually crash into the copy column. */}
           <motion.div
             variants={fadeUp}
-            className="bg-surface p-10 lg:p-12 flex flex-col"
+            className="bg-surface border-t border-rule grid grid-cols-1 lg:grid-cols-12 lg:items-center"
           >
-            <span className="block font-mono text-xs tracking-widest uppercase text-ink-faint mb-10 lg:mb-12">
-              Who it&rsquo;s for
-            </span>
-            <p
-              className="text-sm lg:text-base text-ink-muted leading-relaxed mb-10 lg:mb-12 max-w-md"
-              style={{ textWrap: "pretty" as never }}
+            <div className="lg:col-span-4 p-6 lg:p-8 lg:pr-4">
+              <span className="block font-mono text-xs tracking-widest uppercase text-ink-faint mb-2">
+                Who it&rsquo;s for
+              </span>
+              <p
+                className="text-sm lg:text-base text-ink-muted leading-relaxed max-w-sm"
+                style={{ textWrap: "pretty" as never }}
+              >
+                Built for manufacturers who export or serve technical
+                buyers — across products where every spec decision
+                matters.
+              </p>
+            </div>
+            <div
+              className="lg:col-span-8 flex flex-col gap-2.5 py-6 lg:py-8"
+              role="list"
+              aria-label="Manufacturing categories IndexArch supports"
             >
-              Built for manufacturers who export or serve technical
-              buyers — across the kinds of products where every spec
-              decision matters.
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-rule border border-rule">
-              {INDUSTRIES.cards.map((card, i) => (
-                <article
-                  key={card.title}
-                  className="bg-surface p-6 lg:p-7 flex flex-col gap-3"
-                >
-                  <div className="h-7 w-7 text-ink-faint">
-                    {industryIcons[i]}
-                  </div>
-                  <h4 className="font-serif text-base lg:text-lg text-ink leading-snug">
-                    {card.title}
-                  </h4>
-                </article>
+              {INDUSTRIES.belts.map((belt, i) => (
+                <IndustryBelt
+                  key={i}
+                  items={belt}
+                  // Edit speed (seconds per full loop) and direction
+                  // here. Slightly mismatched periods stop the three
+                  // belts from feeling like they're locked together.
+                  direction={i === 1 ? "left" : "right"}
+                  duration={[62, 70, 58][i]}
+                />
               ))}
             </div>
           </motion.div>
         </motion.div>
 
-        {/* Footnote — the device note sits flush below the bento
-            grid as a quiet closer. */}
+        {/* Device note — quiet closer flush below the panel. */}
         <motion.p
           variants={fadeUp}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="mt-10 lg:mt-12 font-mono text-xs text-ink-faint tracking-wide text-center"
+          className="mt-6 lg:mt-8 font-mono text-xs text-ink-faint tracking-wide text-center"
         >
           {SOLUTION.deviceNote}
         </motion.p>

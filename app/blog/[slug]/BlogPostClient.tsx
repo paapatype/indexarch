@@ -8,6 +8,11 @@ import Footer from "@/components/Footer";
 import Button from "@/components/ui/Button";
 import BlogCard from "@/components/ui/BlogCard";
 import BlogDiagram from "@/components/ui/BlogDiagram";
+import {
+  CostBentoGrid,
+  BuyerComment,
+  AlternativeBentoGrid,
+} from "@/components/ui/BlogBento";
 import type { BlogPost } from "@/lib/constants";
 
 function Figure({
@@ -53,6 +58,27 @@ function renderContent(block: string) {
   if (block.startsWith("[DIAGRAM:")) {
     const m = block.match(/^\[DIAGRAM:([a-z0-9-]+)\]\s*$/);
     if (m) return <BlogDiagram name={m[1]} />;
+  }
+
+  // Editorial bento blocks. New marker types are added in this dispatch
+  // so the markdown-ish content arrays in lib/constants.ts can drop
+  // visual breaks in without escaping JSX.
+  if (block.startsWith("[BENTO:")) {
+    const m = block.match(/^\[BENTO:([a-z0-9-]+)\]\s*$/);
+    if (m) {
+      if (m[1] === "pdf-cost-grid") return <CostBentoGrid />;
+      if (m[1] === "alternatives") return <AlternativeBentoGrid />;
+    }
+  }
+
+  // Buyer-comment box \u2014 quote text lives between the colons so the
+  // content is still authored in plain markdown-like syntax.
+  // [QUOTE:buyer-search:I don\u2019t want to email a sales rep ...]
+  if (block.startsWith("[QUOTE:")) {
+    const m = block.match(/^\[QUOTE:([a-z0-9-]+):([\s\S]+)\]\s*$/);
+    if (m && m[1] === "buyer-search") {
+      return <BuyerComment quote={m[2].trim()} />;
+    }
   }
 
   // Headings
@@ -196,14 +222,17 @@ export default function BlogPostClient({
             <div key={i}>{renderContent(block)}</div>
           ))}
 
-          {/* Post CTA */}
+          {/* Post CTA — echoes the homepage methodology framing
+              ("we don't replace your catalogue, we unpack it") instead
+              of contradicting it. */}
           <div className="mt-16 border border-rule p-8 lg:p-10 bg-surface-sunken text-center">
             <h3 className="font-serif text-2xl text-ink mb-3">
-              Ready to replace your PDF catalogue?
+              Let&rsquo;s unpack your catalogue.
             </h3>
             <p className="text-sm text-ink-muted mb-6 max-w-md mx-auto">
-              We&apos;ll build a free demo with 5 of your products. No contracts,
-              no credit card required.
+              Send us your PDF — we&rsquo;ll build a free 5-product demo
+              from the structure already inside it. No contracts, no
+              credit card required.
             </p>
             <Button variant="primary" href="/#contact">
               Get a free 5-product demo

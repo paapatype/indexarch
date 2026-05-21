@@ -548,27 +548,69 @@ export default function Methodology() {
 
           <motion.div
             variants={staggerContainer}
-            className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-14"
+            className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-10"
           >
             {METHODOLOGY.results.map((result) => (
-              <motion.div
-                key={result.heading}
-                variants={fadeUp}
-                className="flex flex-col gap-4"
-              >
-                {/* Icon at h-6 in full ink — confident but not loud. */}
-                <div className="h-6 w-6 flex items-center justify-center text-ink">
-                  {RESULT_ICONS[result.icon]}
-                </div>
-                <h4 className="font-serif text-xl lg:text-2xl text-ink leading-snug mt-1">
-                  {result.heading}
-                </h4>
-                <p
-                  className="text-sm lg:text-base text-ink-muted leading-relaxed max-w-[34ch]"
-                  style={{ textWrap: "pretty" as never }}
+              // The motion.div handles the staggered fade-in
+              // choreography. The inner `.result-card` div carries the
+              // hover bevel + perimeter trail — kept separate so the
+              // CSS transform doesn't collide with framer-motion's
+              // inline y-translation during the entry animation.
+              <motion.div key={result.heading} variants={fadeUp}>
+                <div
+                  className="result-card flex flex-col gap-4"
+                  tabIndex={0}
                 >
-                  {result.body}
-                </p>
+                  {/* Border SVG — three layered rects, opacities driven
+                      by the parent's :hover/:focus-visible. See
+                      .result-card__border-* in globals.css for tuning. */}
+                  <svg
+                    className="result-card__border"
+                    viewBox="0 0 100 100"
+                    preserveAspectRatio="none"
+                    aria-hidden="true"
+                  >
+                    <rect
+                      className="result-card__border-base"
+                      x="0"
+                      y="0"
+                      width="100"
+                      height="100"
+                      fill="none"
+                    />
+                    <rect
+                      className="result-card__border-trail"
+                      x="0"
+                      y="0"
+                      width="100"
+                      height="100"
+                      fill="none"
+                      pathLength={100}
+                    />
+                    <rect
+                      className="result-card__border-head"
+                      x="0"
+                      y="0"
+                      width="100"
+                      height="100"
+                      fill="none"
+                      pathLength={100}
+                    />
+                  </svg>
+
+                  <div className="result-card__icon h-6 w-6 flex items-center justify-center">
+                    {RESULT_ICONS[result.icon]}
+                  </div>
+                  <h4 className="font-serif text-xl lg:text-2xl text-ink leading-snug mt-1">
+                    {result.heading}
+                  </h4>
+                  <p
+                    className="result-card__body text-sm lg:text-base text-ink-muted leading-relaxed max-w-[34ch]"
+                    style={{ textWrap: "pretty" as never }}
+                  >
+                    {result.body}
+                  </p>
+                </div>
               </motion.div>
             ))}
           </motion.div>

@@ -108,17 +108,17 @@ export const SOLUTION = {
     {
       title: "Smart Filtering",
       description:
-        "Engineers filter by size, grade, material, standard—and find the exact product in seconds, not hours.",
+        "Engineers filter by size, grade, material, and standard to find the exact product in seconds.",
     },
     {
       title: "Side-by-Side Comparison",
       description:
-        "Let buyers compare 2–3 products visually with full specs. No more tabbing between PDF pages.",
+        "Buyers compare 2–3 products visually with full specs, without jumping between PDF pages.",
     },
     {
-      title: "Pre-Qualified Inquiries",
+      title: "Pre-qualified Enquiries",
       description:
-        "Every inquiry arrives with product name, spec, and quantity. Your sales team closes instead of clarifying.",
+        "Every enquiry arrives with product selection, specs, quantities, and project context already attached.",
     },
   ],
   deviceNote:
@@ -200,7 +200,7 @@ export const METHODOLOGY = {
     {
       icon: "clock" as const,
       heading: "Faster decisions",
-      body: "Underneath that buyers find the right fit in minutes not hours",
+      body: "Buyers find the right fit in minutes, not hours.",
     },
     {
       icon: "arrows" as const,
@@ -210,7 +210,7 @@ export const METHODOLOGY = {
     {
       icon: "trending" as const,
       heading: "Higher conversion",
-      body: "Your catalogue works as hard as your sales team",
+      body: "Your catalogue works as hard as your sales team.",
     },
   ],
 } as const;
@@ -350,6 +350,54 @@ export const INDUSTRIES = {
         "Motorsport connectors, circular MIL-spec interfaces, wire configurations—cross-reference competitor parts and decode part numbers instantly.",
     },
   ],
+  // ── Moving industry belts ──
+  // Three horizontal rows of category tiles for the "Who it's for"
+  // marquee. Belts 0 + 2 scroll right, belt 1 scrolls left (alternating
+  // direction is what makes the wall feel alive). Tile labels are
+  // rendered TWICE at render-time so the translateX(-50%) loop is
+  // seamless. Edit the lists to add/remove categories; edit the
+  // SolutionSection's IndustryBelt component for speed + direction.
+  belts: [
+    // Belt 1 — fasteners & hardware
+    [
+      "Fastener Styles",
+      "Precision Washers",
+      "Hinges & Brackets",
+      "Clamps & Saddles",
+      "Bearings",
+      "Seals & O-Rings",
+      "Hardware Connectors",
+      "Door Hardware",
+      "Glass Fittings",
+    ],
+    // Belt 2 — surfaces, profiles & sections
+    [
+      "Tiles & Ceramics",
+      "Laminates",
+      "Plywood Panels",
+      "Timber Sections",
+      "Composite Panels",
+      "Aluminium Profiles",
+      "Extrusions",
+      "Profiles & Hardware",
+      "Fabricated Frames",
+    ],
+    // Belt 3 — electrical, fluid & machined
+    [
+      "Electrical Components",
+      "Steel Pipes",
+      "Rubber Parts",
+      "Cable Trays",
+      "Industrial Gaskets",
+      "Valves & Fittings",
+      "Machine Parts",
+      "CNC Parts",
+      "Sheet Metal Parts",
+      "Plumbing Fittings",
+      "Switchgear Parts",
+      "HVAC Components",
+    ],
+  ],
 } as const;
 
 // ── FAQ ──
@@ -449,14 +497,11 @@ export const BLOG_POSTS: BlogPost[] = [
       `## The Hidden Cost of "It Works Fine"`,
       `Most manufacturers we talk to say the same thing: "Our PDF catalog works fine. We've been using it for years." And they're right—it does work. The problem is what "works" means in 2026.`,
       `Your PDF catalog "works" the way a fax machine "works." It transmits information. But it doesn't help your buyers find what they need, compare options, or make decisions. It just dumps 300 pages of specs into their lap and hopes for the best.`,
-      `### The real costs:`,
-      `- **Sales team time:** Your team spends 2–4 hours per inquiry just clarifying specs that should be self-service.
-- **Response lag:** Average response time of 24–48 hours. Your competitor with a digital catalog responds instantly.
-- **Mobile unusability:** 60%+ of B2B product research happens on mobile. PDFs are unreadable on phones.
-- **Zero analytics:** You have no idea which products buyers are looking at, where they drop off, or what they search for.`,
+      `### The real costs`,
+      `[BENTO:pdf-cost-grid]`,
       `## What Technical Buyers Actually Want`,
       `We surveyed 150 engineers, architects, and procurement managers across India and the Middle East. Here's what they told us:`,
-      `> "I don't want to email a sales rep and wait 2 days just to find out if you make a bolt in M36 DIN. I want to search, filter, and find it myself. If I can't do that in 30 seconds, I move on."`,
+      `[QUOTE:buyer-search:I don't want to email a sales rep and wait 2 days just to find out if you make a bolt in M36 DIN. I want to search, filter, and find it myself. If I can't do that in 30 seconds, I move on.]`,
       `The message is clear: technical buyers want **self-service product discovery**. They want to search by spec, filter by standard, compare options side-by-side, and only reach out when they're ready to buy.`,
       `This isn't about fancy 3D animations or flashy design. It's about making your product information *accessible*. A buyer who can find what they need in 10 seconds is a buyer who converts. A buyer who has to email and wait is a buyer who goes to your competitor.`,
       `## The Math: What One Lost Deal Costs You`,
@@ -465,15 +510,11 @@ export const BLOG_POSTS: BlogPost[] = [
       `### But it's not just about the deals you lose.`,
       `It's about the deals you never see. The engineer who visited your website, downloaded your PDF, couldn't find what they needed, and went to a competitor—all without your sales team ever knowing. That's the invisible cost of a bad catalog experience.`,
       `## What the Alternative Looks Like`,
-      `An interactive product catalog isn't a "nice to have" anymore. It's the baseline expectation for serious B2B buyers. Here's what a modern catalog does that your PDF can't:`,
-      `- **Smart filtering:** Search by any attribute—size, grade, material, standard, finish.
-- **Side-by-side comparison:** Compare 2–3 products with full specs in a single view.
-- **Mobile-first:** Works perfectly on phones, tablets, and desktops.
-- **Pre-qualified inquiries:** Every inquiry arrives with product, spec, and quantity already filled in.
-- **Analytics:** Know exactly which products get viewed, compared, and inquired about.`,
+      `An interactive product catalog isn't a "nice to have" anymore. It's the baseline expectation for serious B2B buyers. Here's what a modern catalogue does that your PDF can't:`,
+      `[BENTO:alternatives]`,
       `## The Bottom Line`,
       `Your products are excellent. Your engineering is world-class. But if the way buyers discover and evaluate your products is a 300-page PDF, you're bringing a knife to a gunfight.`,
-      `The manufacturers who win in the next decade won't just have the best products. They'll have the best product *experiences*. And that starts with replacing the PDF.`,
+      `The manufacturers who win in the next decade won't just have the best products. They'll have the best product *experiences*. And that starts with **unpacking what's already inside your catalogue** — the structure, the specs, the visual cues your buyers actually use — and making it findable.`,
     ],
   },
   {
@@ -498,7 +539,7 @@ export const BLOG_POSTS: BlogPost[] = [
       `Looking at the catalogue, the problem wasn't that it looked bad. It looked fine — clean tables, 2D dimensions, 3D renderings, codes, rates per RFT. The problem was *how* architects were expected to use it: open the PDF, scroll through 55 rows, find a profile that fits the section type, dimension, and rate they need, then email the sales team to confirm availability.`,
       `For 55 profiles across four pages, this is roughly the worst possible interaction. Too many products to remember by name; too few categories to navigate by intuition; and every spec hidden inside a row that has to be read top-to-bottom before you know whether it's even relevant.`,
       `[DIAGRAM:pdf-vs-tile]`,
-      `So we made the case for replacing the PDF entirely.`,
+      `So we made the case for unpacking it into something that actually answered the architect's question.`,
       `## What an architect actually needs`,
       `Architects don't shop a catalogue the way a consumer shops a website. They come in with a brief — *"I need a fluted profile around 145mm wide, ideally under ₹400 per RFT, with a 3D rendering I can drop into my visualisation."* The job of a catalogue, for that user, is to let them filter to the matching profiles in seconds and see the visual identifier they need.`,
       `[DIAGRAM:brief-to-order]`,
@@ -529,10 +570,10 @@ export const BLOG_POSTS: BlogPost[] = [
   {
     slug: "3d-product-catalogs-what-works",
     tag: "Technical",
-    title: "3D Product Catalogs: What Actually Works in 2026",
+    title: "3D catalogues, visual discovery, and what your product actually needs",
     excerpt:
-      "Not all interactive catalogs are created equal. Here's what separates tools that convert from tools that confuse.",
-    readTime: "10 min read",
+      "Visual discovery is the job. 3D is one tool — useful for some categories, decorative for others. Here's how to tell the difference.",
+    readTime: "8 min read",
     date: "Jan 15, 2026",
     author: {
       name: "Sankalp Shetty",
@@ -540,22 +581,53 @@ export const BLOG_POSTS: BlogPost[] = [
       bio: "Founder of IndexArch. Helping manufacturers turn static catalogues into interactive sales tools.",
     },
     content: [
-      `The phrase "3D product catalog" gets thrown around a lot in manufacturing circles. But there's a massive gap between a spinning 3D model on a webpage and a catalog that actually helps engineers find products, compare specs, and place orders.`,
-      `We've built catalogs for fastener manufacturers, tile companies, and hardware distributors. Here's what we've learned about what actually works—and what's just expensive decoration.`,
-      `## The Fundamentals: Search and Filter First`,
-      `The single most important feature in any product catalog isn't 3D. It's search. Specifically, the ability to filter products by the exact attributes your buyers care about: size, grade, material, standard, finish, load rating, whatever matters in your industry.`,
-      `If an engineer can't find the right M36 Grade 10.9 bolt in under 10 seconds, your catalog has failed—no matter how beautiful the 3D rendering is.`,
-      `## 3D That Serves a Purpose`,
-      `3D visualization works brilliantly for products where spatial understanding matters: tiles (how does this texture look at scale?), profiles (what's the cross-section?), hardware (how do these components fit together?). It fails when it's added just because it looks impressive.`,
-      `The test: does the 3D view help the buyer make a decision faster? If yes, invest in it. If it's just a spinning model that adds loading time, skip it.`,
-      `## Comparison Tools: The Underrated Feature`,
-      `In our experience, side-by-side comparison is the single highest-converting feature in B2B catalogs. Engineers and procurement managers don't buy the first product they find—they evaluate 2–3 options against each other. Make that comparison effortless, and you remove a major friction point in the buying process.`,
-      `## Pre-Qualified Inquiries: Stop Wasting Sales Time`,
-      `A generic "Contact Us" form is a missed opportunity. When a buyer has already found the product they want, your inquiry form should capture what they found: product name, spec, quantity, and application. This means your sales team gets a qualified lead instead of a vague question.`,
-      `## Mobile: Non-Negotiable`,
-      `Over 60% of B2B product research now happens on mobile devices. If your catalog doesn't work perfectly on a phone, you're invisible to the majority of your potential buyers.`,
-      `## The Bottom Line`,
-      `The best catalogs in 2026 aren't the flashiest. They're the ones that respect the buyer's time. Fast search, smart filters, useful comparisons, and pre-qualified inquiries. Everything else is optional.`,
+      `The phrase "3D product catalogue" gets thrown around a lot in manufacturing circles. But there's a quieter problem behind it: most catalogues fail not because they're missing 3D — they fail because they don't help buyers *see* the product the way they actually evaluate it.`,
+      `The right question isn't "should we add 3D?" It's "how does my buyer visually discover the right product?"`,
+      `## Visual discovery is what catalogues are actually for`,
+      `Technical buyers don't arrive at a catalogue with a product name. They arrive with a brief — a dimension, a load rating, a material grade, a project context. Their first act is visual. They scan, compare shapes, match a section against a sketch, eliminate options based on what they can see.`,
+      `A catalogue earns its keep by making that visual scan fast. If a buyer can rule out 80% of your range with their eyes in 10 seconds, the catalogue is working. If they have to read every spec to know what something *looks* like, it's failing.`,
+      `That's what we mean by **visual discovery**: the catalogue's primary job is to compress visual evaluation, not to be comprehensive. Comprehensive is what the spec sheet is for. The catalogue is the lens that gets the buyer to the right spec sheet.`,
+      `## Different products need different visual treatments`,
+      `The mistake we see most often is companies deciding on a presentation format before they understand the product. Then they force every product into it — usually either "spec table everywhere" or "3D rendering everywhere."`,
+      `A bolt manufacturer doesn't need 3D. A buyer evaluating an M36 hex bolt cares about thread standard, grade, finish, and length — none of which are visual decisions. A clean filterable spec table with a small thumbnail beats any spinning 3D model.`,
+      `A WPC profiles manufacturer absolutely needs visual treatment. Architects pick fluted profiles by section shape, not part number. They want to see the cross-section and the surface texture together. A 3D rendering they can rotate is genuinely useful here — but so is a precise elevation drawing. 3D is one option, not the only one.`,
+      `A connector manufacturer needs pin layouts, mating compatibility, and dimensional drawings. Sometimes a flat exploded view tells the story better than 3D, because the buyer is matching against a CAD layout, not a photograph.`,
+      `A tile manufacturer needs surface texture at scale and a clean view of the edge profile. A high-resolution photograph in the right light can outperform 3D every time, because the goal is matching what the architect's eye sees in person.`,
+      `The point is simple: ask what visual question your buyer is trying to answer in the first three seconds. Then design the visual treatment around that question.`,
+      `## What "fits the industry" actually looks like`,
+      `### Fasteners and threaded components`,
+      `Spec-first. Buyers filter by thread standard, grade, finish, length. The visual is a small clean thumbnail — a hex-head outline with the standard noted, maybe a side profile if the head shape varies. 3D adds nothing because nothing meaningful rotates. Investing in a 3D viewer here is investing in loading time.`,
+      `### Tiles, ceramics, laminates, surfaces`,
+      `Surface-first. The job is communicating texture, finish, and colour at realistic scale. High-resolution photography on a neutral background, with optional swatch-on-floor mockups. 3D is rarely necessary; what matters is matching what the architect's eye sees on site. A great photo set with consistent lighting will out-convert a 3D viewer here every time.`,
+      `### Aluminium profiles, WPC profiles, extrusions`,
+      `Section-first. The cross-section *is* the product. Show the section drawn at scale alongside a 3D extrusion. Both views serve different purposes: the section is what the architect specifies, the extrusion is what they visualise on an elevation. This is one of the few categories where 3D earns its place — but only paired with the section drawing.`,
+      `### Electrical connectors, hardware connectors`,
+      `Layout-first. Pin positions, mating partner, environmental rating. Cleanly-drawn flat layouts with dimensions plus a small physical render. 3D viewers help when the connector has unusual geometry; otherwise top-and-side technical drawings are more efficient than a model the buyer has to rotate to read.`,
+      `### Sheet metal, fabricated parts`,
+      `Process-first. Show the part with bend lines, joining method, and tolerances called out. 3D helps when the part is geometrically complex; for simpler stamped parts, an isometric line drawing communicates more in less screen space.`,
+      `### Custom-machined components`,
+      `Tolerance-first. The presentation needs to surface the spec sheet — surface finish, tolerance class, material certifications. The visual is supporting evidence, not the lead. A clean dimensioned drawing matters more than any rendering.`,
+      `In every case, the question isn't "should we add 3D?" It's "what does this buyer's eye need to confirm first?"`,
+      `## When 3D earns its place`,
+      `3D is the right answer when:`,
+      `- The product has visual complexity that doesn't read in 2D — architectural hardware, complex connectors, machined assemblies.
+- The buyer needs to rotate the product to confirm specific geometry — connectors with unusual pin layouts, valves with off-axis ports.
+- The product is being specified into a larger visualisation — cladding profiles dropped into elevations, hardware dropped into BIM models.`,
+      `3D is the wrong answer when:`,
+      `- A buyer's decision is driven by a number on a spec table — most fasteners, most fluid components, most resistors.
+- The product's defining feature is a surface or texture, not a shape — tiles, fabrics, laminates.
+- The 3D model adds loading time and reduces clarity instead of adding it — most consumer-facing decorative presentations.`,
+      `A 3D model that's there because everyone else has one is decoration. A 3D model that answers a real visual question your buyer would otherwise have to call your sales team to ask is a tool. The two look identical in a screenshot and behave completely differently in a sales cycle.`,
+      `## The features that work across every category`,
+      `Whatever visual treatment is right for your product, the catalogue itself still needs to do a handful of things consistently. These are the table stakes — the visual treatment on top is what matches the catalogue to the product.`,
+      `- **Filter by the attributes your buyers actually use** — not the ones your engineering team likes to talk about.
+- **Compare two or three candidates side-by-side** with their specs and visuals aligned.
+- **Work on the device the buyer is actually on** — for most categories, that's a phone in a site meeting or a tablet on a desk.
+- **Capture an enquiry with the product, spec, and quantity already attached** so your sales team starts the conversation halfway closed.`,
+      `## The takeaway`,
+      `Visual discovery is the job. 3D is a tool, not a destination.`,
+      `A great catalogue doesn't decide "we're a 3D catalogue" or "we're a spec-sheet catalogue." It decides what visual question its buyer needs answered first, and then uses whatever combination of photography, line drawing, exploded view, 3D rendering, or interactive viewer answers that question best.`,
+      `If you're building a catalogue, start by watching how your customers actually pick a product — what they look at first, what they ignore, where they email instead of clicking. Then design the visual treatment around the moment of decision. Not around what looked good in someone else's catalogue.`,
     ],
   },
   // Stashed for now \u2014 restore by removing the surrounding `/* */`.
@@ -610,9 +682,9 @@ export const FOOTER = {
     { label: "Blog", href: "/blog" },
   ],
   contact: {
-    email: "hello@indexstudio.in",
+    email: "info@indexarch.com",
     phone: "+91 98765 43210",
-    location: "Mumbai, India",
+    location: "Bangalore, India",
   },
   copyright: "© 2026 IndexArch. All rights reserved. Built with care in India.",
 } as const;
