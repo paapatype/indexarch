@@ -23,32 +23,190 @@ interface BlogCardProps {
 function BlogTileArt({ tag }: { tag: string }) {
   const t = tag.toLowerCase();
   const className =
-    "w-44 h-28 lg:w-56 lg:h-32 text-ink-faint transition-transform duration-500 group-hover:scale-[1.04] group-hover:text-ink";
+    "w-56 h-36 lg:w-72 lg:h-44 text-ink-faint transition-transform duration-500 group-hover:scale-[1.04] group-hover:text-ink";
   const stroke = "currentColor";
 
   if (t === "case study") {
     return (
-      <svg viewBox="0 0 200 120" fill="none" stroke={stroke} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
-        {/* PDF on the left */}
-        <rect x="34" y="38" width="34" height="44" />
-        <line x1="42" y1="50" x2="60" y2="50" strokeWidth="0.7" opacity="0.55" />
-        <line x1="42" y1="56" x2="58" y2="56" strokeWidth="0.7" opacity="0.55" />
-        <line x1="42" y1="62" x2="60" y2="62" strokeWidth="0.7" opacity="0.55" />
-        <line x1="42" y1="68" x2="54" y2="68" strokeWidth="0.7" opacity="0.55" />
-        {/* dog ear */}
-        <path d="M62 38 L68 44 L62 44 Z" strokeWidth="0.9" opacity="0.7" />
-        {/* arrow */}
-        <line x1="78" y1="60" x2="100" y2="60" />
-        <polyline points="94,55 100,60 94,65" />
-        {/* Search bar on the right */}
-        <rect x="108" y="50" width="60" height="14" rx="7" />
-        <circle cx="116" cy="57" r="2.6" strokeWidth="0.9" />
-        <line x1="118" y1="59" x2="121" y2="62" strokeWidth="0.9" />
-        <line x1="126" y1="57" x2="158" y2="57" strokeWidth="0.7" opacity="0.45" />
-        {/* filter chips below the bar */}
-        <rect x="108" y="70" width="14" height="6" rx="3" strokeWidth="0.7" opacity="0.55" />
-        <rect x="126" y="70" width="14" height="6" rx="3" strokeWidth="0.7" opacity="0.55" />
-        <rect x="144" y="70" width="14" height="6" rx="3" strokeWidth="0.7" opacity="0.55" />
+      <svg
+        viewBox="0 0 200 120"
+        fill="none"
+        stroke={stroke}
+        strokeWidth="1"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={`${className} blog-cover-casestudy`}
+        aria-hidden="true"
+      >
+        {/* ── LEFT: PDF catalogue page ──
+            A4-style sheet with four WPC profile rows (fluted, hollow
+            square, ribbed, louver). Each row is a thumbnail + spec
+            lines, mirroring how Kayu & Kov's original PDF stacked
+            its profile listings. */}
+        <g className="kk-pdf-page">
+          <rect x="10" y="16" width="78" height="88" strokeWidth="1.1" />
+          {/* Letterhead rule */}
+          <line x1="14" y1="22" x2="56" y2="22" strokeWidth="0.7" opacity="0.55" />
+          <line x1="14" y1="25" x2="42" y2="25" strokeWidth="0.5" opacity="0.35" />
+
+          {/* Row 1 — fluted profile */}
+          <g className="kk-pdf-row-1">
+            <rect x="16" y="32" width="10" height="10" strokeWidth="0.55" opacity="0.6" />
+            <polyline
+              points="17.5,40 17.5,34 19,34 19,36 20.5,34 22,36 23.5,34 25,36 25,40"
+              strokeWidth="0.4"
+              opacity="0.55"
+            />
+            <line x1="30" y1="34" x2="80" y2="34" strokeWidth="0.45" opacity="0.5" />
+            <line x1="30" y1="37" x2="72" y2="37" strokeWidth="0.45" opacity="0.4" />
+            <line x1="30" y1="40" x2="76" y2="40" strokeWidth="0.45" opacity="0.4" />
+          </g>
+
+          {/* Row 2 — hollow square */}
+          <g className="kk-pdf-row-2">
+            <rect x="16" y="48" width="10" height="10" strokeWidth="0.55" opacity="0.6" />
+            <rect x="18.5" y="50.5" width="5" height="5" strokeWidth="0.4" opacity="0.5" />
+            <line x1="30" y1="50" x2="78" y2="50" strokeWidth="0.45" opacity="0.5" />
+            <line x1="30" y1="53" x2="68" y2="53" strokeWidth="0.45" opacity="0.4" />
+            <line x1="30" y1="56" x2="74" y2="56" strokeWidth="0.45" opacity="0.4" />
+          </g>
+
+          {/* Row 3 — ribbed profile */}
+          <g className="kk-pdf-row-3">
+            <rect x="16" y="64" width="10" height="10" strokeWidth="0.55" opacity="0.6" />
+            <line x1="18" y1="66" x2="18" y2="72" strokeWidth="0.35" opacity="0.45" />
+            <line x1="20" y1="66" x2="20" y2="72" strokeWidth="0.35" opacity="0.45" />
+            <line x1="22" y1="66" x2="22" y2="72" strokeWidth="0.35" opacity="0.45" />
+            <line x1="24" y1="66" x2="24" y2="72" strokeWidth="0.35" opacity="0.45" />
+            <line x1="30" y1="66" x2="76" y2="66" strokeWidth="0.45" opacity="0.5" />
+            <line x1="30" y1="69" x2="66" y2="69" strokeWidth="0.45" opacity="0.4" />
+            <line x1="30" y1="72" x2="72" y2="72" strokeWidth="0.45" opacity="0.4" />
+          </g>
+
+          {/* Row 4 — louver / slats */}
+          <g className="kk-pdf-row-4">
+            <rect x="16" y="80" width="10" height="10" strokeWidth="0.55" opacity="0.6" />
+            <line x1="17" y1="82" x2="25" y2="81" strokeWidth="0.35" opacity="0.45" />
+            <line x1="17" y1="84" x2="25" y2="83" strokeWidth="0.35" opacity="0.45" />
+            <line x1="17" y1="86" x2="25" y2="85" strokeWidth="0.35" opacity="0.45" />
+            <line x1="17" y1="88" x2="25" y2="87" strokeWidth="0.35" opacity="0.45" />
+            <line x1="30" y1="82" x2="74" y2="82" strokeWidth="0.45" opacity="0.5" />
+            <line x1="30" y1="85" x2="64" y2="85" strokeWidth="0.45" opacity="0.4" />
+            <line x1="30" y1="88" x2="70" y2="88" strokeWidth="0.45" opacity="0.4" />
+          </g>
+        </g>
+
+        {/* ── Indexing line — dashed guide + arrow connecting the PDF
+            to the searchable grid. The "data flows" cue. ── */}
+        <g className="kk-index">
+          <line
+            x1="92"
+            y1="60"
+            x2="108"
+            y2="60"
+            strokeWidth="0.6"
+            strokeDasharray="2 2"
+          />
+          <polyline
+            points="104,57 108,60 104,63"
+            strokeWidth="0.7"
+          />
+        </g>
+
+        {/* ── RIGHT: search/filter + 2×2 profile grid ── */}
+
+        {/* Search bar */}
+        <g className="kk-search-bar">
+          <rect x="112" y="18" width="78" height="10" strokeWidth="0.9" />
+          {/* Magnifier */}
+          <circle cx="117" cy="23" r="1.7" strokeWidth="0.55" opacity="0.6" />
+          <line x1="118.3" y1="24.3" x2="120" y2="26" strokeWidth="0.55" opacity="0.6" />
+          {/* Search text bar */}
+          <line x1="123" y1="23" x2="162" y2="23" strokeWidth="0.45" opacity="0.4" />
+        </g>
+
+        {/* Filter chips — three pill-shaped chips, middle one highlights */}
+        <g className="kk-filter-chips">
+          <rect x="112" y="32" width="22" height="7" rx="3.5" strokeWidth="0.6" opacity="0.65" />
+          <line x1="116" y1="35.5" x2="130" y2="35.5" strokeWidth="0.4" opacity="0.4" />
+
+          <rect x="138" y="32" width="22" height="7" rx="3.5" strokeWidth="0.6" opacity="0.65" />
+          <line x1="142" y1="35.5" x2="156" y2="35.5" strokeWidth="0.4" opacity="0.4" />
+
+          <rect x="164" y="32" width="22" height="7" rx="3.5" strokeWidth="0.6" opacity="0.65" />
+          <line x1="168" y1="35.5" x2="182" y2="35.5" strokeWidth="0.4" opacity="0.4" />
+
+          {/* Active chip overlay — warm-bronze fill + brighter stroke */}
+          <rect
+            className="kk-active-chip"
+            x="138"
+            y="32"
+            width="22"
+            height="7"
+            rx="3.5"
+            strokeWidth="0.8"
+          />
+        </g>
+
+        {/* Product grid 2×2 — each card carries one WPC profile shape */}
+
+        {/* Card 1 (top-left) — fluted profile */}
+        <g className="kk-card kk-card-1">
+          <rect x="112" y="44" width="36" height="26" />
+          <polyline
+            points="119,64 119,52 121,52 121,55 123,52 125,55 127,52 129,55 131,52 133,55 135,52 135,64 119,64"
+            strokeWidth="0.6"
+            opacity="0.75"
+          />
+        </g>
+
+        {/* Card 2 (top-right) — hollow rectangular profile */}
+        <g className="kk-card kk-card-2">
+          <rect x="152" y="44" width="36" height="26" />
+          <rect x="161" y="51" width="18" height="14" strokeWidth="0.7" opacity="0.75" />
+          <rect x="164" y="54" width="12" height="8" strokeWidth="0.5" opacity="0.5" />
+        </g>
+
+        {/* Card 3 (bottom-left) — RIBBED profile (the search match) */}
+        <g className="kk-card kk-card-3">
+          <rect x="112" y="74" width="36" height="26" />
+          <rect x="118" y="80" width="24" height="14" strokeWidth="0.7" opacity="0.85" />
+          <line x1="121" y1="82" x2="121" y2="92" strokeWidth="0.4" opacity="0.6" />
+          <line x1="124" y1="82" x2="124" y2="92" strokeWidth="0.4" opacity="0.6" />
+          <line x1="127" y1="82" x2="127" y2="92" strokeWidth="0.4" opacity="0.6" />
+          <line x1="130" y1="82" x2="130" y2="92" strokeWidth="0.4" opacity="0.6" />
+          <line x1="133" y1="82" x2="133" y2="92" strokeWidth="0.4" opacity="0.6" />
+          <line x1="136" y1="82" x2="136" y2="92" strokeWidth="0.4" opacity="0.6" />
+          <line x1="139" y1="82" x2="139" y2="92" strokeWidth="0.4" opacity="0.6" />
+        </g>
+
+        {/* Card 4 (bottom-right) — louver / slat profile */}
+        <g className="kk-card kk-card-4">
+          <rect x="152" y="74" width="36" height="26" />
+          <line x1="158" y1="80" x2="183" y2="78" strokeWidth="0.5" opacity="0.65" />
+          <line x1="158" y1="83" x2="183" y2="81" strokeWidth="0.5" opacity="0.65" />
+          <line x1="158" y1="86" x2="183" y2="84" strokeWidth="0.5" opacity="0.65" />
+          <line x1="158" y1="89" x2="183" y2="87" strokeWidth="0.5" opacity="0.65" />
+          <line x1="158" y1="92" x2="183" y2="90" strokeWidth="0.5" opacity="0.65" />
+          <line x1="158" y1="95" x2="183" y2="93" strokeWidth="0.5" opacity="0.65" />
+        </g>
+
+        {/* Selected-card focus brackets — warm bronze L-shapes at the
+            four corners of card 3 (ribbed), extending 3 units outside. */}
+        <g className="kk-brackets">
+          <polyline points="108,77 108,71 114,71" strokeWidth="0.9" />
+          <polyline points="146,71 152,71 152,77" strokeWidth="0.9" />
+          <polyline points="108,97 108,103 114,103" strokeWidth="0.9" />
+          <polyline points="146,103 152,103 152,97" strokeWidth="0.9" />
+        </g>
+
+        {/* Dimension callout inside the matched card — implies a buyer
+            zeroed in on the spec they needed. */}
+        <g className="kk-dimension">
+          <line x1="118" y1="97" x2="142" y2="97" strokeWidth="0.4" />
+          <line x1="118" y1="95.5" x2="118" y2="98.5" strokeWidth="0.4" />
+          <line x1="142" y1="95.5" x2="142" y2="98.5" strokeWidth="0.4" />
+        </g>
       </svg>
     );
   }
@@ -532,7 +690,7 @@ export default function BlogCard({
     <motion.article variants={fadeUp}>
       <Link
         href={`/blog/${slug}`}
-        className="group block border border-rule bg-surface-raised transition-shadow duration-300 hover:shadow-card-hover"
+        className="blog-card-link group block border border-rule bg-surface-raised"
       >
         {/* Tile illustration — topic-specific */}
         <div className="relative aspect-[16/9] bg-surface-sunken overflow-hidden border-b border-rule">
@@ -547,7 +705,7 @@ export default function BlogCard({
             {tag}
           </span>
           <h3
-            className={`font-serif text-ink leading-snug group-hover:text-accent transition-colors duration-200 ${
+            className={`blog-card-title font-serif text-ink leading-snug transition-colors duration-200 ${
               compact ? "text-lg mb-2" : "text-xl lg:text-2xl mb-3"
             }`}
             style={{ textWrap: "balance" as never }}

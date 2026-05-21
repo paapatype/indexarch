@@ -12,6 +12,8 @@ import {
   CostBentoGrid,
   BuyerComment,
   AlternativeBentoGrid,
+  IndustryGrid,
+  ThreeDDecisionGrid,
 } from "@/components/ui/BlogBento";
 import type { BlogPost } from "@/lib/constants";
 
@@ -68,6 +70,8 @@ function renderContent(block: string) {
     if (m) {
       if (m[1] === "pdf-cost-grid") return <CostBentoGrid />;
       if (m[1] === "alternatives") return <AlternativeBentoGrid />;
+      if (m[1] === "industry-grid") return <IndustryGrid />;
+      if (m[1] === "3d-decision") return <ThreeDDecisionGrid />;
     }
   }
 

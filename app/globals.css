@@ -82,6 +82,13 @@
   --color-trail-head: #1F1612;
   --color-trail-tail: #5C4A33;
   --color-trail-frame: #6B5942;
+
+  /* Verdict colours for "earns it / wrong tool"-style decision blocks.
+     Calibrated to read as semantic green/red on the cream surface
+     without going SaaS-neon. Dark-mode block lifts both saturations
+     so they stay readable on black. */
+  --color-verdict-yes: #2F7D3F;
+  --color-verdict-no: #B5402A;
 }
 
 /* ── Dark Theme Overrides ──
@@ -146,6 +153,10 @@ html.dark {
   --color-trail-head: #FCF7EA;
   --color-trail-tail: #E8DCC2;
   --color-trail-frame: #C9B894;
+
+  /* Verdict colours — lifted saturations for readability on black. */
+  --color-verdict-yes: #6BC07E;
+  --color-verdict-no: #E78A78;
 }
 
 /* ── Base Styles ── */
@@ -920,6 +931,216 @@ html[data-theme-transition="active"] body > footer {
     opacity: 1 !important;
     transform: scale(1) !important;
   }
+}
+
+/* ── Blog card hover state ──
+   The original `hover:shadow-card-hover` token resolves to pure-black
+   shadows that disappear on the dark-mode surface (the card sits on a
+   black bg). And `group-hover:text-accent` collapses to the same colour
+   as `text-ink` in BOTH themes, so the title-hover was a no-op.
+
+   This block replaces both with a single theme-aware lift:
+     • subtle Y translate
+     • border tints to the warm trail-frame (visible on cream + black)
+     • title shifts to the warm trail-head accent
+     • box-shadow uses theme-specific values so the lift reads on both
+       surfaces (cream uses warm-bronze shadow, black uses a warm rim-
+       light instead of a pure-black drop). */
+
+.blog-card-link {
+  transition:
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.blog-card-link:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-trail-frame);
+  /* Light-mode default — warm-bronze drop shadow visible on cream. */
+  box-shadow:
+    0 1px 0 var(--color-trail-frame),
+    0 14px 28px -16px rgba(31, 22, 18, 0.32);
+}
+
+html.dark .blog-card-link:hover {
+  /* Dark-mode override — pure-black drop shadows vanish, so use a
+     warm rim-light + a softer ambient shadow instead. */
+  box-shadow:
+    0 0 0 1px rgba(232, 226, 214, 0.10),
+    0 18px 36px -22px rgba(0, 0, 0, 0.7),
+    0 6px 18px -14px rgba(232, 226, 214, 0.16);
+}
+
+.blog-card-link:hover .blog-card-title {
+  color: var(--color-trail-head);
+}
+
+/* ── Blog cover (Case Study tag): "PDF → searchable profile system" ──
+   Eight-second editorial loop for the Kayu & Kov case study tile.
+   Reads as: PDF catalogue sheet sits on the left → indexing line +
+   arrow connect it to a 2×2 product grid on the right → search bar
+   and filter chips appear → middle chip activates → the matching
+   ribbed profile card gets corner brackets + a dimension callout →
+   non-matching cards dim, the PDF page fades to a quieter background
+   role → hold the composed final state → gentle reset → loop.
+
+   Timeline (% of 8 s):
+      0–15   PDF page alone
+     15–35   cards fade in (staggered) + index line/arrow draw in
+     35–48   search bar appears
+     45–55   filter chips appear
+     50–60   middle chip activates (warm-bronze fill)
+     55–65   focus brackets on the matched card
+     60–70   dimension callout on the match
+     60–92   non-matching cards dim, PDF page softens
+     92–100  fade everything for clean loop
+*/
+
+.blog-cover-casestudy .kk-pdf-page {
+  animation: kk-pdf-page 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.blog-cover-casestudy .kk-index {
+  opacity: 0;
+  animation: kk-index 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.blog-cover-casestudy .kk-search-bar {
+  opacity: 0;
+  animation: kk-search-bar 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.blog-cover-casestudy .kk-filter-chips {
+  opacity: 0;
+  animation: kk-filter-chips 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.blog-cover-casestudy .kk-active-chip {
+  fill: var(--color-trail-head);
+  fill-opacity: 0;
+  stroke: var(--color-trail-head);
+  opacity: 0;
+  animation: kk-active-chip 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.blog-cover-casestudy .kk-card {
+  opacity: 0;
+}
+.blog-cover-casestudy .kk-card-1 {
+  animation: kk-card-other 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  animation-delay: 0s;
+}
+.blog-cover-casestudy .kk-card-2 {
+  animation: kk-card-other 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  animation-delay: 0.18s;
+}
+.blog-cover-casestudy .kk-card-3 {
+  animation: kk-card-match 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  animation-delay: 0.36s;
+}
+.blog-cover-casestudy .kk-card-4 {
+  animation: kk-card-other 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  animation-delay: 0.54s;
+}
+
+.blog-cover-casestudy .kk-brackets {
+  stroke: var(--color-trail-head);
+  opacity: 0;
+  animation: kk-brackets 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.blog-cover-casestudy .kk-dimension {
+  stroke: var(--color-trail-head);
+  opacity: 0;
+  animation: kk-dimension 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+@keyframes kk-pdf-page {
+  0%, 4% { opacity: 0; }
+  10%, 50% { opacity: 1; }
+  62%, 92% { opacity: 0.5; }
+  98%, 100% { opacity: 0; }
+}
+
+@keyframes kk-index {
+  0%, 22% { opacity: 0; }
+  32%, 92% { opacity: 0.55; }
+  98%, 100% { opacity: 0; }
+}
+
+@keyframes kk-search-bar {
+  0%, 36% { opacity: 0; }
+  46%, 92% { opacity: 1; }
+  98%, 100% { opacity: 0; }
+}
+
+@keyframes kk-filter-chips {
+  0%, 42% { opacity: 0; }
+  52%, 92% { opacity: 1; }
+  98%, 100% { opacity: 0; }
+}
+
+@keyframes kk-active-chip {
+  0%, 50% { opacity: 0; fill-opacity: 0; }
+  58%, 92% { opacity: 1; fill-opacity: 0.22; }
+  98%, 100% { opacity: 0; fill-opacity: 0; }
+}
+
+/* Non-matching cards — appear, hold briefly, then dim to background. */
+@keyframes kk-card-other {
+  0%, 14% { opacity: 0; }
+  24%, 55% { opacity: 0.9; }
+  68%, 92% { opacity: 0.3; }
+  98%, 100% { opacity: 0; }
+}
+
+/* Matched card (Card 3, ribbed profile) — appears and stays bright. */
+@keyframes kk-card-match {
+  0%, 14% { opacity: 0; }
+  24%, 92% { opacity: 1; }
+  98%, 100% { opacity: 0; }
+}
+
+@keyframes kk-brackets {
+  0%, 55% { opacity: 0; }
+  65%, 92% { opacity: 0.85; }
+  98%, 100% { opacity: 0; }
+}
+
+@keyframes kk-dimension {
+  0%, 60% { opacity: 0; }
+  70%, 92% { opacity: 0.8; }
+  98%, 100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blog-cover-casestudy .kk-pdf-page,
+  .blog-cover-casestudy .kk-index,
+  .blog-cover-casestudy .kk-search-bar,
+  .blog-cover-casestudy .kk-filter-chips,
+  .blog-cover-casestudy .kk-active-chip,
+  .blog-cover-casestudy .kk-card,
+  .blog-cover-casestudy .kk-brackets,
+  .blog-cover-casestudy .kk-dimension {
+    animation: none !important;
+  }
+  /* Composed final state: PDF quietly behind, grid populated, middle
+     chip active, matched card highlighted with brackets + dimension. */
+  .blog-cover-casestudy .kk-pdf-page { opacity: 0.5 !important; }
+  .blog-cover-casestudy .kk-index { opacity: 0.55 !important; }
+  .blog-cover-casestudy .kk-search-bar { opacity: 1 !important; }
+  .blog-cover-casestudy .kk-filter-chips { opacity: 1 !important; }
+  .blog-cover-casestudy .kk-active-chip {
+    opacity: 1 !important;
+    fill-opacity: 0.22 !important;
+  }
+  .blog-cover-casestudy .kk-card-1,
+  .blog-cover-casestudy .kk-card-2,
+  .blog-cover-casestudy .kk-card-4 { opacity: 0.3 !important; }
+  .blog-cover-casestudy .kk-card-3 { opacity: 1 !important; }
+  .blog-cover-casestudy .kk-brackets { opacity: 0.85 !important; }
+  .blog-cover-casestudy .kk-dimension { opacity: 0.8 !important; }
 }
 
 /* ── Blog cover (Technical tag): "visual discovery lens" ──────────────

@@ -150,6 +150,240 @@ export function BuyerComment({
   );
 }
 
+// ─── Industry-by-industry visual treatment grid ──────────────────────
+// Used by: "3D catalogues, visual discovery, and what your product actually needs"
+// Marker:  [BENTO:industry-grid]
+//
+// Six categories laid out as scannable cards instead of six prose
+// sub-sections. Each card carries:
+//   • a thin-line icon hinting at the recommended visual treatment
+//   • a small uppercase "lead" tag (Spec-first / Surface-first / ...)
+//   • the category name (serif)
+//   • a one-line description
+//   • a hairline-divided footer noting whether 3D earns its place
+//
+// Layout: 1 col on mobile, 2 cols on tablet, 3 cols on desktop.
+
+interface IndustryCard {
+  name: string;
+  lead: string;
+  body: string;
+  threeD: string;
+  icon: ReactNode;
+}
+
+const INDUSTRY_CARDS: IndustryCard[] = [
+  {
+    name: "Fasteners",
+    lead: "Spec-first",
+    body: "Buyers filter by thread, grade, finish, length. The visual is a thumbnail — a hex-head outline with the standard noted.",
+    threeD: "Skip",
+    icon: (
+      <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" className="h-7 w-7">
+        <polygon points="6,9 14,4 22,9 22,19 14,24 6,19" />
+        <circle cx="14" cy="14" r="4" opacity="0.55" />
+      </svg>
+    ),
+  },
+  {
+    name: "Tiles, ceramics, laminates",
+    lead: "Surface-first",
+    body: "Texture, finish, and colour at realistic scale. High-resolution photography on a neutral background wins.",
+    threeD: "Skip",
+    icon: (
+      <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" className="h-7 w-7">
+        <rect x="4" y="4" width="20" height="20" />
+        <line x1="7" y1="22" x2="11" y2="6" strokeWidth="0.7" opacity="0.55" />
+        <line x1="12" y1="22" x2="16" y2="6" strokeWidth="0.7" opacity="0.55" />
+        <line x1="17" y1="22" x2="21" y2="6" strokeWidth="0.7" opacity="0.55" />
+      </svg>
+    ),
+  },
+  {
+    name: "Profiles & extrusions",
+    lead: "Section-first",
+    body: "The cross-section is the product. Show the section drawn at scale alongside an extrusion view — they serve different purposes.",
+    threeD: "Pair with section",
+    icon: (
+      <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" className="h-7 w-7">
+        <polyline points="4,9 24,9 24,13 16,13 16,23 12,23 12,13 4,13 4,9" />
+        <line x1="4" y1="25" x2="24" y2="25" strokeWidth="0.55" opacity="0.5" />
+        <line x1="4" y1="24" x2="4" y2="26" strokeWidth="0.55" opacity="0.5" />
+        <line x1="24" y1="24" x2="24" y2="26" strokeWidth="0.55" opacity="0.5" />
+      </svg>
+    ),
+  },
+  {
+    name: "Connectors & hardware",
+    lead: "Layout-first",
+    body: "Pin positions, mating partner, environmental rating. Cleanly-drawn flat layouts beat a model the buyer has to rotate to read.",
+    threeD: "Optional",
+    icon: (
+      <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" className="h-7 w-7">
+        <circle cx="14" cy="14" r="9" />
+        <circle cx="11" cy="11" r="1" fill="currentColor" />
+        <circle cx="17" cy="11" r="1" fill="currentColor" />
+        <circle cx="8" cy="14" r="1" fill="currentColor" />
+        <circle cx="14" cy="14" r="1" fill="currentColor" />
+        <circle cx="20" cy="14" r="1" fill="currentColor" />
+        <circle cx="11" cy="17" r="1" fill="currentColor" />
+        <circle cx="17" cy="17" r="1" fill="currentColor" />
+      </svg>
+    ),
+  },
+  {
+    name: "Sheet metal, fabricated parts",
+    lead: "Process-first",
+    body: "Bend lines, joining method, and tolerances called out. 3D helps when the part is geometrically complex.",
+    threeD: "When complex",
+    icon: (
+      <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" className="h-7 w-7">
+        <polyline points="4,18 12,18 12,8 24,8" strokeWidth="1.3" />
+        <line x1="12" y1="8" x2="12" y2="18" strokeDasharray="1 1.5" opacity="0.5" />
+        <polyline points="22,6 24,8 22,10" strokeWidth="0.7" opacity="0.55" />
+      </svg>
+    ),
+  },
+  {
+    name: "Custom-machined",
+    lead: "Tolerance-first",
+    body: "Surface finish, tolerance class, material certifications. The visual is supporting evidence — the spec is the lead.",
+    threeD: "Supporting only",
+    icon: (
+      <svg viewBox="0 0 28 28" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" className="h-7 w-7">
+        <rect x="6" y="10" width="3" height="12" />
+        <rect x="19" y="10" width="3" height="12" />
+        <line x1="9" y1="16" x2="19" y2="16" strokeWidth="0.7" />
+        <polyline points="11,14 9,16 11,18" strokeWidth="0.6" opacity="0.7" />
+        <polyline points="17,14 19,16 17,18" strokeWidth="0.6" opacity="0.7" />
+        <line x1="6" y1="8" x2="22" y2="8" strokeWidth="0.55" opacity="0.4" />
+      </svg>
+    ),
+  },
+];
+
+export function IndustryGrid() {
+  return (
+    <section
+      className="blog-bento-grid my-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-px bg-rule border border-rule"
+      aria-label="Recommended visual treatment by manufacturing category"
+    >
+      {INDUSTRY_CARDS.map((card) => (
+        <article
+          key={card.name}
+          className="blog-bento-card bg-surface p-6 lg:p-7 flex flex-col gap-3"
+        >
+          <div className="text-ink-muted">{card.icon}</div>
+          <span className="font-mono text-[10px] tracking-[0.18em] uppercase text-ink-faint">
+            {card.lead}
+          </span>
+          <h3 className="font-serif text-lg text-ink leading-snug">
+            {card.name}
+          </h3>
+          <p
+            className="text-sm text-ink-muted leading-relaxed"
+            style={{ textWrap: "pretty" as never }}
+          >
+            {card.body}
+          </p>
+          <p className="mt-auto pt-3 border-t border-rule font-mono text-[10px] tracking-[0.16em] uppercase text-ink-faint">
+            3D&nbsp;<span className="text-ink-muted">·&nbsp;{card.threeD}</span>
+          </p>
+        </article>
+      ))}
+    </section>
+  );
+}
+
+// ─── 3D decision grid (when 3D earns it vs when it's the wrong tool) ─
+// Used by: "3D catalogues, visual discovery, and what your product actually needs"
+// Marker:  [BENTO:3d-decision]
+//
+// 2-column × 3-row grid. Left column collects the "EARNS IT" cases
+// (each tagged with a warm-bronze status pill), right column collects
+// the "WRONG TOOL" cases (muted-grey status). Cards are interleaved in
+// the array (earns/wrong/earns/wrong/...) so a `grid-cols-2` row-flow
+// renders left-to-right in the right reading order.
+
+interface DecisionCard {
+  verdict: "earns" | "wrong";
+  title: string;
+  body: string;
+}
+
+const DECISION_CARDS: DecisionCard[] = [
+  {
+    verdict: "earns",
+    title: "Geometry that doesn't read in 2D",
+    body: "Architectural hardware, complex connectors, machined assemblies — visual complexity the buyer has to rotate to land.",
+  },
+  {
+    verdict: "wrong",
+    title: "Driven by a number on a spec table",
+    body: "Most fasteners, fluid components, resistors — the decision is the spec, not the shape.",
+  },
+  {
+    verdict: "earns",
+    title: "Buyer needs to confirm specific geometry",
+    body: "Connectors with unusual pin layouts, valves with off-axis ports — the eye has to inspect, not just read.",
+  },
+  {
+    verdict: "wrong",
+    title: "Defining feature is a surface, not a shape",
+    body: "Tiles, fabrics, laminates — what matters is texture and colour at scale, not how it rotates.",
+  },
+  {
+    verdict: "earns",
+    title: "Specified into a larger visualisation",
+    body: "Cladding profiles dropped into elevations, hardware dropped into BIM models — 3D as a downstream asset.",
+  },
+  {
+    verdict: "wrong",
+    title: "Adds loading time without clarity",
+    body: "Most consumer-facing decorative presentations. If the 3D doesn't answer a real visual question, it's noise.",
+  },
+];
+
+export function ThreeDDecisionGrid() {
+  return (
+    <section
+      className="blog-bento-grid my-12 grid grid-cols-1 md:grid-cols-2 gap-px bg-rule border border-rule"
+      aria-label="When 3D earns its place and when it is the wrong tool"
+    >
+      {DECISION_CARDS.map((card, i) => (
+        <article
+          key={i}
+          className="blog-bento-card bg-surface p-6 lg:p-7 flex flex-col gap-3"
+        >
+          <span
+            className="font-mono text-[10px] tracking-[0.2em] uppercase"
+            style={{
+              color:
+                card.verdict === "earns"
+                  ? "var(--color-verdict-yes)"
+                  : "var(--color-verdict-no)",
+            }}
+          >
+            {card.verdict === "earns" ? "✓ Earns it" : "✗ Wrong tool"}
+          </span>
+          <h3
+            className="font-serif text-lg text-ink leading-snug"
+            style={{ textWrap: "balance" as never }}
+          >
+            {card.title}
+          </h3>
+          <p
+            className="text-sm text-ink-muted leading-relaxed"
+            style={{ textWrap: "pretty" as never }}
+          >
+            {card.body}
+          </p>
+        </article>
+      ))}
+    </section>
+  );
+}
+
 // ─── Alternative feature bento (5 cards with micro-animations) ───────
 // Used by: "Why your PDF catalogue is costing you deals"
 // Marker:  [BENTO:alternatives]
