@@ -1,13 +1,12 @@
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
 import ProblemSection from "@/components/ProblemSection";
-import SolutionSection from "@/components/SolutionSection";
 import Methodology from "@/components/Methodology";
 import BeforeAfter from "@/components/BeforeAfter";
 import Process from "@/components/Process";
-import Industries from "@/components/Industries";
-import FAQ from "@/components/FAQ";
+import SolutionSection from "@/components/SolutionSection";
 import ContactForm from "@/components/ContactForm";
+import FAQ from "@/components/FAQ";
 import Footer from "@/components/Footer";
 
 export default function Home() {
@@ -17,13 +16,12 @@ export default function Home() {
       <main>
         <Hero />
         <ProblemSection />
-        <SolutionSection />
         <Methodology />
         <BeforeAfter />
         <Process />
-        <Industries />
-        <FAQ />
+        <SolutionSection />
         <ContactForm />
+        <FAQ />
       </main>
       <Footer />
     </>

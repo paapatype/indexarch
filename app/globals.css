@@ -72,6 +72,16 @@
   --orb-blur: blur(0.9px);
   --orb-shadow: none;
   --orb-opacity: 0.7;
+
+  /* ── Methodology split-trace trails (light defaults) ──
+     On a cream background the warm-champagne palette that reads as
+     premium on black disappears. Light mode uses a deep warm bronze
+     for the head and a mid bronze for the trailing tail — same warm
+     family, dialled down in lightness so the trace has real contrast
+     against the surface. Dark-mode block restores the champagne. */
+  --color-trail-head: #1F1612;
+  --color-trail-tail: #5C4A33;
+  --color-trail-frame: #6B5942;
 }
 
 /* ── Dark Theme Overrides ──
@@ -124,11 +134,18 @@ html.dark {
   --shadow-card-hover: 0 2px 10px rgba(0, 0, 0, 0.6), 0 12px 32px rgba(0, 0, 0, 0.5);
   --shadow-nav: 0 1px 0 rgba(242, 237, 229, 0.06);
 
-  /* Methodology orb — dark theme: sharp glowing puck. */
-  --orb-size: 0.625rem;
+  /* Methodology orb — dark theme. Tiny dot with a thin halo only as
+     wide as the loader line is tall (~1–2 px). Reads as a sophisticated
+     pinpoint of light, not a glowing puck. */
+  --orb-size: 0.34rem;
   --orb-blur: none;
-  --orb-shadow: 0 0 14px var(--color-ink), 0 0 28px var(--color-ink);
+  --orb-shadow: 0 0 2px var(--color-ink), 0 0 5px rgba(242, 237, 229, 0.35);
   --orb-opacity: 1;
+
+  /* Split-trace trails — warm champagne on black, as originally tuned. */
+  --color-trail-head: #FCF7EA;
+  --color-trail-tail: #E8DCC2;
+  --color-trail-frame: #C9B894;
 }
 
 /* ── Base Styles ── */

@@ -96,27 +96,319 @@ function BlogTileArt({ tag }: { tag: string }) {
     );
   }
 
-  // Default + "strategy" — line graph trending down
+  // Default + "strategy" — clock fires dollar signs that accelerate
+  // toward a wall, hit it, rebound and tumble down into a stacked pile.
+  // The strategy tile renders bigger than the other variants so the
+  // sequence reads at a glance.
+  return <StrategyAnim stroke={stroke} />;
+}
+
+// Three dollar tokens, each on its own phase, repeating forever.
+const DOLLAR_PHASE_MS = 2400;
+const DOLLAR_COUNT = 3;
+// Layout — equally spaced (clock → wall → PDF, 68 viewBox units apart)
+// and ~25% bigger than the prior pass.
+const CLOCK_X = 36;
+const CLOCK_Y = 60;
+const WALL_X = 104;
+const WALL_Y_TOP = 18;
+const WALL_Y_BOT = 102;
+const IMPACT_Y = 60;
+const PDF_LEFT = 151;
+const PDF_TOP = 32;
+
+function StrategyAnim({ stroke }: { stroke: string }) {
+  // 25% larger render size — still respects the card's aspect-[16/9]
+  // padding via Tailwind utility caps.
+  const className =
+    "w-64 h-40 lg:w-[22rem] lg:h-[13rem] text-ink-faint transition-transform duration-500 group-hover:scale-[1.04] group-hover:text-ink";
   return (
-    <svg viewBox="0 0 200 120" fill="none" stroke={stroke} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
-      {/* axis */}
-      <line x1="40" y1="32" x2="40" y2="92" strokeWidth="0.7" opacity="0.4" />
-      <line x1="40" y1="92" x2="170" y2="92" strokeWidth="0.7" opacity="0.4" />
-      {/* y-axis tick marks */}
-      <line x1="38" y1="48" x2="40" y2="48" strokeWidth="0.6" opacity="0.4" />
-      <line x1="38" y1="64" x2="40" y2="64" strokeWidth="0.6" opacity="0.4" />
-      <line x1="38" y1="80" x2="40" y2="80" strokeWidth="0.6" opacity="0.4" />
-      {/* downward data line */}
-      <polyline points="50,42 78,52 106,62 134,76 162,88" strokeWidth="1.2" />
-      <circle cx="50" cy="42" r="1.8" fill={stroke} />
-      <circle cx="78" cy="52" r="1.8" fill={stroke} opacity="0.85" />
-      <circle cx="106" cy="62" r="1.8" fill={stroke} opacity="0.7" />
-      <circle cx="134" cy="76" r="1.8" fill={stroke} opacity="0.55" />
-      <circle cx="162" cy="88" r="1.8" fill={stroke} opacity="0.4" />
-      {/* down arrow at the trailing point */}
-      <line x1="162" y1="88" x2="172" y2="100" strokeWidth="1" opacity="0.7" />
-      <polyline points="167,98 172,100 170,95" strokeWidth="1" opacity="0.7" />
+    <svg
+      viewBox="0 0 200 120"
+      fill="none"
+      stroke={stroke}
+      strokeWidth="1"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      {/* Clock — face + hour markers + three live hands. Each hand
+          rotates continuously; second hand whips around so time
+          visibly burns away while the PDF sits untouched. */}
+      <g transform={`translate(${CLOCK_X} ${CLOCK_Y})`} opacity="0.9">
+        <circle r="18" strokeWidth="1.2" />
+        {/* Hour markers at 12, 3, 6, 9 */}
+        <line x1="0" y1="-17" x2="0" y2="-14" strokeWidth="0.9" opacity="0.45" />
+        <line x1="17" y1="0" x2="14" y2="0" strokeWidth="0.9" opacity="0.45" />
+        <line x1="0" y1="17" x2="0" y2="14" strokeWidth="0.9" opacity="0.45" />
+        <line x1="-17" y1="0" x2="-14" y2="0" strokeWidth="0.9" opacity="0.45" />
+        {/* Hour hand — thick, short, slowest */}
+        <motion.line
+          x1="0"
+          y1="0"
+          x2="0"
+          y2="-9"
+          strokeWidth="1.6"
+          stroke={stroke}
+          strokeLinecap="round"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+          style={{ originX: 0.5, originY: 1 }}
+        />
+        {/* Minute hand — medium */}
+        <motion.line
+          x1="0"
+          y1="0"
+          x2="0"
+          y2="-13"
+          strokeWidth="1.2"
+          stroke={stroke}
+          strokeLinecap="round"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+          style={{ originX: 0.5, originY: 1 }}
+        />
+        {/* Second hand — thin, fastest. ~2s per revolution so it reads
+            as time burning while the catalogue sits unbothered. */}
+        <motion.line
+          x1="0"
+          y1="0"
+          x2="0"
+          y2="-15"
+          strokeWidth="0.7"
+          stroke={stroke}
+          opacity="0.75"
+          strokeLinecap="round"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          style={{ originX: 0.5, originY: 1 }}
+        />
+        {/* Center pin */}
+        <circle r="1.7" fill={stroke} />
+      </g>
+
+      {/* PDF (25% bigger) — equally spaced from the wall */}
+      <g transform={`translate(${PDF_LEFT} ${PDF_TOP})`} opacity="0.9">
+        <rect x="0" y="0" width="42" height="56" rx="2" strokeWidth="1.2" />
+        <path d="M 32 0 L 42 10 L 32 10 Z" strokeWidth="0.9" opacity="0.6" />
+        <line x1="7" y1="17" x2="32" y2="17" strokeWidth="0.7" opacity="0.55" />
+        <line x1="7" y1="24" x2="26" y2="24" strokeWidth="0.7" opacity="0.55" />
+        <line x1="7" y1="31" x2="32" y2="31" strokeWidth="0.7" opacity="0.55" />
+        <line x1="7" y1="38" x2="23" y2="38" strokeWidth="0.7" opacity="0.55" />
+        <line x1="7" y1="45" x2="29" y2="45" strokeWidth="0.7" opacity="0.55" />
+      </g>
+
+      {/* Wall — sits at the midpoint between clock and PDF. */}
+      <line
+        x1={WALL_X}
+        y1={WALL_Y_TOP}
+        x2={WALL_X}
+        y2={WALL_Y_BOT}
+        strokeWidth="1.2"
+        opacity="0.7"
+      />
+
+      {/* Floor pile — 4 dollars only, scattered (not in a row) and
+          rotated so they read as "lying down". Soft opacities so the
+          pile feels like it's settled, not stacked. */}
+      <g>
+        <text
+          x="80"
+          y="110"
+          fontSize="11"
+          fontFamily="ui-serif, serif"
+          fill={stroke}
+          opacity="0.42"
+          textAnchor="middle"
+          transform="rotate(86 80 110)"
+        >
+          $
+        </text>
+        <text
+          x="98"
+          y="113"
+          fontSize="10"
+          fontFamily="ui-serif, serif"
+          fill={stroke}
+          opacity="0.32"
+          textAnchor="middle"
+          transform="rotate(74 98 113)"
+        >
+          $
+        </text>
+        <text
+          x="90"
+          y="106"
+          fontSize="11"
+          fontFamily="ui-serif, serif"
+          fill={stroke}
+          opacity="0.5"
+          textAnchor="middle"
+          transform="rotate(96 90 106)"
+        >
+          $
+        </text>
+        <text
+          x="70"
+          y="114"
+          fontSize="9"
+          fontFamily="ui-serif, serif"
+          fill={stroke}
+          opacity="0.26"
+          textAnchor="middle"
+          transform="rotate(106 70 114)"
+        >
+          $
+        </text>
+      </g>
+
+      {/* Flying dollars + impact pulses, sequenced. */}
+      {Array.from({ length: DOLLAR_COUNT }).map((_, i) => (
+        <FlyingDollar key={`d${i}`} index={i} stroke={stroke} />
+      ))}
+      {Array.from({ length: DOLLAR_COUNT }).map((_, i) => (
+        <ImpactPulse key={`p${i}`} index={i} stroke={stroke} />
+      ))}
     </svg>
+  );
+}
+
+function FlyingDollar({ index, stroke }: { index: number; stroke: string }) {
+  const total = DOLLAR_PHASE_MS * DOLLAR_COUNT;
+  const offset = index * DOLLAR_PHASE_MS;
+  const fmt = (ms: number) => (offset + ms) / total;
+  // Landing scattered near the static pile but not overlapping any
+  // single floor dollar.
+  const landingX = 66 + ((index * 13) % 30);
+  const landingRot = index % 2 ? 18 : -12;
+
+  return (
+    <motion.text
+      fontSize="14"
+      fontFamily="ui-serif, serif"
+      fill={stroke}
+      textAnchor="middle"
+      initial={{ opacity: 0 }}
+      animate={{
+        // launch → accelerate → impact squash → rebound → gravity fall
+        // → land → fade.
+        x: [
+          CLOCK_X + 8,
+          CLOCK_X + 10,
+          WALL_X,
+          WALL_X,
+          WALL_X - 12,
+          landingX + 5,
+          landingX,
+          landingX,
+          landingX,
+        ],
+        y: [
+          IMPACT_Y,
+          IMPACT_Y,
+          IMPACT_Y,
+          IMPACT_Y,
+          IMPACT_Y + 2,
+          IMPACT_Y + 22,
+          IMPACT_Y + 44,
+          IMPACT_Y + 44,
+          IMPACT_Y + 44,
+        ],
+        scaleX: [1, 1, 1, 0.5, 1.12, 1, 1, 1, 1],
+        scaleY: [1, 1, 1, 1.45, 0.88, 1, 1, 1, 1],
+        rotate: [0, 0, 0, -6, 14, 44, landingRot, landingRot, landingRot],
+        opacity: [0, 1, 1, 1, 1, 0.95, 0.55, 0.55, 0],
+      }}
+      transition={{
+        duration: total / 1000,
+        repeat: Infinity,
+        ease: [
+          "easeOut",
+          [0.55, 0, 0.95, 0.4], // accelerate aggressively into wall
+          [0.35, 0, 0.65, 1],
+          [0.2, 0.8, 0.4, 1],
+          [0.4, 0, 0.85, 0.4],
+          [0.2, 0.6, 0.4, 1],
+          "linear",
+          "easeIn",
+        ] as never,
+        times: [
+          fmt(0),
+          fmt(80),
+          fmt(680),
+          fmt(760),
+          fmt(880),
+          fmt(1180),
+          fmt(1600),
+          fmt(2000),
+          fmt(DOLLAR_PHASE_MS),
+        ],
+      }}
+      style={{ transformOrigin: "center" } as never}
+    >
+      $
+    </motion.text>
+  );
+}
+
+// Gentle pulse along the wall at the moment of impact. Two short
+// strokes radiate up and down from the impact point, fading as they
+// extend. Sized small and faint so it reads as a ripple, not a flash.
+function ImpactPulse({ index, stroke }: { index: number; stroke: string }) {
+  const total = DOLLAR_PHASE_MS * DOLLAR_COUNT;
+  const offset = index * DOLLAR_PHASE_MS;
+  // Impact happens around 680ms into each dollar's slot (when the
+  // dollar reaches the wall). Pulse lasts ~900ms.
+  const IMPACT = 680;
+  const PULSE = 900;
+  const slotEnd = DOLLAR_PHASE_MS;
+  const times = [
+    offset / total,
+    (offset + IMPACT - 30) / total,
+    (offset + IMPACT + 60) / total,
+    (offset + IMPACT + PULSE) / total,
+    (offset + slotEnd) / total,
+  ];
+  const transition = {
+    duration: total / 1000,
+    repeat: Infinity,
+    ease: "easeOut",
+    times,
+  } as const;
+  return (
+    <g>
+      {/* Up trail — thin line that travels from the impact point UP
+          the wall to its top end. Same stroke width as the wall itself
+          so it reads as the wall's own ripple, not a separate flash. */}
+      <motion.line
+        x1={WALL_X}
+        x2={WALL_X}
+        y1={IMPACT_Y}
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        stroke={stroke}
+        animate={{
+          y2: [IMPACT_Y, IMPACT_Y, IMPACT_Y - 6, WALL_Y_TOP, WALL_Y_TOP],
+          opacity: [0, 0, 0.95, 0.4, 0],
+        }}
+        transition={transition}
+      />
+      {/* Down trail — same idea, travels DOWN the wall to its bottom. */}
+      <motion.line
+        x1={WALL_X}
+        x2={WALL_X}
+        y1={IMPACT_Y}
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        stroke={stroke}
+        animate={{
+          y2: [IMPACT_Y, IMPACT_Y, IMPACT_Y + 6, WALL_Y_BOT, WALL_Y_BOT],
+          opacity: [0, 0, 0.95, 0.4, 0],
+        }}
+        transition={transition}
+      />
+    </g>
   );
 }
 
@@ -151,6 +443,7 @@ export default function BlogCard({
             className={`font-serif text-ink leading-snug group-hover:text-accent transition-colors duration-200 ${
               compact ? "text-lg mb-2" : "text-xl lg:text-2xl mb-3"
             }`}
+            style={{ textWrap: "balance" as never }}
           >
             {title}
           </h3>

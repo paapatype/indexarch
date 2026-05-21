@@ -2,6 +2,7 @@
 
 export const NAV_LINKS = [
   { label: "How It Works", href: "#how-it-works" },
+  { label: "FAQ", href: "#faq" },
   { label: "Blog", href: "/blog" },
 ] as const;
 
@@ -24,7 +25,7 @@ export const HERO = {
 // ── Problem Section ──
 
 export const PROBLEM = {
-  quote: `"Do you have M36 Grade 10.9 in DIN?"\nYour sales team hears this 20 times a day. They dig through 300-page PDFs, cross-reference spec sheets, and reply hours later—if they reply at all. Meanwhile, the buyer moves on to a competitor who made it easy.`,
+  quote: `"Do you have M36 Grade 10.9 in DIN?"\nYour sales team hears this 20 times a day. They dig through 300-page PDFs, cross-reference spec sheets, and reply hours later—if they reply at all. Meanwhile, the buyer moves on to a competitor who made it easy.`,
   cards: [
     {
       title: "Slow Response Times",
@@ -49,6 +50,51 @@ export const PROBLEM = {
     source: "Forrester",
     sourceUrl: "https://www.forrester.com/press-newsroom/forrester-predictions-2025-b2b-marketing-sales/",
   },
+  stat2: {
+    value: "75%",
+    label: "B2B buyers prefer a rep-free buying experience",
+    source: "Gartner",
+    sourceUrl:
+      "https://www.gartner.com/en/sales/insights/b2b-buying-journey",
+  },
+} as const;
+
+// ── Problem Carousel ──
+//
+// Three problems the catalogue work fixes, surfaced one at a time in
+// the ProblemSection.  Each problem has a serif title + supporting
+// copy on the left and a named graphic on the right.  The carousel
+// auto-cycles every ~6s and pauses on hover.
+
+export const PROBLEM_CAROUSEL = {
+  // Each problem reads as a long sentence-style headline + a single
+  // supporting paragraph, in the style of the original "Not just your
+  // sales team — 20 times a day" framing. Layout is bare: serif title,
+  // body, prev/next arrows underneath; a hairline divides it from the
+  // graphic on the right. No surrounding container, no section eyebrow.
+  problems: [
+    {
+      title:
+        "Not just your sales team — anyone would get tired of answering questions like these 20 times a day.",
+      description:
+        "They dig through 300-page PDFs, cross-reference spec sheets, and reply hours later — if they reply at all. Meanwhile, the buyer moves on to a competitor who made it easy.",
+      graphic: "workforce",
+    },
+    {
+      title:
+        "Half the day goes to time-zone delay — the other half to clarifying basics.",
+      description:
+        "When a buyer in another zone fires off a question, the back-and-forth balloons. Eight hours to confirm a dimension, sixteen to verify a finish, and the order that should have been one click becomes a week of email.",
+      graphic: "globe",
+    },
+    {
+      title:
+        "Even when the right part is found, the hours go into verifying it.",
+      description:
+        "Cross-reference the rate, confirm the standard, verify the lead time, re-read the email to make sure nothing got missed. A catalogue that surfaces every spec up front collapses three rounds of confirmation into one.",
+      graphic: "checklist",
+    },
+  ],
 } as const;
 
 // ── Solution Section ──
@@ -105,45 +151,66 @@ export const IMPACT = {
     "Based on average results across Index clients. Individual results may vary.",
 } as const;
 
-// ── Methodology (How It Works) ──
+// ── Methodology (How It Works) — single combined section ──
+//
+// All four beats now render as one 4-column static grid with a
+// "The Result →" row underneath. No loader bar, no rotating active
+// state — clean editorial layout.
 
 export const METHODOLOGY = {
   eyebrow: "How it works",
-  // Two structural lines — the period anchors the line break.
-  headingLines: [
-    "We don't replace your catalogue.",
-    "We unpack it.",
-  ],
-  // Three structural lines, last one stands alone for emphasis.
-  subtitleLines: [
+  headingLines: ["We don't replace your", "catalogue, we unpack it."],
+  // Right column reads as two paragraphs only. The second paragraph
+  // pairs "The PDF buries them." with the emphasised closer "We pull
+  // them to the surface." on the same line/flow.
+  subtitleIntro:
     "Every catalogue already contains the structure a buyer needs — quality tiers, technical specs, the visual cues people match against a brief.",
-    "The PDF buries them.",
-    "We pull them to the surface.",
-  ],
+  subtitleBuries: "The PDF buries them.",
+  subtitleEmphasis: "We pull them to the surface.",
   beats: [
     {
       number: "01",
-      title: "Start with what you already have",
+      // Every title is split into exactly THREE lines so all four
+      // cards share the same heading-block height — bodies start on
+      // the same baseline regardless of card.
+      title: "We start with\nwhat you\nalready have",
       description:
-        "Send us your existing PDF catalogue, spec sheets, and product images. Nothing changes about your products. We work with the data you already document.",
+        "A 30-minute discovery call on your buyers, your pain points, and the shape of your existing catalogue. Send us your PDF, spec sheets, and product images — we work with the data you already document.",
     },
     {
       number: "02",
-      title: "Map the variation",
+      title: "Map out\nvariations of all\nshapes & sizes",
       description:
-        "55 profiles, 200 SKUs, 12 standards, 4 finishes — every catalogue has structure hiding in it. We map quality tiers, quantity breakpoints, and how variants relate, so a buyer can navigate them instead of reading them.",
+        "Every catalogue has structure hiding in it. We map quality tiers, quantity breakpoints, and how variants relate — so engineers, architects, and procurement leads each find their match without reading cover to cover.",
     },
     {
       number: "03",
-      title: "Find the technical hooks that close the deal",
+      title: "Finding the\ntechnical hooks\nthat close deals",
       description:
-        "Engineers and architects don't buy by name; they buy by spec. We identify the technical factors that drive the inquiry — load rating, dimension, material grade, certification — and put them at the front of how products are filtered and compared.",
+        "Technical buyers don't buy by name; they buy by spec. We identify the factors that drive the inquiry — load rating, dimension, material grade, certification — and put them at the front of how products are filtered and compared.",
     },
     {
       number: "04",
-      title: "Pull out the visual identifiers",
+      title: "Pull out the\nvisual identifiers\nthat matter",
       description:
-        "A 3D rendering, a profile cross-section, a finish swatch — the visual cues a buyer matches against a project brief. We surface these consistently so the path from “I'm looking for X” to “I want to order Y” is one decision, not twelve.",
+        "A 3D rendering, a profile cross-section, a finish swatch — the visual cues a buyer matches against a project brief. We surface these consistently so the path from looking to ordering is one decision, not twelve.",
+    },
+  ],
+  results: [
+    {
+      icon: "clock" as const,
+      heading: "Faster decisions",
+      body: "Underneath that buyers find the right fit in minutes not hours",
+    },
+    {
+      icon: "arrows" as const,
+      heading: "Fewer back-and-forth",
+      body: "Technical clarity upfront means stronger enquiries land in your inbox.",
+    },
+    {
+      icon: "trending" as const,
+      heading: "Higher conversion",
+      body: "Your catalogue works as hard as your sales team",
     },
   ],
 } as const;
@@ -151,15 +218,23 @@ export const METHODOLOGY = {
 // ── Before / After (Kayu & Kov example) ──
 
 export const BEFORE_AFTER = {
-  eyebrow: "What it looks like in practice",
-  heading: "From a 4-page PDF to a catalogue you can search.",
-  body: "Kayu & Kov sent us this — 55 WPC profiles across 4 pages. Each row a product description, a rate, a 2D drawing, a 3D rendering. Useful, but only if you already know what you're looking for. We rebuilt it as a website where architects can filter by section type, dimension, and rate, see each profile in 3D, and place an order that arrives directly in your inbox.",
+  eyebrow: "How it works",
+  // Two explicit headline lines — renders as two block spans so the
+  // wrap is deterministic, editorial.
+  headingLines: ["From a PDF to", "smart sales engine"],
+  // Right-column eyebrow split into a primary + secondary label so
+  // "LIVE DEMO" reads as the emphasis and "See it in action" follows
+  // in muted mono.
+  liveDemoEyebrow: { primary: "Live Demo", secondary: "See it in action" },
+  body: "An interactive catalogue we built for Kayu & Kov — 55 cladding profiles in 3D, filtered by section, dimension, and rate. Try it out below.",
   beforeLabel: "What they sent us",
-  beforeMeta: "PDF · 4 pages · 55 profiles",
+  beforeMeta: "4 pages · 55 profiles",
   afterLabel: "What we shipped",
-  afterMeta: "filterable · order-ready",
+  afterMeta: "kayuandkov.com",
+  // External link displayed in the AFTER panel header row.
+  afterLink: { label: "Visit kayuandkov.com →", href: "https://www.kayuandkov.com" },
   afterCaption:
-    "An interactive catalogue we built for Kayu & Kov — 55 profiles, filtered by section type, dimension, and rate. Try it out below.",
+    "An interactive catalogue we built for Kayu & Kov — 55 cladding profiles in 3D, filtered by section, dimension, and rate. Try it out below.",
   cta: { label: "Read the full story →", href: "/blog/kayu-kov-cut-architect-emails" },
 } as const;
 
@@ -358,7 +433,7 @@ export const BLOG_POSTS: BlogPost[] = [
   {
     slug: "pdf-catalog-costing-you-deals",
     tag: "Strategy",
-    title: "Why Your PDF Catalog Is Costing You Deals",
+    title: "Why your PDF catalogue is costing you deals",
     excerpt:
       "The hidden cost of static catalogs: lost leads, slow responses, and buyers who never come back.",
     readTime: "8 min read",
@@ -483,6 +558,8 @@ export const BLOG_POSTS: BlogPost[] = [
       `The best catalogs in 2026 aren't the flashiest. They're the ones that respect the buyer's time. Fast search, smart filters, useful comparisons, and pre-qualified inquiries. Everything else is optional.`,
     ],
   },
+  // Stashed for now \u2014 restore by removing the surrounding `/* */`.
+  /*
   {
     slug: "fastener-industry-digital-gap",
     tag: "Industry",
@@ -517,6 +594,7 @@ export const BLOG_POSTS: BlogPost[] = [
       `The cost of bridging this gap is modest compared to the value of even a single additional export contract. The question isn't whether to invest in digital—it's how quickly you can get there.`,
     ],
   },
+  */
 ];
 
 // ── Footer ──

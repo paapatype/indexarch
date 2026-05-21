@@ -16,8 +16,11 @@ const base =
 const variants: Record<Variant, string> = {
   primary:
     "bg-ink text-sand-50 px-7 py-3.5 text-sm tracking-wide hover:bg-ink-light active:scale-[0.98]",
+  // Solid surface fill so the hero tile-grid doesn't show through the
+  // button. The grid lines were visible behind a transparent outline
+  // button — bg-surface masks them while keeping the outlined look.
   secondary:
-    "border border-ink text-ink px-7 py-3.5 text-sm tracking-wide hover:bg-ink hover:text-sand-50 active:scale-[0.98]",
+    "border border-ink bg-surface text-ink px-7 py-3.5 text-sm tracking-wide hover:bg-ink hover:text-sand-50 active:scale-[0.98]",
   ghost:
     "text-ink-muted text-sm tracking-wide hover:text-ink underline underline-offset-4 decoration-rule hover:decoration-ink",
 };

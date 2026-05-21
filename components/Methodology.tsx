@@ -1,193 +1,397 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { motion, useMotionValue, useTransform, animate, useMotionValueEvent } from "motion/react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  animate,
+  motion,
+  useMotionValue,
+  useTransform,
+} from "motion/react";
 import { fadeUp, staggerContainer } from "@/lib/animations";
 import { METHODOLOGY } from "@/lib/constants";
 
-const stepIcons = [
-  <svg key="pdf" viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-full h-full">
-    <rect x="16" y="8" width="32" height="48" rx="2" />
-    <line x1="22" y1="22" x2="42" y2="22" strokeWidth="1" opacity="0.55" />
-    <line x1="22" y1="28" x2="38" y2="28" strokeWidth="1" opacity="0.55" />
-    <rect x="22" y="34" width="20" height="10" strokeWidth="1" opacity="0.4" />
-    <line x1="22" y1="48" x2="36" y2="48" strokeWidth="1" opacity="0.55" />
-    <path d="M44 8 L48 12 L48 8 Z" opacity="0.5" />
-  </svg>,
-  <svg key="branch" viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-full h-full">
-    <circle cx="14" cy="32" r="3" />
-    <circle cx="44" cy="14" r="3" />
-    <circle cx="44" cy="32" r="3" />
-    <circle cx="44" cy="50" r="3" />
-    <line x1="17" y1="32" x2="41" y2="14" />
-    <line x1="17" y1="32" x2="41" y2="32" />
-    <line x1="17" y1="32" x2="41" y2="50" />
-    <circle cx="54" cy="14" r="2" strokeWidth="1.2" opacity="0.5" />
-    <line x1="47" y1="14" x2="52" y2="14" strokeWidth="1" opacity="0.5" />
-    <circle cx="54" cy="32" r="2" strokeWidth="1.2" opacity="0.5" />
-    <line x1="47" y1="32" x2="52" y2="32" strokeWidth="1" opacity="0.5" />
-    <circle cx="54" cy="50" r="2" strokeWidth="1.2" opacity="0.5" />
-    <line x1="47" y1="50" x2="52" y2="50" strokeWidth="1" opacity="0.5" />
-  </svg>,
-  <svg key="hooks" viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-full h-full">
-    <line x1="12" y1="20" x2="52" y2="20" />
-    <line x1="12" y1="32" x2="52" y2="32" />
-    <line x1="12" y1="44" x2="52" y2="44" />
-    <circle cx="22" cy="20" r="3" fill="currentColor" />
-    <circle cx="40" cy="32" r="3" fill="currentColor" />
-    <circle cx="30" cy="44" r="3" fill="currentColor" />
-    <polyline points="46,42 49,45 53,40" strokeWidth="1.2" opacity="0.55" />
-  </svg>,
-  <svg key="visual" viewBox="0 0 64 64" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-full h-full">
-    <polygon points="14,24 32,16 50,24 50,46 32,54 14,46" />
-    <line x1="14" y1="24" x2="32" y2="32" strokeWidth="1" opacity="0.45" />
-    <line x1="50" y1="24" x2="32" y2="32" strokeWidth="1" opacity="0.45" />
-    <line x1="32" y1="32" x2="32" y2="54" strokeWidth="1" opacity="0.45" />
-    <circle cx="50" cy="24" r="2.5" fill="currentColor" opacity="0.55" />
-  </svg>,
-];
+// ─── Result-row icons ────────────────────────────────────────────────
+// Stroke-based 24×24 SVGs at h-6 w-6 (slightly larger than the prior
+// h-5 to bump the result section's prominence without going graphic).
+// Color is inherited from the parent text class so the result row can
+// style icons together with the headings.
 
-// Per-card duration. Bumped 25% slower than before (3600 → 4500ms).
-const STEP_DURATION_MS = 4500;
-
-interface DividerRange {
-  left: number;
-  right: number;
+function ClockIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-6 w-6 shrink-0"
+      aria-hidden
+    >
+      <circle cx="12" cy="12" r="9" />
+      <line x1="12" y1="12" x2="12" y2="7.5" />
+      <line x1="12" y1="12" x2="15.5" y2="13.5" />
+    </svg>
+  );
 }
 
-// Fraction of each card's step the orb spends traversing the loader
-// line. The remainder is spent invisible "between" cards, where the
-// orb would otherwise sit on the "01"/"02" label area.
-const ORB_VISIBLE_PORTION = 0.85;
+function ArrowsIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-6 w-6 shrink-0"
+      aria-hidden
+    >
+      <line x1="3" y1="9" x2="14" y2="9" />
+      <polyline points="11,6 14,9 11,12" />
+      <line x1="21" y1="15" x2="10" y2="15" />
+      <polyline points="13,12 10,15 13,18" />
+    </svg>
+  );
+}
 
-export default function Methodology() {
-  const beats = METHODOLOGY.beats;
-  const [hovering, setHovering] = useState(false);
-  const [active, setActive] = useState(0);
-  const [orbTop, setOrbTop] = useState<number | null>(null);
-  const [dividerRanges, setDividerRanges] = useState<DividerRange[]>([]);
-  const wrapperRef = useRef<HTMLDivElement>(null);
+function TrendingIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-6 w-6 shrink-0"
+      aria-hidden
+    >
+      <polyline points="3,17 9,11 13,15 21,7" />
+      <polyline points="15,7 21,7 21,13" />
+    </svg>
+  );
+}
 
-  // Measure each divider line's exact left/right and the shared Y so
-  // the orb travels along the loader line itself (not the full card
-  // width). Polls for 5s to catch the post-fadeUp final layout, and
-  // re-measures on resize / scroll.
+const RESULT_ICONS = {
+  clock: <ClockIcon />,
+  arrows: <ArrowsIcon />,
+  trending: <TrendingIcon />,
+} as const;
+
+// ─── Split-trace perimeter border ────────────────────────────────────
+//
+// Premium variant of the sequential-card highlight. Two light trails
+// originate from the vertical centre of the active card's left edge
+// and travel in opposite directions around the perimeter, meeting at
+// the vertical centre of the right edge.
+//
+//   - Upper path: left-centre → up → top → down to right-centre
+//   - Lower path: left-centre → down → bottom → up to right-centre
+//
+// Each path renders two layered strokes that share a single animated
+// progress value:
+//   - Tail: a long, dim warm streak that lags behind the head
+//   - Head: a short, bright leading dot
+//
+// We read the parent card's pixel dimensions via ResizeObserver and
+// draw the paths in actual pixel space (viewBox = card box). This
+// keeps the head's screen length and the stroke uniformity equal on
+// every edge, regardless of the card's aspect ratio.
+//
+// `runId` increments each time the orchestrator starts a fresh trace
+// on this card; `active` controls the opacity fade-in/out so the
+// previous card's trails dissolve gracefully as the next one ignites.
+
+interface SplitTraceBorderProps {
+  runId: number;
+  active: boolean;
+  durationSec: number;
+}
+
+// Visible head length and lagging tail length, both expressed in
+// `pathLength=100` units (i.e. % of the path).
+const HEAD_LEN = 3.6;
+const TAIL_LEN = 30;
+
+function SplitTraceBorder({ runId, active, durationSec }: SplitTraceBorderProps) {
+  // `progress` ∈ [0, 100 - HEAD_LEN]. The head's leading edge sits at
+  // path position `progress`; the head's tail-edge at `progress + HEAD_LEN`.
+  // The lagging tail sits at `[progress - TAIL_LEN, progress]`.
+  const progress = useMotionValue(0);
+  const headOffset = useTransform(progress, (v) => -v);
+  const tailOffset = useTransform(progress, (v) => -v + TAIL_LEN);
+
+  const svgRef = useRef<SVGSVGElement | null>(null);
+  const [size, setSize] = useState({ w: 0, h: 0 });
+
+  // Read the card's real pixel size so the paths are drawn in screen
+  // coords (no aspect-ratio stretch, uniform dash and stroke widths).
   useEffect(() => {
-    const wrapper = wrapperRef.current;
-    if (!wrapper) return;
-    const measure = () => {
-      const articles = wrapper.querySelectorAll("article");
-      if (articles.length === 0) return;
-      const wRect = wrapper.getBoundingClientRect();
-      const ranges: DividerRange[] = [];
-      let topY: number | null = null;
-      articles.forEach((art) => {
-        const divider = art.querySelector(".bg-rule") as HTMLElement | null;
-        if (!divider) return;
-        const dRect = divider.getBoundingClientRect();
-        ranges.push({
-          left: dRect.left - wRect.left,
-          right: dRect.right - wRect.left,
-        });
-        if (topY === null) topY = dRect.top + dRect.height / 2 - wRect.top;
-      });
-      if (topY !== null) {
-        setOrbTop((prev) =>
-          prev !== null && Math.abs(prev - topY!) < 0.5 ? prev : topY
-        );
-      }
-      setDividerRanges((prev) => {
-        if (prev.length !== ranges.length) return ranges;
-        const same = ranges.every(
-          (r, i) =>
-            Math.abs(r.left - prev[i].left) < 0.5 &&
-            Math.abs(r.right - prev[i].right) < 0.5
-        );
-        return same ? prev : ranges;
-      });
+    if (typeof window === "undefined") return;
+    if (!svgRef.current) return;
+    const parent = svgRef.current.parentElement;
+    if (!parent) return;
+    const update = () => {
+      const r = parent.getBoundingClientRect();
+      setSize({ w: r.width, h: r.height });
     };
-    measure();
-    const id = setInterval(measure, 80);
-    const stop = setTimeout(() => clearInterval(id), 5000);
-    const ro = new ResizeObserver(measure);
-    ro.observe(wrapper);
-    window.addEventListener("scroll", measure, { passive: true });
-    return () => {
-      clearInterval(id);
-      clearTimeout(stop);
-      ro.disconnect();
-      window.removeEventListener("scroll", measure);
-    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(parent);
+    return () => ro.disconnect();
   }, []);
 
-  // Continuous cycle progress: 0 → 1 across all 4 cards, linear, repeating.
-  // The orb's X position and the active-card index both derive from this
-  // single value so the orb never "teleports" between cards.
-  const progress = useMotionValue(0);
-
-  // Map progress → orb X (in px, along the divider lines) and → opacity
-  // (sine arc 0 → 1 → 0 within each tile, 0 in the gap between tiles
-  // where the orb would otherwise sit on the "01"/"02" label area).
-  const orbLeft = useTransform(progress, (p) => {
-    if (dividerRanges.length === 0) return 0;
-    const totalSteps = p * beats.length;
-    const stepIdx = Math.min(beats.length - 1, Math.floor(totalSteps));
-    const localStep = totalSteps - stepIdx;
-    const r = dividerRanges[stepIdx];
-    const localTile = Math.min(1, localStep / ORB_VISIBLE_PORTION);
-    return r.left + localTile * (r.right - r.left);
-  });
-  const orbOpacity = useTransform(progress, (p) => {
-    if (dividerRanges.length === 0) return 0;
-    const totalSteps = p * beats.length;
-    const stepIdx = Math.floor(totalSteps);
-    const localStep = totalSteps - stepIdx;
-    if (localStep >= ORB_VISIBLE_PORTION) return 0;
-    return Math.sin((localStep / ORB_VISIBLE_PORTION) * Math.PI);
-  });
-
-  // Drive the cycle. Re-starts whenever hover state changes — when hover
-  // ends the cycle restarts at the current progress so no visible jump.
+  // Fresh sweep whenever `runId` ticks. Slight ease so the head has a
+  // tiny breath at the start/end rather than purely mechanical linear.
   useEffect(() => {
-    if (hovering) return;
-    const controls = animate(progress, [progress.get(), 1], {
-      duration: (1 - progress.get()) * (STEP_DURATION_MS * beats.length) / 1000,
-      ease: "linear",
-      onComplete: () => {
-        progress.set(0);
-      },
+    if (runId <= 0) return;
+    progress.set(0);
+    const controls = animate(progress, 100 - HEAD_LEN, {
+      duration: durationSec,
+      ease: [0.4, 0, 0.6, 1],
     });
     return () => controls.stop();
-    // Re-trigger when progress wraps via onComplete (which resets value).
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hovering, beats.length]);
+  }, [runId, durationSec, progress]);
 
-  // Loop forever by detecting completion and restarting.
-  useMotionValueEvent(progress, "change", (p) => {
-    if (p >= 0.999 && !hovering) {
-      // Restart the cycle
-      progress.set(0);
-      animate(progress, 1, {
-        duration: (STEP_DURATION_MS * beats.length) / 1000,
-        ease: "linear",
-        onComplete: () => progress.set(0),
+  const { w, h } = size;
+
+  // Path geometry — split at left-centre, both halves end at right-centre.
+  const upperPath =
+    w && h ? `M 0 ${h / 2} L 0 0 L ${w} 0 L ${w} ${h / 2}` : "";
+  const lowerPath =
+    w && h ? `M 0 ${h / 2} L 0 ${h} L ${w} ${h} L ${w} ${h / 2}` : "";
+
+  return (
+    <svg
+      ref={svgRef}
+      className="pointer-events-none absolute inset-0 h-full w-full overflow-visible"
+      viewBox={w && h ? `0 0 ${w} ${h}` : "0 0 100 100"}
+      preserveAspectRatio="none"
+      aria-hidden
+    >
+      {w > 0 && h > 0 && (
+        <>
+          {/* Warm-highlight along the full perimeter — "you are here"
+              cue for the active card. Crossfades with the next card's
+              frame so the baton pass feels calm and intentional. */}
+          <motion.rect
+            x={0}
+            y={0}
+            width={w}
+            height={h}
+            fill="none"
+            stroke="var(--color-trail-frame)"
+            strokeWidth={0.8}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: active ? 0.28 : 0 }}
+            transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
+            vectorEffect="non-scaling-stroke"
+          />
+
+          {/* ── UPPER half ── */}
+          {/* Tail */}
+          <motion.path
+            d={upperPath}
+            fill="none"
+            stroke="var(--color-trail-tail)"
+            strokeWidth={1.1}
+            pathLength={100}
+            strokeDasharray={`${TAIL_LEN} ${100 - TAIL_LEN}`}
+            style={{ strokeDashoffset: tailOffset }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: active ? 0.55 : 0 }}
+            transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
+            vectorEffect="non-scaling-stroke"
+            strokeLinecap="round"
+          />
+          {/* Head */}
+          <motion.path
+            d={upperPath}
+            fill="none"
+            stroke="var(--color-trail-head)"
+            strokeWidth={1.7}
+            pathLength={100}
+            strokeDasharray={`${HEAD_LEN} ${100 - HEAD_LEN}`}
+            style={{ strokeDashoffset: headOffset }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: active ? 1 : 0 }}
+            transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
+            vectorEffect="non-scaling-stroke"
+            strokeLinecap="round"
+          />
+
+          {/* ── LOWER half ── */}
+          {/* Tail */}
+          <motion.path
+            d={lowerPath}
+            fill="none"
+            stroke="var(--color-trail-tail)"
+            strokeWidth={1.1}
+            pathLength={100}
+            strokeDasharray={`${TAIL_LEN} ${100 - TAIL_LEN}`}
+            style={{ strokeDashoffset: tailOffset }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: active ? 0.55 : 0 }}
+            transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
+            vectorEffect="non-scaling-stroke"
+            strokeLinecap="round"
+          />
+          {/* Head */}
+          <motion.path
+            d={lowerPath}
+            fill="none"
+            stroke="var(--color-trail-head)"
+            strokeWidth={1.7}
+            pathLength={100}
+            strokeDasharray={`${HEAD_LEN} ${100 - HEAD_LEN}`}
+            style={{ strokeDashoffset: headOffset }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: active ? 1 : 0 }}
+            transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
+            vectorEffect="non-scaling-stroke"
+            strokeLinecap="round"
+          />
+        </>
+      )}
+    </svg>
+  );
+}
+
+// ─── Static fallback (prefers-reduced-motion) ────────────────────────
+// When reduce-motion is set we don't animate anything — just paint a
+// quiet warm-highlight border on the first card so the section still
+// has a visible "anchor" without movement.
+
+function StaticAccentBorder() {
+  return (
+    <svg
+      className="pointer-events-none absolute inset-0 h-full w-full"
+      preserveAspectRatio="none"
+      aria-hidden
+    >
+      <rect
+        x="0"
+        y="0"
+        width="100%"
+        height="100%"
+        fill="none"
+        stroke="var(--color-trail-frame)"
+        strokeWidth="1"
+        opacity="0.45"
+        vectorEffect="non-scaling-stroke"
+      />
+    </svg>
+  );
+}
+
+// ─── Section ─────────────────────────────────────────────────────────
+
+export default function Methodology() {
+  // Per-card reading-paced durations: 170 wpm, clamped 7–16s. Computed
+  // once from the static METHODOLOGY data.
+  const durations = useMemo(
+    () =>
+      METHODOLOGY.beats.map((beat) => {
+        const text = `${beat.title.replace(/\n/g, " ")} ${beat.description}`;
+        const words = text.split(/\s+/).filter(Boolean).length;
+        return Math.min(16, Math.max(7, (words / 170) * 60));
+      }),
+    []
+  );
+
+  // Per-card "run id" — incremented each time the orchestrator starts
+  // a fresh sweep on that card. The TrailingBorder useEffect keys off
+  // this value so the same card can be re-animated on each loop.
+  const [runIds, setRunIds] = useState<number[]>(() =>
+    METHODOLOGY.beats.map(() => 0)
+  );
+  // The card currently lit. -1 means everything is faded out (during
+  // the brief gap between cards or the 2s pause between full loops).
+  const [activeIdx, setActiveIdx] = useState<number>(-1);
+  const [reduceMotion, setReduceMotion] = useState(false);
+
+  const sectionRef = useRef<HTMLElement | null>(null);
+
+  // Reduce-motion preference. Read once on mount and listen for change.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduceMotion(mq.matches);
+    const onChange = (e: MediaQueryListEvent) => setReduceMotion(e.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  // Sequence orchestrator. Once the section becomes visible we start
+  // cycling cards 0→1→2→3 with a 400ms fade between each and a 2s
+  // pause after the last before looping. Cleaned up on unmount or if
+  // reduce-motion flips on.
+  useEffect(() => {
+    if (reduceMotion) return;
+    if (!sectionRef.current) return;
+    if (typeof window === "undefined") return;
+
+    let timeoutId: number | undefined;
+    let started = false;
+    let idx = 0;
+
+    const runStep = () => {
+      setActiveIdx(idx);
+      setRunIds((prev) => {
+        const next = [...prev];
+        next[idx] = next[idx] + 1;
+        return next;
       });
-    }
-    // Update active card from the same motion value.
-    const newActive = Math.min(beats.length - 1, Math.floor(p * beats.length));
-    if (newActive !== active) setActive(newActive);
-  });
+      const dwell = durations[idx] * 1000;
+      timeoutId = window.setTimeout(() => {
+        // Advance immediately — the trail layers each carry a 700ms
+        // ease-out opacity transition, so the outgoing card's head
+        // gracefully dims at right-centre while the incoming card's
+        // head rises at left-centre. The crossfade overlap means the
+        // perimeter is never empty during the hand-off. The 2s pause
+        // only happens after the final card before looping back.
+        const wasLast = idx === durations.length - 1;
+        if (wasLast) {
+          setActiveIdx(-1); // brief darkness during the loop pause
+          timeoutId = window.setTimeout(() => {
+            idx = 0;
+            runStep();
+          }, 2000);
+        } else {
+          idx = idx + 1;
+          runStep();
+        }
+      }, dwell);
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry && entry.isIntersecting && !started) {
+          started = true;
+          runStep();
+        }
+      },
+      { threshold: 0.25 }
+    );
+    observer.observe(sectionRef.current);
+
+    return () => {
+      observer.disconnect();
+      if (timeoutId) window.clearTimeout(timeoutId);
+    };
+  }, [durations, reduceMotion]);
 
   return (
     <section
+      ref={sectionRef}
       id="how-it-works"
       className="relative py-section-sm lg:py-section hairline-top"
     >
       <div className="mx-auto max-w-[var(--max-width)] px-6 lg:px-8">
-        {/* Header — both columns align at the top so the right paragraph's
-            first line sits on the same baseline as the headline's first
-            line. Right column narrowed (col-span-5) and capped to keep
-            the paragraph to ~3 lines. */}
+        {/* Header — asymmetric: heading on the left (col-span-7), the
+            3-paragraph subtitle on the right (col-span-5). */}
         <motion.div
           className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-16 mb-16 lg:mb-20 items-start"
           variants={staggerContainer}
@@ -207,158 +411,169 @@ export default function Methodology() {
               ))}
             </h2>
           </motion.div>
+
           <motion.div
             variants={fadeUp}
-            // Match the eyebrow + headline-line-1 baseline. The eyebrow is
-            // mb-4 above the headline; the right paragraph mirrors that
-            // top offset so its first line aligns with "We don't replace
-            // your catalogue."
             className="lg:col-span-5 lg:pt-[2.1rem] text-base lg:text-lg text-ink-muted leading-relaxed space-y-2 max-w-md"
+            style={{ textWrap: "pretty" as never }}
           >
-            {METHODOLOGY.subtitleLines.map((line, i) => (
-              <p
-                key={i}
-                className={
-                  i === METHODOLOGY.subtitleLines.length - 1
-                    ? "text-ink"
-                    : ""
-                }
+            <p>{METHODOLOGY.subtitleIntro}</p>
+            {/* "The PDF buries them." flows on the same line as
+                "We pull them to the surface." — second sentence is an
+                inline span with text-ink for emphasis, but they share
+                one paragraph so the leading stays equal across the
+                column. */}
+            <p>
+              {METHODOLOGY.subtitleBuries}{" "}
+              <span className="text-ink">{METHODOLOGY.subtitleEmphasis}</span>
+            </p>
+            {/* Skip-link — for visitors who clicked "How It Works"
+                already convinced and want to see the example. Quiet
+                underline-style link, mirrors the Back-link inside the
+                Kayu & Kov section. */}
+            <p className="pt-4">
+              <a
+                href="#example"
+                className="inline-flex items-center gap-1.5 font-sans text-sm text-ink underline underline-offset-4 decoration-rule hover:decoration-ink transition-colors"
               >
-                {line}
-              </p>
-            ))}
+                Skip straight to example
+                <span aria-hidden>→</span>
+              </a>
+            </p>
           </motion.div>
         </motion.div>
 
-        {/* Steps. The orb is positioned at the section level so it can
-            travel continuously across all four cards. Cards highlight
-            via a subtle bg shift + scale instead of blurring others. */}
-        <div
-          ref={wrapperRef}
-          className="relative"
-          onMouseEnter={() => setHovering(true)}
-          onMouseLeave={() => setHovering(false)}
+        {/* Step grid — single 4-column row of static cards. Each card
+            sits on `position: relative` so the TrailingBorder SVG can
+            be absolutely positioned within. */}
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-rule border border-rule"
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-80px" }}
+        >
+          {METHODOLOGY.beats.map((beat, i) => (
+            <motion.article
+              key={beat.number}
+              variants={fadeUp}
+              // Equal padding on all four sides — more spacious and
+              // minimal. Same on every card so the inside layout
+              // reads as one consistent editorial system. `relative`
+              // anchors the absolute TrailingBorder overlay.
+              className="relative bg-surface p-10 lg:p-12 lg:min-h-[460px] flex flex-col"
+            >
+              {/* Split-trace perimeter overlay — two trails launch
+                  from the left-centre and sweep around in opposite
+                  directions to meet at the right-centre. Static accent
+                  on card 1 only when reduce-motion is set. */}
+              {reduceMotion ? (
+                i === 0 ? <StaticAccentBorder /> : null
+              ) : (
+                <SplitTraceBorder
+                  runId={runIds[i]}
+                  active={activeIdx === i}
+                  durationSec={durations[i]}
+                />
+              )}
+
+              <span className="block font-mono text-xs tracking-widest uppercase text-ink-faint mb-6">
+                Step {beat.number.replace(/^0+/, "")}
+              </span>
+              {/* Title lines are explicit — split on "\n" so all four
+                  titles emit exactly three blocks. `whitespace-nowrap`
+                  on each block locks every line to a single row, so
+                  every card's title is guaranteed to be exactly 3
+                  lines. Font size is set so the longest segment fits
+                  inside the card's content width. */}
+              <h3
+                className="font-serif text-xl lg:text-[1.4rem] text-ink leading-snug mb-8 min-h-[3lh]"
+              >
+                {beat.title.split("\n").map((line, j) => (
+                  <span key={j} className="block whitespace-nowrap">
+                    {line}
+                  </span>
+                ))}
+              </h3>
+              <p
+                className="text-base text-ink-muted leading-relaxed"
+                style={{ textWrap: "pretty" as never }}
+              >
+                {beat.description}
+              </p>
+            </motion.article>
+          ))}
+        </motion.div>
+
+        {/* ─── RESULT — bumped prominence ─────────────────────────
+            Still lives inside the max-w container so it reads as the
+            outcome of the steps above. Compared to the prior quiet
+            treatment, this version adds:
+              • a serif sub-heading under "THE RESULT" eyebrow so the
+                section has a voice, not just a label
+              • larger icons (h-6) at full ink colour
+              • serif result headings (text-xl/2xl) for parity with the
+                rest of the editorial system
+              • larger body type and tighter measure
+            Framing stays a single hairline-top so we don't slide into
+            an enclosed "box" treatment. */}
+        <motion.div
+          className="mt-20 lg:mt-28 pt-14 lg:pt-20 border-t border-rule"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-60px" }}
+          variants={staggerContainer}
         >
           <motion.div
-            className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-rule border border-rule"
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-80px" }}
+            variants={fadeUp}
+            className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-16 items-start mb-14 lg:mb-16"
           >
-            {beats.map((beat, i) => {
-              const isActive = !hovering && i === active;
-              return (
-                <Card
-                  key={beat.number}
-                  beat={beat}
-                  icon={stepIcons[i]}
-                  isActive={isActive}
-                  isPast={!hovering && i < active}
-                  cardIndex={i}
-                  progress={progress}
-                  totalSteps={beats.length}
-                />
-              );
-            })}
+            <div className="lg:col-span-7">
+              <span className="block font-mono text-xs tracking-widest uppercase text-ink-faint mb-4">
+                The Result
+              </span>
+              <h3 className="font-serif text-2xl lg:text-[2rem] text-ink leading-snug max-w-xl">
+                Three changes your sales team feels in the first month.
+              </h3>
+            </div>
+            <p
+              className="lg:col-span-5 lg:pt-2 text-base lg:text-lg text-ink-muted leading-relaxed max-w-md"
+              style={{ textWrap: "pretty" as never }}
+            >
+              Not vanity metrics — the kind of shift you notice in the
+              inbox, the calendar, and the deals that come in already
+              halfway closed.
+            </p>
           </motion.div>
 
-          {/* Continuous orb — single element, traverses 0% → 100% of the
-              cards row in one smooth pass. Positioned over the divider
-              line at approximately the divider's Y. */}
-          {!hovering && orbTop !== null && dividerRanges.length > 0 && (
-            <motion.span
-              aria-hidden
-              className="hidden lg:block absolute z-20 pointer-events-none rounded-full bg-ink"
-              style={{
-                top: `${orbTop}px`,
-                left: orbLeft,
-                opacity: orbOpacity,
-                width: "var(--orb-size)",
-                height: "var(--orb-size)",
-                transform: "translate(-50%, -50%)",
-                boxShadow: "var(--orb-shadow)",
-                filter: "var(--orb-blur)",
-              }}
-            />
-          )}
-        </div>
+          <motion.div
+            variants={staggerContainer}
+            className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-14"
+          >
+            {METHODOLOGY.results.map((result) => (
+              <motion.div
+                key={result.heading}
+                variants={fadeUp}
+                className="flex flex-col gap-4"
+              >
+                {/* Icon at h-6 in full ink — confident but not loud. */}
+                <div className="h-6 w-6 flex items-center justify-center text-ink">
+                  {RESULT_ICONS[result.icon]}
+                </div>
+                <h4 className="font-serif text-xl lg:text-2xl text-ink leading-snug mt-1">
+                  {result.heading}
+                </h4>
+                <p
+                  className="text-sm lg:text-base text-ink-muted leading-relaxed max-w-[34ch]"
+                  style={{ textWrap: "pretty" as never }}
+                >
+                  {result.body}
+                </p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </motion.div>
       </div>
     </section>
-  );
-}
-
-interface CardProps {
-  beat: { number: string; title: string; description: string };
-  icon: React.ReactNode;
-  isActive: boolean;
-  isPast: boolean;
-  cardIndex: number;
-  progress: ReturnType<typeof useMotionValue<number>>;
-  totalSteps: number;
-}
-
-// Per-card fill bar driven directly off the global progress motion value
-// so the bar grows in lockstep with the orb. No setTimeout, no per-card
-// keyframe restart.
-function Card({ beat, icon, isActive, isPast, cardIndex, progress, totalSteps }: CardProps) {
-  const fillRef = useRef<HTMLSpanElement>(null);
-
-  // Each card "owns" 1/totalSteps of the progress range.
-  // Fill = clamp((progress * totalSteps - cardIndex), 0, 1) * 100%
-  useMotionValueEvent(progress, "change", (p) => {
-    const local = Math.max(0, Math.min(1, p * totalSteps - cardIndex));
-    if (fillRef.current) {
-      fillRef.current.style.width = `${local * 100}%`;
-    }
-  });
-
-  return (
-    <motion.article
-      variants={fadeUp}
-      animate={{
-        backgroundColor: isActive ? "var(--color-surface-raised)" : "var(--color-surface)",
-        scale: isActive ? 1.018 : 1,
-      }}
-      transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-      className="relative bg-surface p-8 lg:p-10 lg:min-h-[420px] flex flex-col cursor-default"
-      style={{ zIndex: isActive ? 2 : 1 }}
-    >
-      <div
-        className={`h-11 w-11 mb-7 transition-colors duration-700 ${
-          isActive ? "text-ink" : "text-ink-faint"
-        }`}
-      >
-        {icon}
-      </div>
-
-      <div className="flex items-baseline gap-4 mb-5">
-        <span
-          className={`font-mono text-sm tracking-widest transition-colors duration-700 ${
-            isActive ? "text-ink" : "text-ink-faint"
-          }`}
-        >
-          {beat.number}
-        </span>
-        <div className="relative h-px flex-1 bg-rule overflow-visible">
-          <span
-            ref={fillRef}
-            className="absolute inset-y-0 left-0 bg-ink"
-            style={{ width: isPast ? "100%" : "0%" }}
-          />
-        </div>
-      </div>
-
-      <h3
-        className={`font-serif text-xl lg:text-[1.45rem] leading-snug mb-4 transition-colors duration-700 ${
-          isActive ? "text-accent" : "text-ink"
-        }`}
-      >
-        {beat.title}
-      </h3>
-      <p className="text-sm lg:text-[0.95rem] text-ink-muted leading-relaxed">
-        {beat.description}
-      </p>
-    </motion.article>
   );
 }

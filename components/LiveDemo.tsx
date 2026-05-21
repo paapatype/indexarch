@@ -26,8 +26,11 @@ const GUIDE_STEPS = [
   },
   {
     number: "05",
-    text: "Drag the 3D model to rotate and view it from any angle",
-    subtext: "Click and hold on the product visual, then move your mouse",
+    // Trimmed so step 05 reads at roughly the same length as the
+    // other four steps — keeps the DemoGuide bar at a constant
+    // single-line height without wrapping into a taller component.
+    text: "Drag the 3D model to rotate it",
+    subtext: "Click, hold, and move your mouse",
   },
 ];
 
@@ -52,7 +55,7 @@ export function DemoGuide() {
   const current = GUIDE_STEPS[step];
 
   return (
-    <div className="flex items-center gap-4 flex-wrap border border-rule bg-surface-raised px-5 py-4">
+    <div className="flex items-center gap-4 flex-wrap border border-rule bg-surface-raised px-5 py-4 min-h-[3.25rem]">
       <div className="flex gap-2">
         {GUIDE_STEPS.map((_, i) => (
           <button

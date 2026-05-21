@@ -7,7 +7,7 @@ import { FAQ as FAQ_DATA } from "@/lib/constants";
 
 export default function FAQ() {
   return (
-    <section className="py-section-sm lg:py-section bg-surface-sunken relative">
+    <section id="faq" className="py-section-sm lg:py-section bg-surface-sunken relative">
       <div className="mx-auto max-w-[var(--max-width)] px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
           {/* Left — Heading */}
