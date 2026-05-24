@@ -377,14 +377,19 @@ function ChecklistGraphic() {
   }, []);
 
   return (
-    <div className="relative h-full flex items-center justify-center text-ink-faint">
+    <div className="problem-graphic-color relative h-full flex items-center justify-center">
       <svg
         viewBox="0 0 320 420"
         fill="none"
         stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="w-full max-w-sm"
+        // `max-h-full` constrains the SVG to its container's height
+        // so the clipboard (taller-than-wide 0.76:1 viewBox) can never
+        // overflow the 300px mobile slot and crash into the heading
+        // below. Width auto so it scales by height first; max-w-sm
+        // still caps it on tablet+ so it doesn't stretch.
+        className="h-auto max-h-full w-auto max-w-sm"
         aria-hidden="true"
       >
         {/* Clipboard backing board — longer, generous margins. */}
@@ -786,20 +791,56 @@ export default function ProblemSection() {
   return (
     <section className="relative min-h-screen flex items-center hairline-top">
       <div
-        className="mx-auto w-full max-w-[var(--max-width)] px-6 lg:px-8 py-24 lg:py-36"
+        className="mx-auto w-full max-w-[var(--max-width)] px-6 lg:px-8 py-14 sm:py-20 lg:py-36"
         onMouseEnter={() => setHovering(true)}
         onMouseLeave={() => setHovering(false)}
       >
-        {/* Two-column carousel — no surrounding container. Vertical hairline
-            divides the title/body on the left from the graphic on the right.
-            Auto-cycles every 9s, pauses on hover. Arrows + dot indicators
-            live underneath the body paragraph on the left side. */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-0 min-h-[72vh] lg:divide-x lg:divide-rule">
-          {/* LEFT — heading + body + nav as one tight, vertically
-              centred unit. justify-center anchors the whole stack to
-              the middle of the row so it sits comfortably next to the
-              right-hand graphic. */}
-          <div className="lg:pr-12 xl:pr-16 flex flex-col justify-center">
+        {/* Two-column carousel — no surrounding container. Vertical
+            hairline divides the title/body on the left from the
+            graphic on the right. Auto-cycles every 9s, pauses on
+            hover.
+
+            Order on mobile (single column):
+              1. graphic
+              2. nav controls   ← positioned right under the graphic so
+                                  they're visible immediately
+              3. heading + body
+            Order on desktop (two columns):
+              left  = heading + body + nav controls
+              right = graphic
+            The desktop layout is unchanged — only the third grid
+            child (mobile-only nav) is added with `lg:hidden`. */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-0 min-h-0 lg:min-h-[72vh] lg:divide-x lg:divide-rule">
+          {/* GRAPHIC — mobile order-1 (top), desktop right column.
+              Mobile heights use fixed px so the whole slide (graphic
+              + heading + body + nav) lands inside one phone screen
+              instead of pushing the controls below the fold. */}
+          <div className="order-1 lg:order-2 lg:pl-12 xl:pl-16">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`graphic-${active}`}
+                initial={{ opacity: 0, scale: 0.985 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1.015 }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                // Tighter mobile height to keep the slide compact;
+                // illustration color is inherited from
+                // `.problem-graphic-color` on the inner wrappers
+                // (light → graphite, dark → warm cream).
+                className="h-[280px] sm:h-[340px] md:h-[44vh] lg:h-[72vh]"
+              >
+                <ProblemGraphic name={problems[active].graphic} />
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* TEXT + NAV — mobile order-2 (after graphic), desktop
+              order-1 (left column). The nav controls live INSIDE this
+              column so they belong to the slide on every breakpoint
+              and scroll with the section — never floating relative to
+              the viewport. Mobile centres the whole block; desktop
+              keeps the left-aligned editorial layout untouched. */}
+          <div className="order-2 lg:order-1 lg:pr-12 xl:pr-16 flex flex-col justify-center text-center lg:text-left">
             <AnimatePresence mode="wait">
               <motion.h2
                 key={`title-${active}`}
@@ -807,7 +848,7 @@ export default function ProblemSection() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-                className="font-serif text-3xl lg:text-[2.6rem] text-ink leading-[1.28]"
+                className="font-serif text-[1.65rem] sm:text-3xl lg:text-[2.6rem] text-ink leading-[1.3] lg:leading-[1.28]"
                 style={{ textWrap: "balance" as never }}
               >
                 {problems[active].title}
@@ -815,9 +856,8 @@ export default function ProblemSection() {
             </AnimatePresence>
 
             {/* Body sits tight beneath the heading. `text-wrap: pretty`
-                pulls extra words down to the last line so it never ends
-                on a one-word widow — at least 3 words always sit on
-                the closing line. */}
+                pulls extra words down to the last line so it never
+                ends on a one-word widow. */}
             <AnimatePresence mode="wait">
               <motion.p
                 key={`body-${active}`}
@@ -825,21 +865,23 @@ export default function ProblemSection() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-                className="mt-6 lg:mt-7 max-w-xl text-base lg:text-lg text-ink-muted leading-relaxed"
+                className="mt-5 lg:mt-7 mx-auto lg:mx-0 max-w-xl text-[15px] sm:text-base lg:text-lg text-ink-muted leading-relaxed"
                 style={{ textWrap: "pretty" as never }}
               >
                 {problems[active].description}
               </motion.p>
             </AnimatePresence>
 
-            {/* Nav controls — direct child of the centred column, so
-                they sit as part of the same tight unit. */}
-            <div className="mt-10 lg:mt-12 flex items-center gap-5">
+            {/* Nav controls — under the body on mobile so the user
+                reads the point first, then taps prev/next. Same row
+                on desktop, just left-aligned via the column's
+                text-center→lg:text-left switch above. */}
+            <div className="mt-8 lg:mt-12 flex items-center gap-5 justify-center lg:justify-start">
               <button
                 type="button"
                 onClick={() => goTo(active - 1)}
                 aria-label="Previous problem"
-                className="flex h-10 w-10 items-center justify-center border border-rule bg-surface text-ink-muted transition-colors hover:border-ink-faint hover:text-ink cursor-pointer"
+                className="flex h-11 w-11 lg:h-10 lg:w-10 items-center justify-center border border-rule bg-surface text-ink-muted transition-colors hover:border-ink-faint hover:text-ink cursor-pointer"
               >
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="13" y1="8" x2="3" y2="8" />
@@ -850,7 +892,7 @@ export default function ProblemSection() {
                 type="button"
                 onClick={() => goTo(active + 1)}
                 aria-label="Next problem"
-                className="flex h-10 w-10 items-center justify-center border border-rule bg-surface text-ink-muted transition-colors hover:border-ink-faint hover:text-ink cursor-pointer"
+                className="flex h-11 w-11 lg:h-10 lg:w-10 items-center justify-center border border-rule bg-surface text-ink-muted transition-colors hover:border-ink-faint hover:text-ink cursor-pointer"
               >
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
                   <line x1="3" y1="8" x2="13" y2="8" />
@@ -870,28 +912,10 @@ export default function ProblemSection() {
                   />
                 ))}
               </div>
-              <span className="ml-3 font-mono text-xs text-ink-faint tracking-wide">
+              <span className="ml-2 font-mono text-xs text-ink-faint tracking-wide">
                 {String(active + 1).padStart(2, "0")} / {String(problems.length).padStart(2, "0")}
               </span>
             </div>
-          </div>
-
-          {/* RIGHT — graphic */}
-          <div className="lg:pl-12 xl:pl-16">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={`graphic-${active}`}
-                initial={{ opacity: 0, scale: 0.985 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 1.015 }}
-                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                // Fixed height ⇒ ConveyorBelt's h-full clips properly
-                // and the section doesn't grow with the doubled list.
-                className="h-[60vh] lg:h-[72vh] text-ink-faint"
-              >
-                <ProblemGraphic name={problems[active].graphic} />
-              </motion.div>
-            </AnimatePresence>
           </div>
         </div>
 

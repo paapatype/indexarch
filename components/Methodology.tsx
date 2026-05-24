@@ -312,6 +312,14 @@ export default function Methodology() {
   const [reduceMotion, setReduceMotion] = useState(false);
 
   const sectionRef = useRef<HTMLElement | null>(null);
+  // Result-row auto-trigger: on mobile (no hover) we need the perimeter
+  // trail to play on its own when the row scrolls into view, then stay
+  // available for tap-retrigger. `activeResultIdx === -1` means no card
+  // is highlighted; a number means that index card is in its "hovered"
+  // state via `data-active="true"` (matched by globals.css alongside
+  // `.result-card:hover`).
+  const resultsRef = useRef<HTMLDivElement | null>(null);
+  const [activeResultIdx, setActiveResultIdx] = useState<number>(-1);
 
   // Reduce-motion preference. Read once on mount and listen for change.
   useEffect(() => {
@@ -373,7 +381,11 @@ export default function Methodology() {
           runStep();
         }
       },
-      { threshold: 0.25 }
+      // Lower threshold + early rootMargin so the trail sequence fires
+      // as soon as the section starts entering the viewport — important
+      // on mobile where the section is much taller than the screen and
+      // a 0.25 threshold would only fire deep into the scroll.
+      { threshold: 0.05, rootMargin: "0px 0px -10% 0px" }
     );
     observer.observe(sectionRef.current);
 
@@ -382,6 +394,54 @@ export default function Methodology() {
       if (timeoutId) window.clearTimeout(timeoutId);
     };
   }, [durations, reduceMotion]);
+
+  // Result-row scroll-trigger: when the result strip enters the
+  // viewport, cycle each card through its "active" state (~2.6s each)
+  // so mobile users see the hover treatment without needing a cursor.
+  // Runs only once per page-load; tap on a card retriggers that card
+  // individually via the click handler below.
+  useEffect(() => {
+    if (reduceMotion) return;
+    if (typeof window === "undefined") return;
+    if (!resultsRef.current) return;
+
+    let timeouts: number[] = [];
+    let started = false;
+    const cycle = () => {
+      const dwell = 2600;
+      const gap = 220;
+      const order = [0, 1, 2];
+      order.forEach((cardIdx, i) => {
+        const startAt = i * (dwell + gap);
+        timeouts.push(
+          window.setTimeout(() => setActiveResultIdx(cardIdx), startAt)
+        );
+        timeouts.push(
+          window.setTimeout(
+            () => setActiveResultIdx(-1),
+            startAt + dwell
+          )
+        );
+      });
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry && entry.isIntersecting && !started) {
+          started = true;
+          cycle();
+        }
+      },
+      { threshold: 0.2, rootMargin: "0px 0px -10% 0px" }
+    );
+    observer.observe(resultsRef.current);
+
+    return () => {
+      observer.disconnect();
+      timeouts.forEach((t) => window.clearTimeout(t));
+    };
+  }, [reduceMotion]);
 
   return (
     <section
@@ -399,22 +459,31 @@ export default function Methodology() {
           whileInView="visible"
           viewport={{ once: true, margin: "-80px" }}
         >
-          <motion.div variants={fadeUp} className="lg:col-span-7">
+          <motion.div variants={fadeUp} className="lg:col-span-7 text-center lg:text-left">
             <span className="block font-mono text-xs tracking-widest uppercase text-ink-faint mb-4">
               {METHODOLOGY.eyebrow}
             </span>
-            <h2 className="font-serif text-4xl lg:text-5xl text-ink leading-[1.15]">
-              {METHODOLOGY.headingLines.map((line, i) => (
-                <span key={i} className="block">
-                  {line}
-                </span>
-              ))}
+            <h2 className="font-serif text-[2rem] sm:text-4xl lg:text-5xl text-ink leading-[1.18] lg:leading-[1.15]">
+              {/* Mobile heading: 2 cleaner lines — "We don't replace
+                  your catalogue," / "we unpack it." Desktop keeps the
+                  original split where each lg:col-span-7 line fits
+                  comfortably without overflow. */}
+              <span className="block lg:hidden">
+                We don&rsquo;t replace your catalogue,
+              </span>
+              <span className="block lg:hidden">we unpack it.</span>
+              <span className="hidden lg:block">
+                {METHODOLOGY.headingLines[0]}
+              </span>
+              <span className="hidden lg:block">
+                {METHODOLOGY.headingLines[1]}
+              </span>
             </h2>
           </motion.div>
 
           <motion.div
             variants={fadeUp}
-            className="lg:col-span-5 lg:pt-[2.1rem] text-base lg:text-lg text-ink-muted leading-relaxed space-y-2 max-w-md"
+            className="lg:col-span-5 lg:pt-[2.1rem] text-base lg:text-lg text-ink-muted leading-relaxed space-y-2 max-w-md mx-auto lg:mx-0 text-center lg:text-left"
             style={{ textWrap: "pretty" as never }}
           >
             <p>{METHODOLOGY.subtitleIntro}</p>
@@ -461,7 +530,10 @@ export default function Methodology() {
               // minimal. Same on every card so the inside layout
               // reads as one consistent editorial system. `relative`
               // anchors the absolute TrailingBorder overlay.
-              className="relative bg-surface p-10 lg:p-12 lg:min-h-[460px] flex flex-col"
+              // Mobile centres the step number + title (and body)
+              // for editorial balance under the centred section
+              // heading; desktop keeps the left-aligned grid.
+              className="relative bg-surface p-8 lg:p-12 lg:min-h-[460px] flex flex-col text-center lg:text-left items-center lg:items-stretch"
             >
               {/* Split-trace perimeter overlay — two trails launch
                   from the left-centre and sweep around in opposite
@@ -547,10 +619,11 @@ export default function Methodology() {
           </motion.div>
 
           <motion.div
+            ref={resultsRef}
             variants={staggerContainer}
             className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-10"
           >
-            {METHODOLOGY.results.map((result) => (
+            {METHODOLOGY.results.map((result, idx) => (
               // The motion.div handles the staggered fade-in
               // choreography. The inner `.result-card` div carries the
               // hover bevel + perimeter trail — kept separate so the
@@ -560,6 +633,15 @@ export default function Methodology() {
                 <div
                   className="result-card flex flex-col gap-4"
                   tabIndex={0}
+                  data-active={activeResultIdx === idx ? "true" : undefined}
+                  // Tap retriggers this card's active state for ~2.6s
+                  // so mobile users can replay the effect on demand.
+                  onClick={() => {
+                    setActiveResultIdx(idx);
+                    window.setTimeout(() => {
+                      setActiveResultIdx((curr) => (curr === idx ? -1 : curr));
+                    }, 2600);
+                  }}
                 >
                   {/* Border SVG — three layered rects, opacities driven
                       by the parent's :hover/:focus-visible. See

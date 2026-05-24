@@ -19,6 +19,7 @@ export default function BlogListClient() {
               variants={staggerContainer}
               initial="hidden"
               animate="visible"
+              className="text-center lg:text-left"
             >
               <motion.span
                 variants={fadeUp}
@@ -28,13 +29,13 @@ export default function BlogListClient() {
               </motion.span>
               <motion.h1
                 variants={fadeUp}
-                className="font-serif text-5xl lg:text-6xl text-ink leading-tight max-w-2xl"
+                className="font-serif text-[2.4rem] sm:text-5xl lg:text-6xl text-ink leading-tight max-w-2xl mx-auto lg:mx-0"
               >
                 Insights on B2B catalogs
               </motion.h1>
               <motion.p
                 variants={fadeUp}
-                className="mt-6 text-lg text-ink-muted max-w-xl"
+                className="mt-6 text-base sm:text-lg text-ink-muted max-w-xl mx-auto lg:mx-0"
               >
                 Practical guides for manufacturers ready to sell smarter online.
               </motion.p>

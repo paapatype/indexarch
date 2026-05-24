@@ -83,6 +83,11 @@
   --color-trail-tail: #5C4A33;
   --color-trail-frame: #6B5942;
 
+  /* Problem-section illustration stroke. Light mode uses a darker
+     graphite-brown than `text-ink-faint` (#999) so the thin technical
+     linework reads with real presence against the cream surface. */
+  --color-graphic-stroke: #2A2622;
+
   /* Verdict colours for "earns it / wrong tool"-style decision blocks.
      Calibrated to read as semantic green/red on the cream surface
      without going SaaS-neon. Dark-mode block lifts both saturations
@@ -154,6 +159,12 @@ html.dark {
   --color-trail-tail: #E8DCC2;
   --color-trail-frame: #C9B894;
 
+  /* Problem-section illustration stroke — warm cream noticeably
+     brighter than the previous `text-ink-faint` (#A89E90) so dots
+     and meridians come through clearly against the black surface
+     during the entrance fade. */
+  --color-graphic-stroke: #CFC5B4;
+
   /* Verdict colours — lifted saturations for readability on black. */
   --color-verdict-yes: #6BC07E;
   --color-verdict-no: #E78A78;
@@ -165,6 +176,10 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Prevent any horizontally-overflowing element (carousels, marquees)
+     from shifting the whole page when a user swipes left/right on
+     mobile. The body still scrolls vertically as normal. */
+  overflow-x: hidden;
 }
 
 body {
@@ -172,6 +187,8 @@ body {
   color: var(--color-ink);
   background-color: var(--color-surface);
   line-height: 1.6;
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
   /* Tuned to overlap the page-wide ThemeWave overlay so the body slowly
      dissolves between themes underneath the gradient sweep. */
   transition: background-color 2.4s var(--ease-out-expo), color 2.4s var(--ease-out-expo);
@@ -248,8 +265,97 @@ html[data-theme-transition="active"] body > footer {
   border-top: 1px solid var(--color-rule);
 }
 
+/* ── Problem-section illustration colour ──
+   Drop-in class for the wrappers around the conveyor / globe /
+   clipboard SVGs. Sets `color` so any inner element using
+   `currentColor` (every stroke + the dot fills inside IndexArchGlobe)
+   inherits the right value per theme. */
+.problem-graphic-color {
+  color: var(--color-graphic-stroke);
+}
+
 .hairline-bottom {
   border-bottom: 1px solid var(--color-rule);
+}
+
+/* ── Pricing payback-calculator slider ─────────────────────────────
+   Native <input type="range"> restyled so the slider matches the
+   editorial palette (hairline track + small graphite thumb) rather
+   than the browser's blue default. Same markup works in light and
+   dark mode — colours come from --color-rule and --color-ink, which
+   already flip in html.dark above. Keyboard arrows / Home / End
+   still work natively because we don't replace the input element. */
+.pricing-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  background: transparent;
+  cursor: pointer;
+  /* Vertical padding gives the thumb a hit-area larger than its
+     visible 16px disc — comfortable on touch without bloating the
+     visible track. */
+  padding: 0.75rem 0;
+}
+.pricing-range:focus { outline: none; }
+
+/* Track — 2px hairline, same colour as section dividers. */
+.pricing-range::-webkit-slider-runnable-track {
+  height: 2px;
+  background: var(--color-rule);
+  border: 0;
+}
+.pricing-range::-moz-range-track {
+  height: 2px;
+  background: var(--color-rule);
+  border: 0;
+}
+
+/* Thumb — small graphite disc with a 2px surface-raised ring so the
+   thumb reads as floating above the track on either theme. */
+.pricing-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 9999px;
+  background: var(--color-ink);
+  border: 2px solid var(--color-surface-raised);
+  /* Center the thumb on a 2px track: thumb_h/2 - track_h/2 = 8 - 1 */
+  margin-top: -7px;
+  transition: transform 0.15s var(--ease-out-expo);
+}
+.pricing-range::-moz-range-thumb {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 9999px;
+  background: var(--color-ink);
+  border: 2px solid var(--color-surface-raised);
+  transition: transform 0.15s var(--ease-out-expo);
+}
+
+/* Thumb grows slightly on hover/active so a user can feel the
+   slider respond. No movement of the track or label, so no layout
+   shift while dragging. */
+.pricing-range:hover::-webkit-slider-thumb,
+.pricing-range:active::-webkit-slider-thumb {
+  transform: scale(1.1);
+}
+.pricing-range:hover::-moz-range-thumb,
+.pricing-range:active::-moz-range-thumb {
+  transform: scale(1.1);
+}
+
+/* Visible keyboard focus — outer ring in --color-ink with a
+   surface-raised spacer so it reads on both themes. */
+.pricing-range:focus-visible::-webkit-slider-thumb {
+  box-shadow:
+    0 0 0 2px var(--color-surface-raised),
+    0 0 0 4px var(--color-ink);
+}
+.pricing-range:focus-visible::-moz-range-thumb {
+  box-shadow:
+    0 0 0 2px var(--color-surface-raised),
+    0 0 0 4px var(--color-ink);
 }
 
 /* ── Industry belts (Who-it's-for marquee) ────────────────────────────
@@ -1660,7 +1766,8 @@ html.dark {
 }
 
 .result-card:hover,
-.result-card:focus-visible {
+.result-card:focus-visible,
+.result-card[data-active="true"] {
   transform: translateY(-4px);
   background-color: var(--result-card-hover-bg);
   /* Bevel — inset top/left highlight + bottom/right shadow + a soft
@@ -1694,7 +1801,8 @@ html.dark {
   vector-effect: non-scaling-stroke;
 }
 .result-card:hover .result-card__border-base,
-.result-card:focus-visible .result-card__border-base {
+.result-card:focus-visible .result-card__border-base,
+.result-card[data-active="true"] .result-card__border-base {
   opacity: 0.32;
 }
 
@@ -1712,7 +1820,8 @@ html.dark {
   vector-effect: non-scaling-stroke;
 }
 .result-card:hover .result-card__border-trail,
-.result-card:focus-visible .result-card__border-trail {
+.result-card:focus-visible .result-card__border-trail,
+.result-card[data-active="true"] .result-card__border-trail {
   opacity: 0.6;
 }
 
@@ -1729,7 +1838,8 @@ html.dark {
   vector-effect: non-scaling-stroke;
 }
 .result-card:hover .result-card__border-head,
-.result-card:focus-visible .result-card__border-head {
+.result-card:focus-visible .result-card__border-head,
+.result-card[data-active="true"] .result-card__border-head {
   opacity: 1;
 }
 
@@ -1748,14 +1858,16 @@ html.dark {
   transition: color 380ms ease;
 }
 .result-card:hover .result-card__icon,
-.result-card:focus-visible .result-card__icon {
+.result-card:focus-visible .result-card__icon,
+.result-card[data-active="true"] .result-card__icon {
   color: var(--color-ink);
 }
 .result-card__body {
   transition: color 380ms ease;
 }
 .result-card:hover .result-card__body,
-.result-card:focus-visible .result-card__body {
+.result-card:focus-visible .result-card__body,
+.result-card[data-active="true"] .result-card__body {
   color: var(--color-ink-light);
 }
 

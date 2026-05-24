@@ -83,8 +83,13 @@ export default function Nav() {
             <ThemeToggle />
           </div>
 
-          {/* Spacer to keep nav layout balanced on mobile (button is rendered outside) */}
-          <div className="h-10 w-10 md:hidden" aria-hidden />
+          {/* Mobile right-side cluster — theme toggle (visible) +
+              spacer for the burger button which is rendered outside
+              the header's backdrop-filter containing block. */}
+          <div className="flex items-center gap-2 md:hidden">
+            <ThemeToggle />
+            <div className="h-10 w-10" aria-hidden />
+          </div>
         </nav>
       </header>
 
@@ -168,7 +173,8 @@ export default function Nav() {
                 >
                   Get Started
                 </Button>
-                <ThemeToggle />
+                {/* ThemeToggle already lives in the mobile header bar
+                    — no duplicate needed inside the menu. */}
               </motion.div>
             </div>
           </motion.div>

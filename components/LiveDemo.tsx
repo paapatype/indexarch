@@ -88,17 +88,22 @@ export function DemoGuide() {
         </motion.div>
       </AnimatePresence>
 
-      <div className="flex gap-1 ml-auto">
+      {/* Prev/next nav. On mobile (where the strip wraps into stacked
+          rows) the buttons get their own full-width row and are
+          centred + sized for a 44×44 touch target. On desktop they
+          collapse back to the original tight pair pushed to the right
+          edge with ml-auto. */}
+      <div className="flex gap-2 md:gap-1 w-full md:w-auto justify-center md:justify-start md:ml-auto">
         <button
           onClick={() => goTo((step - 1 + GUIDE_STEPS.length) % GUIDE_STEPS.length)}
-          className="w-7 h-7 flex items-center justify-center border border-rule text-ink-muted hover:text-ink hover:border-ink-faint transition-colors cursor-pointer text-xs"
+          className="w-11 h-11 md:w-7 md:h-7 flex items-center justify-center border border-rule text-ink-muted hover:text-ink hover:border-ink-faint transition-colors cursor-pointer text-base md:text-xs"
           aria-label="Previous step"
         >
           &larr;
         </button>
         <button
           onClick={() => goTo((step + 1) % GUIDE_STEPS.length)}
-          className="w-7 h-7 flex items-center justify-center border border-rule text-ink-muted hover:text-ink hover:border-ink-faint transition-colors cursor-pointer text-xs"
+          className="w-11 h-11 md:w-7 md:h-7 flex items-center justify-center border border-rule text-ink-muted hover:text-ink hover:border-ink-faint transition-colors cursor-pointer text-base md:text-xs"
           aria-label="Next step"
         >
           &rarr;

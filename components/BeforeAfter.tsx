@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
@@ -133,6 +133,7 @@ interface PdfCarouselProps {
 function PdfCarousel({ onExpand }: PdfCarouselProps) {
   const [page, setPage] = useState(1);
   const [hovering, setHovering] = useState(false);
+  const touchStartX = useRef<number | null>(null);
   const prev = () =>
     setPage((p) => (p === 1 ? PDF_PAGES.length : p - 1));
   const next = () =>
@@ -147,6 +148,23 @@ function PdfCarousel({ onExpand }: PdfCarouselProps) {
     return () => clearInterval(id);
   }, [hovering]);
 
+  // Horizontal swipe → navigate pages (scoped to the carousel only).
+  // `touch-action: pan-y` on the page container below tells the browser
+  // we own horizontal gestures here, so vertical page scroll still
+  // works as normal but the swipe doesn't drag the whole section.
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    if (Math.abs(dx) > 40) {
+      if (dx > 0) prev();
+      else next();
+    }
+    touchStartX.current = null;
+  };
+
   return (
     <div
       // Fill the BEFORE column width — matches the deployed site's
@@ -156,7 +174,12 @@ function PdfCarousel({ onExpand }: PdfCarouselProps) {
       onMouseLeave={() => setHovering(false)}
     >
       {/* PDF page + overlaid prev/next arrows + page counter. */}
-      <div className="relative aspect-[1241/1754] bg-surface-raised border border-rule shadow-card overflow-hidden group">
+      <div
+        className="relative aspect-[1241/1754] bg-surface-raised border border-rule shadow-card overflow-hidden group"
+        style={{ touchAction: "pan-y" }}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+      >
         {PDF_PAGES.map((n) => (
           <div
             key={n}
@@ -311,11 +334,11 @@ export default function BeforeAfter() {
           whileInView="visible"
           viewport={{ once: true, margin: "-80px" }}
         >
-          <motion.div variants={fadeUp} className="lg:col-span-7">
+          <motion.div variants={fadeUp} className="lg:col-span-7 text-center lg:text-left">
             <span className="block font-mono text-xs tracking-widest uppercase text-ink-faint mb-6 lg:mb-8">
               {BEFORE_AFTER.eyebrow}
             </span>
-            <h2 className="font-serif text-4xl lg:text-5xl xl:text-[3.5rem] text-ink leading-[1.1]">
+            <h2 className="font-serif text-[2rem] sm:text-4xl lg:text-5xl xl:text-[3.5rem] text-ink leading-[1.18] lg:leading-[1.1]">
               {BEFORE_AFTER.headingLines.map((line, i) => (
                 <span key={i} className="block">
                   {line}
@@ -381,20 +404,29 @@ export default function BeforeAfter() {
           onSetPage={setModalPage}
         />
 
-        {/* Bottom CTA — link to full case study */}
+        {/* Bottom strip — mobile gets the DemoGuide here (desktop has
+            it above the iframe inside AfterPanel and hides this copy)
+            with the "Read the full story" link as a tight follow-on
+            right underneath. Centering on mobile matches the rest of
+            the section's mobile heading treatment. */}
         <motion.div
           variants={fadeUp}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="mt-14 text-center"
+          className="mt-12 lg:mt-14"
         >
-          <Link
-            href={BEFORE_AFTER.cta.href}
-            className="inline-block font-sans text-sm text-ink underline underline-offset-4 decoration-rule hover:decoration-ink transition-colors"
-          >
-            {BEFORE_AFTER.cta.label}
-          </Link>
+          <div className="md:hidden mb-5">
+            <DemoGuide />
+          </div>
+          <div className="text-center">
+            <Link
+              href={BEFORE_AFTER.cta.href}
+              className="inline-block font-sans text-sm text-ink underline underline-offset-4 decoration-rule hover:decoration-ink transition-colors"
+            >
+              {BEFORE_AFTER.cta.label}
+            </Link>
+          </div>
         </motion.div>
       </div>
     </section>

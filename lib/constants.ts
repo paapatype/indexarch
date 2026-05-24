@@ -397,6 +397,29 @@ export const INDUSTRIES = {
       "Switchgear Parts",
       "HVAC Components",
     ],
+    // Belt 4 — process & finishing
+    [
+      "Forging Components",
+      "Casting Parts",
+      "Pressed Sheet",
+      "Polished Finishes",
+      "Powder Coatings",
+      "Anodised Sections",
+      "Heat-Treated Components",
+      "Welded Assemblies",
+    ],
+    // Belt 5 — architectural & infrastructure
+    [
+      "Architectural Hardware",
+      "Cladding Profiles",
+      "Roofing Sections",
+      "Glazing Systems",
+      "Modular Structures",
+      "Solar Mounting",
+      "Tower Fittings",
+      "Insulation Panels",
+      "Acoustic Components",
+    ],
   ],
 } as const;
 
@@ -671,5 +694,5 @@ export const FOOTER = {
     phone: "+91 98765 43210",
     location: "Bangalore, India",
   },
-  copyright: "© 2026 IndexArch. All rights reserved. Built with care in India.",
+  copyright: "© 2026 IndexArch. All rights reserved.",
 } as const;

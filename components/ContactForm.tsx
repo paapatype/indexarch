@@ -103,7 +103,7 @@ export default function ContactForm() {
           {/* Left — Copy. items-start on the grid + no self-center so the
               headline's first line aligns with the form box's top edge. */}
           <motion.div
-            className="lg:col-span-5"
+            className="lg:col-span-5 text-center lg:text-left"
             variants={staggerContainer}
             initial="hidden"
             whileInView="visible"
@@ -111,14 +111,23 @@ export default function ContactForm() {
           >
             <motion.h2
               variants={fadeUp}
-              className="font-serif text-4xl sm:text-5xl lg:text-6xl text-ink leading-[1.2]"
+              className="font-serif text-[2.1rem] sm:text-5xl lg:text-6xl text-ink leading-[1.2]"
             >
-              {CONTACT.heading}
+              {/* Mobile: forced break after "deals" so the heading lands
+                  as two balanced lines ("Stop losing deals" / "to messy
+                  PDFs.") instead of an unbalanced three-line auto-wrap.
+                  Desktop keeps the natural flow. */}
+              <span className="sm:hidden">
+                Stop losing deals
+                <br />
+                to messy PDFs.
+              </span>
+              <span className="hidden sm:inline">{CONTACT.heading}</span>
             </motion.h2>
 
             <motion.p
               variants={fadeUp}
-              className="mt-8 text-base lg:text-lg text-ink-muted leading-relaxed max-w-md"
+              className="mt-8 text-base lg:text-lg text-ink-muted leading-relaxed max-w-md mx-auto lg:mx-0"
             >
               {CONTACT.subheading}
             </motion.p>
