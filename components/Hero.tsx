@@ -24,12 +24,22 @@ export default function Hero() {
             variants={fadeUp}
             className="font-mono text-xs tracking-widest uppercase text-ink-faint mb-8"
           >
-            For manufacturers who sell to technical buyers
+            {/* Mobile: hard-break after "sell" so "buyers" never sits
+                alone on its own line. Desktop keeps the eyebrow on
+                one line. */}
+            <span className="sm:hidden">
+              For manufacturers who sell
+              <br />
+              to technical buyers
+            </span>
+            <span className="hidden sm:inline">
+              For manufacturers who sell to technical buyers
+            </span>
           </motion.span>
 
           <motion.h1
             variants={fadeUp}
-            className="font-serif text-[3.4rem] sm:text-[4.2rem] lg:text-[5.7rem] leading-[1.08] text-ink"
+            className="font-serif text-[3.1rem] sm:text-[4.2rem] lg:text-[5.7rem] leading-[1.15] sm:leading-[1.1] lg:leading-[1.08] text-ink"
           >
             <span className="block">Your catalogue is</span>
             <span className="block pl-7 sm:pl-10 lg:pl-14">losing you deals.</span>
@@ -38,9 +48,18 @@ export default function Hero() {
 
           <motion.p
             variants={fadeUp}
-            className="mt-12 lg:mt-16 max-w-xl text-lg leading-relaxed text-ink-muted whitespace-pre-line"
+            className="mt-12 lg:mt-16 max-w-xl text-base sm:text-lg leading-relaxed text-ink-muted"
           >
-            {HERO.subheading}
+            {/* Mobile: forced break after "a week" keeps the first
+                sentence on a controlled two visual lines. Desktop
+                lets the sentence flow naturally and only breaks
+                between the two sentences. */}
+            Technical buyers spend 10+ hours a week
+            <span className="hidden sm:inline"> </span>
+            <br className="sm:hidden" />
+            digging through PDFs.
+            <br />
+            We cut that to minutes.
           </motion.p>
 
           <motion.div

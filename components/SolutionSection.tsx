@@ -122,11 +122,11 @@ export default function SolutionSection() {
           whileInView="visible"
           viewport={{ once: true, margin: "-80px" }}
         >
-          <motion.div variants={fadeUp} className="lg:col-span-7">
+          <motion.div variants={fadeUp} className="lg:col-span-7 text-center lg:text-left">
             <span className="block font-mono text-xs tracking-widest uppercase text-ink-faint mb-4">
               What you get
             </span>
-            <h2 className="font-serif text-4xl lg:text-5xl text-ink leading-[1.15]">
+            <h2 className="font-serif text-[2rem] sm:text-4xl lg:text-5xl text-ink leading-[1.2] lg:leading-[1.15]">
               {SOLUTION.heading}
             </h2>
           </motion.div>
@@ -207,17 +207,27 @@ export default function SolutionSection() {
               role="list"
               aria-label="Manufacturing categories IndexArch supports"
             >
-              {INDUSTRIES.belts.map((belt, i) => (
-                <IndustryBelt
-                  key={i}
-                  items={belt}
-                  // Edit speed (seconds per full loop) and direction
-                  // here. Slightly mismatched periods stop the three
-                  // belts from feeling like they're locked together.
-                  direction={i === 1 ? "left" : "right"}
-                  duration={[62, 70, 58][i]}
-                />
-              ))}
+              {INDUSTRIES.belts.map((belt, i) => {
+                // Speeds + directions cycle through a small set so any
+                // number of belts (currently 5) drift with mismatched
+                // periods and alternating sides — never locked together.
+                const durations = [62, 70, 58, 66, 74];
+                const directions: Array<"left" | "right"> = [
+                  "right",
+                  "left",
+                  "right",
+                  "left",
+                  "right",
+                ];
+                return (
+                  <IndustryBelt
+                    key={i}
+                    items={belt}
+                    direction={directions[i % directions.length]}
+                    duration={durations[i % durations.length]}
+                  />
+                );
+              })}
             </div>
           </motion.div>
         </motion.div>

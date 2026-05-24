@@ -183,6 +183,7 @@ export default function BlogPostClient({
               variants={staggerContainer}
               initial="hidden"
               animate="visible"
+              className="text-center lg:text-left"
             >
               <motion.span
                 variants={fadeUp}
@@ -192,13 +193,14 @@ export default function BlogPostClient({
               </motion.span>
               <motion.h1
                 variants={fadeUp}
-                className="font-serif text-4xl lg:text-5xl text-ink leading-tight"
+                className="font-serif text-[2.1rem] sm:text-4xl lg:text-5xl text-ink leading-[1.18] lg:leading-tight"
+                style={{ textWrap: "balance" as never }}
               >
                 {post.title}
               </motion.h1>
               <motion.div
                 variants={fadeUp}
-                className="mt-6 flex flex-wrap items-center gap-3 font-mono text-sm text-ink-muted"
+                className="mt-6 flex flex-wrap items-center justify-center lg:justify-start gap-3 font-mono text-sm text-ink-muted"
               >
                 <span>{post.readTime}</span>
                 <span className="text-rule">&middot;</span>
