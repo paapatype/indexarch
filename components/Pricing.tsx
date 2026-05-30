@@ -151,7 +151,7 @@ export default function Pricing() {
                 fields keeps each slider feeling like its own discrete
                 row. */}
             <div className="flex flex-col divide-y divide-rule">
-              <div className="px-5 py-5 lg:px-7 lg:py-6">
+              <div className="px-5 py-4 lg:px-7 lg:py-6">
                 <SliderField
                   id={orderId}
                   label="Average order value"
@@ -166,7 +166,7 @@ export default function Pricing() {
                   maxLabel="$50k"
                 />
               </div>
-              <div className="px-5 py-5 lg:px-7 lg:py-6">
+              <div className="px-5 py-4 lg:px-7 lg:py-6">
                 <SliderField
                   id={dealsId}
                   label="Extra deals closed / month"
@@ -185,8 +185,12 @@ export default function Pricing() {
 
             {/* Result cards pinned to the bottom of the right half
                 (mt-auto) so they line up with the bottom of the price
-                band on desktop. */}
-            <div className="mt-auto border-t border-rule grid grid-cols-1 sm:grid-cols-3 gap-px bg-rule">
+                band on desktop. 3-across on EVERY viewport (incl.
+                mobile) so the two sliders + all three results fit in
+                one phone screen without scrolling — previously they
+                stacked vertically on mobile and pushed the last
+                result off-screen. */}
+            <div className="mt-auto border-t border-rule grid grid-cols-3 gap-px bg-rule">
               <ResultCard
                 label="Extra revenue / year"
                 figure={fmtUSD(extraAnnual)}
@@ -316,27 +320,18 @@ interface ResultCardProps {
 
 function ResultCard({ label, figure }: ResultCardProps) {
   return (
-    // text-center across every viewport so the three result cards
-    // read as a centred trio of units (the figures sit visually
-    // under their label rather than left-anchored against the cell
-    // edge).
-    //
-    // Figure sizing tuned so the widest possible value ("$6,000,000",
-    // 10 characters at the max slider setting) fits comfortably
-    // inside the narrow desktop card (~170px wide inside the right
-    // half of the unified panel):
-    //   – mobile (cards stack full-width): text-2xl (~24px)
-    //   – sm   (3-col grid kicks in, cards get tighter): text-lg
-    //   – lg   (still 3-col, ~170px each): text-[1.15rem] (~18.4px)
-    // tabular-nums + tracking-tight + leading-none keep the figure
-    // compact, and break-words/word-break-keep-all stop a stray
-    // figure from clipping the cell's right edge.
-    <div className="bg-surface-raised p-4 lg:p-5 min-h-[6rem] flex flex-col items-center justify-between text-center">
-      <span className="block font-mono text-[10.5px] tracking-widest uppercase text-ink-muted">
+    // 3-across on every viewport now, so the card has to be compact
+    // enough that even the widest value ("$6,000,000", 10 chars at
+    // max sliders) fits a ~109px mobile column. Figure scales up with
+    // viewport; tabular-nums + tracking-tight keep it tight. The label
+    // uses smaller tracking on mobile so "EXTRA REVENUE / YEAR" wraps
+    // to ~2 readable lines instead of clipping.
+    <div className="bg-surface-raised px-2 py-4 lg:px-5 lg:py-5 min-h-[5.5rem] lg:min-h-[6rem] flex flex-col items-center justify-between text-center">
+      <span className="block font-mono text-[8.5px] sm:text-[10px] tracking-wide sm:tracking-widest uppercase text-ink-muted leading-tight">
         {label}
       </span>
       <span
-        className="block mt-2 font-mono text-2xl sm:text-lg lg:text-[1.15rem] text-ink leading-none tabular-nums tracking-tight"
+        className="block mt-2 font-mono text-base sm:text-xl lg:text-[1.15rem] text-ink leading-none tabular-nums tracking-tight"
         aria-live="polite"
       >
         {figure}
