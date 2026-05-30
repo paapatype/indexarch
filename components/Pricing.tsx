@@ -147,40 +147,32 @@ export default function Pricing() {
 
           {/* ── Right half — calculator (sliders + results) ───── */}
           <motion.div variants={fadeUp} className="flex flex-col">
-            {/* Sliders stacked vertically; hairline between the two
-                fields keeps each slider feeling like its own discrete
-                row. */}
-            <div className="flex flex-col divide-y divide-rule">
-              <div className="px-5 py-4 lg:px-7 lg:py-6">
-                <SliderField
-                  id={orderId}
-                  label="Average order value"
-                  min={1000}
-                  max={50000}
-                  step={500}
-                  value={orderValue}
-                  onChange={setOrderValue}
-                  displayValue={fmtUSD(orderValue)}
-                  valueText={fmtUSD(orderValue)}
-                  minLabel="$1k"
-                  maxLabel="$50k"
-                />
-              </div>
-              <div className="px-5 py-4 lg:px-7 lg:py-6">
-                <SliderField
-                  id={dealsId}
-                  label="Extra deals closed / month"
-                  min={1}
-                  max={10}
-                  step={1}
-                  value={extraDeals}
-                  onChange={setExtraDeals}
-                  displayValue={String(extraDeals)}
-                  valueText={`${extraDeals} extra deal${extraDeals === 1 ? "" : "s"} per month`}
-                  minLabel="1"
-                  maxLabel="10"
-                />
-              </div>
+            {/* Two compact in-bar sliders with a small gap between
+                them — each bar carries its own label + live value, so
+                no separate label rows or tick rows are needed. */}
+            <div className="flex flex-col gap-2.5 p-4 lg:p-5">
+              <SliderField
+                id={orderId}
+                label="Average order value"
+                min={1000}
+                max={50000}
+                step={500}
+                value={orderValue}
+                onChange={setOrderValue}
+                displayValue={fmtUSD(orderValue)}
+                valueText={fmtUSD(orderValue)}
+              />
+              <SliderField
+                id={dealsId}
+                label="Extra deals closed / month"
+                min={1}
+                max={10}
+                step={1}
+                value={extraDeals}
+                onChange={setExtraDeals}
+                displayValue={String(extraDeals)}
+                valueText={`${extraDeals} extra deal${extraDeals === 1 ? "" : "s"} per month`}
+              />
             </div>
 
             {/* Result cards pinned to the bottom of the right half
@@ -225,11 +217,18 @@ export default function Pricing() {
   );
 }
 
-// ─── Slider field (label + value readout + native range) ───────────
-// Extracted so the markup for both sliders is symmetrical and the
-// accessibility wiring is impossible to forget on one of them.
-// `pricing-range` is the class globals.css uses to recolour the
-// native range track/thumb to the editorial palette.
+// ─── Slider field — compact in-bar control ─────────────────────────
+// The label and live value sit INSIDE a single horizontal bar (label
+// left, value right) with a fill that grows from the left to show the
+// position. This collapses each control to one ~52px row instead of
+// the old stacked label-row + track + min/max-tick layout (~110px),
+// so both sliders + the 3 result cards fit one phone screen.
+//
+// Interaction + a11y come from a real <input type="range"> overlaid
+// transparently across the whole bar: dragging (mouse + touch),
+// click-to-position, keyboard arrows, and screen-reader value
+// announcements (aria-valuetext) all work for free. The visible bar
+// (fill + label + value + handle line) is driven by the same value.
 
 interface SliderFieldProps {
   id: string;
@@ -241,8 +240,6 @@ interface SliderFieldProps {
   onChange: (v: number) => void;
   displayValue: string;
   valueText: string;
-  minLabel: string;
-  maxLabel: string;
 }
 
 function SliderField({
@@ -255,35 +252,35 @@ function SliderField({
   onChange,
   displayValue,
   valueText,
-  minLabel,
-  maxLabel,
 }: SliderFieldProps) {
+  const pct = ((value - min) / (max - min)) * 100;
   return (
-    <div>
-      {/* Label + value:
-          – Mobile: stacked vertically and centred so the slider
-            field reads as a single centred unit (matches the
-            centred price band and calculator lead-in above).
-          – sm: and up: side-by-side with the label on the left and
-            the value on the right, which gives the wider desktop
-            slider room to breathe without feeling cramped. */}
-      <div className="flex flex-col items-center text-center gap-1.5 sm:flex-row sm:items-baseline sm:justify-between sm:text-left sm:gap-3 mb-3">
-        <label
-          htmlFor={id}
-          className="font-mono text-xs tracking-widest uppercase text-ink-faint"
-        >
-          {label}
-        </label>
-        {/* tabular-nums keeps digit columns aligned so dragging never
-            jiggles the readout's width. aria-hidden because the
-            range's aria-valuetext already announces the value. */}
-        <span
-          className="font-mono text-base lg:text-lg text-ink tabular-nums"
-          aria-hidden
-        >
-          {displayValue}
-        </span>
-      </div>
+    <div className="relative h-[52px] select-none overflow-hidden rounded-md bg-surface-sunken">
+      {/* Fill — subtle tint growing from the left to show position. */}
+      <div
+        className="pointer-events-none absolute inset-y-0 left-0 bg-ink/[0.07]"
+        style={{ width: `${pct}%` }}
+      />
+      {/* Handle — thin vertical line at the fill's leading edge. */}
+      <div
+        className="pointer-events-none absolute inset-y-2 w-px bg-ink/40"
+        style={{ left: `calc(${pct}% - 0.5px)` }}
+      />
+      {/* Label (left) + value (right), overlaid inside the bar. */}
+      <span className="pointer-events-none absolute left-4 top-1/2 z-10 -translate-y-1/2 font-mono text-[11px] tracking-widest uppercase text-ink-muted">
+        {label}
+      </span>
+      <span
+        className="pointer-events-none absolute right-4 top-1/2 z-10 -translate-y-1/2 font-mono text-base text-ink tabular-nums"
+        aria-hidden
+      >
+        {displayValue}
+      </span>
+      {/* Transparent native range across the whole bar — drives value,
+          handles drag/click/keyboard, announces aria-valuetext. */}
+      <label htmlFor={id} className="sr-only">
+        {label}
+      </label>
       <input
         id={id}
         type="range"
@@ -293,17 +290,8 @@ function SliderField({
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
         aria-valuetext={valueText}
-        className="pricing-range w-full"
+        className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
       />
-      {/* Min/max tick labels stay anchored to the slider's range
-          endpoints on every viewport — they're positional cues, not
-          centred text. Bumped from text-[10px] text-ink-faint to a
-          larger, less-muted text-xs text-ink-muted so the endpoints
-          read as real anchors and not afterthought captions. */}
-      <div className="mt-3 flex items-center justify-between font-mono text-xs tracking-[0.12em] uppercase text-ink-muted">
-        <span>{minLabel}</span>
-        <span>{maxLabel}</span>
-      </div>
     </div>
   );
 }
