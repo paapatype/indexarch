@@ -1,9 +1,50 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
-const COLS = 14;
-const ROWS = 8;
+// ─── Responsive grid density ───────────────────────────────────────
+// The tile grid used to render 14×8 (=112) cells on every viewport.
+// That looked right on mobile — small, fine, square-ish cells — but
+// on desktop the same 14 columns stretched each cell to ~90px wide,
+// reading as a sparse "wide rectangle" pattern. The mobile shape is
+// the one to keep. Below, breakpoints scale cols/rows up on wider
+// viewports so each cell stays roughly the same physical size as on
+// mobile (~30–45px wide, ~70–80px tall) regardless of section width.
+//
+// Returning state from a hook means a window resize across a
+// breakpoint reflows the grid (and re-runs the theme-wave effect)
+// without a manual refresh.
+function useGridDims(): { cols: number; rows: number } {
+  const [dims, setDims] = useState<{ cols: number; rows: number }>({
+    cols: 14,
+    rows: 8,
+  });
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const update = () => {
+      const w = window.innerWidth;
+      if (w >= 1024) {
+        // Desktop / laptop — thinner & longer cells. More columns
+        // (28) → narrower cells (~46px wide on 1280); fewer rows
+        // (6) → much taller cells (~150px tall on 900). Reads as
+        // a vertical-bar rhythm rather than a square grid.
+        setDims({ cols: 28, rows: 6 });
+      } else if (w >= 640) {
+        // Tablet — same proportional shift as desktop.
+        setDims({ cols: 22, rows: 6 });
+      } else {
+        // Mobile — original 14×8, the look the user asked us to match
+        // on the larger viewports.
+        setDims({ cols: 14, rows: 8 });
+      }
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+  return dims;
+}
+
 const STAGGER_MS = 28;
 const FADE_MS = 320;
 
@@ -24,6 +65,7 @@ const FADE_MS = 320;
  */
 export default function TileGrid({ className = "" }: { className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
+  const { cols, rows } = useGridDims();
 
   // Cursor light source — fast path, no React state.
   useEffect(() => {
@@ -51,6 +93,9 @@ export default function TileGrid({ className = "" }: { className?: string }) {
   }, []);
 
   // Tile colours + theme-change wave.
+  // Re-runs when cols changes (i.e. when a window resize crosses a
+  // breakpoint and the grid template reflows) so the wave math
+  // operates on the current row/col count, not the initial one.
   useEffect(() => {
     const root = ref.current;
     if (!root) return;
@@ -80,8 +125,8 @@ export default function TileGrid({ className = "" }: { className?: string }) {
         timers.forEach(clearTimeout);
         timers.length = 0;
         tiles.forEach((tile, i) => {
-          const row = Math.floor(i / COLS);
-          const col = i % COLS;
+          const row = Math.floor(i / cols);
+          const col = i % cols;
           const delay = (row + col) * STAGGER_MS;
           timers.push(
             setTimeout(() => {
@@ -98,7 +143,7 @@ export default function TileGrid({ className = "" }: { className?: string }) {
       obs.disconnect();
       timers.forEach(clearTimeout);
     };
-  }, []);
+  }, [cols]);
 
   return (
     <div
@@ -106,8 +151,8 @@ export default function TileGrid({ className = "" }: { className?: string }) {
       aria-hidden
       className={`absolute inset-0 pointer-events-none grid ${className}`}
       style={{
-        gridTemplateColumns: `repeat(${COLS}, 1fr)`,
-        gridTemplateRows: `repeat(${ROWS}, 1fr)`,
+        gridTemplateColumns: `repeat(${cols}, 1fr)`,
+        gridTemplateRows: `repeat(${rows}, 1fr)`,
         // Cursor light source: bright at pointer, blurry mid-falloff,
         // dim baseline 12% so the grid is still hinted-at when the
         // cursor isn't on the page. The vertical fade is folded into
@@ -119,7 +164,7 @@ export default function TileGrid({ className = "" }: { className?: string }) {
           "radial-gradient(320px circle at var(--cx, 50%) var(--cy, 38%), rgba(255,255,255,1) 0%, rgba(255,255,255,0.55) 35%, rgba(255,255,255,0.12) 80%)",
       }}
     >
-      {Array.from({ length: COLS * ROWS }).map((_, i) => (
+      {Array.from({ length: cols * rows }).map((_, i) => (
         <div
           key={i}
           style={{

@@ -6,6 +6,7 @@ import BeforeAfter from "@/components/BeforeAfter";
 import Process from "@/components/Process";
 import SolutionSection from "@/components/SolutionSection";
 import Pricing from "@/components/Pricing";
+import BookCall from "@/components/BookCall";
 import ContactForm from "@/components/ContactForm";
 import FAQ from "@/components/FAQ";
 import Footer from "@/components/Footer";
@@ -25,6 +26,12 @@ export default function Home() {
             before the contact form — claims the footer's #pricing
             anchor. */}
         <Pricing />
+        {/* Standalone "book a call" CTA — its own section with a
+            TileGrid texture, sitting between Pricing and the actual
+            contact form. The narrow centred box gives Pricing a
+            clean closing beat without bloating the Pricing section
+            itself. */}
+        <BookCall />
         <ContactForm />
         <FAQ />
       </main>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "motion/react";
 import { fadeUp, staggerContainer } from "@/lib/animations";
 import { SOLUTION, INDUSTRIES } from "@/lib/constants";
@@ -55,8 +56,18 @@ interface IndustryBeltProps {
 }
 
 function IndustryBelt({ items, direction, duration }: IndustryBeltProps) {
+  // Per-belt selected label. Tapping a tile toggles selection on that
+  // belt only — selecting in belt 1 doesn't affect belt 2. While
+  // anything is selected, the belt's marquee animation is paused via
+  // the data-paused attribute + CSS rule in globals.css. Tapping the
+  // same tile again clears the selection and the marquee resumes.
+  const [selected, setSelected] = useState<string | null>(null);
+
+  const toggle = (label: string) =>
+    setSelected((prev) => (prev === label ? null : label));
+
   return (
-    <div className="industry-belt">
+    <div className="industry-belt" data-paused={selected !== null}>
       <div
         className="industry-track"
         style={{
@@ -66,13 +77,25 @@ function IndustryBelt({ items, direction, duration }: IndustryBeltProps) {
         }}
       >
         {items.map((label) => (
-          <IndustryTile key={`a-${label}`} label={label} />
+          <IndustryTile
+            key={`a-${label}`}
+            label={label}
+            selected={selected === label}
+            onToggle={() => toggle(label)}
+          />
         ))}
         {/* Second copy — aria-hidden so screen readers don't announce
             duplicate labels, and CSS hides this whole set in reduced
-            motion mode. */}
+            motion mode. The selected state still flows in so both
+            visual copies highlight together when one is tapped. */}
         {items.map((label) => (
-          <IndustryTile key={`b-${label}`} label={label} duplicate />
+          <IndustryTile
+            key={`b-${label}`}
+            label={label}
+            duplicate
+            selected={selected === label}
+            onToggle={() => toggle(label)}
+          />
         ))}
       </div>
     </div>
@@ -82,20 +105,51 @@ function IndustryBelt({ items, direction, duration }: IndustryBeltProps) {
 function IndustryTile({
   label,
   duplicate = false,
+  selected = false,
+  onToggle,
 }: {
   label: string;
   duplicate?: boolean;
+  selected?: boolean;
+  onToggle?: () => void;
 }) {
-  // Hover state: warmer border, warmer text, faintly warm translucent
-  // background fill. Stays within the IndexArch palette.
+  // Tap-to-toggle interaction:
+  //   – First tap selects the tile (border + text warm up, faint
+  //     translucent fill, marquee pauses via data-paused on the belt).
+  //   – Second tap on the same tile clears the selection — marquee
+  //     resumes. Selecting a different tile in the same belt simply
+  //     hands the highlight over (belt stays paused until the second
+  //     tap on the now-selected tile).
+  //
+  // Implementation notes:
+  //   – <button type="button"> is the right element for this
+  //     interaction (toggle, no form submit). aria-pressed reflects
+  //     state for assistive tech.
+  //   – Duplicate copies are aria-hidden + tabIndex=-1 so SRs and
+  //     keyboard users only see/traverse one set, but the click
+  //     handler still works on either visible copy.
+  //   – Hover / active / focus-visible styles fall away when selected
+  //     so a second hover doesn't visually fight the persistent
+  //     selected state. We rely on onClick + selected for both
+  //     pointer and touch — no :hover hacks needed.
+  const base =
+    "inline-flex shrink-0 items-center border px-3 py-1.5 font-mono text-[10.5px] tracking-[0.16em] uppercase whitespace-nowrap cursor-pointer select-none transition-colors duration-200 focus-visible:outline-none";
+  const state = selected
+    ? "border-ink-faint text-ink bg-surface-raised/50"
+    : "border-rule text-ink-muted hover:border-ink-faint hover:text-ink hover:bg-surface-raised/50 active:border-ink-faint active:text-ink active:bg-surface-raised/50 focus-visible:border-ink-faint focus-visible:text-ink focus-visible:bg-surface-raised/50";
+
   return (
-    <span
+    <button
+      type="button"
       role={duplicate ? "presentation" : "listitem"}
       aria-hidden={duplicate || undefined}
-      className="inline-flex shrink-0 items-center border border-rule px-3 py-1.5 font-mono text-[10.5px] tracking-[0.16em] uppercase text-ink-muted whitespace-nowrap cursor-default transition-colors duration-200 hover:border-ink-faint hover:text-ink hover:bg-surface-raised/50"
+      aria-pressed={!duplicate ? selected : undefined}
+      tabIndex={duplicate ? -1 : 0}
+      onClick={onToggle}
+      className={`${base} ${state}`}
     >
       {label}
-    </span>
+    </button>
   );
 }
 

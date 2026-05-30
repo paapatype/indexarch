@@ -323,7 +323,15 @@ function BuildIllustration() {
 // Step 03 — Go Live: iPhone center, devices orbit like a solar system using CSS
 function LaunchIllustration() {
   return (
-    <div className="relative w-full h-full">
+    // Responsive orbit radius via CSS variable, read by the
+    // @keyframes below as var(--orbit-r).
+    //   – mobile: a small fixed 38px so the devices stay inside the
+    //     cell's overflow-hidden bounds (set on the parent above).
+    //   – sm: and up: 36% of container width — the original live-
+    //     site value. The parent flips to overflow:visible at sm:
+    //     so the devices can spread freely into the cream surface
+    //     surrounding the cell, the way it looks on indexarch.com.
+    <div className="relative w-full h-full [--orbit-r:38px] sm:[--orbit-r:36%]">
       {/* Center: iPhone */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
         <svg width="36" height="70" viewBox="0 0 36 70" fill="none" className="text-ink-muted">
@@ -345,11 +353,15 @@ function LaunchIllustration() {
         </div>
       </div>
 
-      {/* Orbiting devices — each uses CSS animation for circular path */}
+      {/* Orbiting devices — each uses CSS animation for circular
+          path. The orbit radius is var(--orbit-r) which is set on
+          the LaunchIllustration root with responsive breakpoints so
+          each viewport gets a radius that fits its cell height
+          without pushing devices through the cell's top hairline. */}
       <style>{`
-        @keyframes orbit { from { transform: rotate(0deg) translateX(36%) rotate(0deg); } to { transform: rotate(360deg) translateX(36%) rotate(-360deg); } }
-        @keyframes orbit120 { from { transform: rotate(120deg) translateX(36%) rotate(-120deg); } to { transform: rotate(480deg) translateX(36%) rotate(-480deg); } }
-        @keyframes orbit240 { from { transform: rotate(240deg) translateX(36%) rotate(-240deg); } to { transform: rotate(600deg) translateX(36%) rotate(-600deg); } }
+        @keyframes orbit { from { transform: rotate(0deg) translateX(var(--orbit-r, 45px)) rotate(0deg); } to { transform: rotate(360deg) translateX(var(--orbit-r, 45px)) rotate(-360deg); } }
+        @keyframes orbit120 { from { transform: rotate(120deg) translateX(var(--orbit-r, 45px)) rotate(-120deg); } to { transform: rotate(480deg) translateX(var(--orbit-r, 45px)) rotate(-480deg); } }
+        @keyframes orbit240 { from { transform: rotate(240deg) translateX(var(--orbit-r, 45px)) rotate(-240deg); } to { transform: rotate(600deg) translateX(var(--orbit-r, 45px)) rotate(-600deg); } }
         @keyframes livePing { 0%, 100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(2.5); opacity: 0; } }
       `}</style>
 
@@ -473,8 +485,17 @@ export default function Process() {
                   : ""
               }`}
             >
-              {/* Animated illustration */}
-              <div className="h-36 sm:h-40 lg:h-48 mb-8 text-ink-faint">
+              {/* Animated illustration.
+                  – Mobile: overflow-hidden + a small fixed orbit
+                    radius (set on LaunchIllustration via --orbit-r)
+                    keeps the Go Live devices inside the cell so they
+                    don't punch above the cell's top hairline on
+                    narrow viewports.
+                  – sm: and up: overflow-visible + the original
+                    percentage-based orbit (translateX(36%)) so the
+                    devices spread out into the surrounding cream
+                    surface the same way they do on the live site. */}
+              <div className="h-36 sm:h-40 lg:h-48 mb-8 text-ink-faint overflow-hidden sm:overflow-visible">
                 {illustrations[i]}
               </div>
 

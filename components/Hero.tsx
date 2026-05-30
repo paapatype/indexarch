@@ -49,15 +49,15 @@ export default function Hero() {
           <motion.p
             variants={fadeUp}
             className="mt-12 lg:mt-16 max-w-xl text-base sm:text-lg leading-relaxed text-ink-muted"
+            style={{ textWrap: "balance" as never }}
           >
-            {/* Mobile: forced break after "a week" keeps the first
-                sentence on a controlled two visual lines. Desktop
-                lets the sentence flow naturally and only breaks
-                between the two sentences. */}
-            Technical buyers spend 10+ hours a week
-            <span className="hidden sm:inline"> </span>
-            <br className="sm:hidden" />
-            digging through PDFs.
+            {/* Two sentences, each its own line on viewports that can
+                fit the first sentence (sm: and up — that's where the
+                user wants this to read as "two lines"). The forced
+                break only sits between the two sentences; the first
+                sentence is allowed to wrap naturally on the smallest
+                mobile widths where it can't fit on one line. */}
+            Technical buyers spend 10+ hours a week digging through PDFs.
             <br />
             We cut that to minutes.
           </motion.p>

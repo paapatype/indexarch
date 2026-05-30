@@ -120,7 +120,11 @@ export default function Nav() {
         </div>
       </button>
 
-      {/* Mobile Menu — sibling of <header> for the same containing-block reason */}
+      {/* Mobile Menu — sibling of <header> for the same containing-block reason.
+          The menu items now sit in a flex-1 inner column that fills the
+          available viewport (minus the header bar) and centres its
+          children both horizontally and vertically, so the menu reads
+          as a centred page rather than a left-anchored list. */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
@@ -128,15 +132,18 @@ export default function Nav() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-[60] bg-surface md:hidden"
+            className="fixed inset-0 z-[60] bg-surface md:hidden flex flex-col"
             style={{ paddingTop: "var(--header-height)" }}
           >
-            <div className="flex flex-col items-start gap-10 p-8 pt-16">
+            <div className="flex-1 flex flex-col items-center justify-center gap-8 px-8 pb-12">
               {NAV_LINKS.map((link, i) => {
+                // Slide-up rather than slide-in-from-left so the
+                // animation reads as a vertical centred stack rather
+                // than a left-anchored list.
                 const animation = {
-                  initial: { opacity: 0, x: -20 },
-                  animate: { opacity: 1, x: 0 },
-                  transition: { delay: i * 0.08, duration: 0.4 },
+                  initial: { opacity: 0, y: 16 },
+                  animate: { opacity: 1, y: 0 },
+                  transition: { delay: i * 0.06, duration: 0.4 },
                 };
                 return link.href.startsWith("/") ? (
                   <motion.div key={link.label} {...animation}>
@@ -161,10 +168,10 @@ export default function Nav() {
                 );
               })}
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.35 }}
-                className="flex items-center gap-4 mt-4"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: NAV_LINKS.length * 0.06 + 0.05, duration: 0.4 }}
+                className="mt-4"
               >
                 <Button
                   variant="primary"

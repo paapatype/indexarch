@@ -194,6 +194,63 @@ body {
   transition: background-color 2.4s var(--ease-out-expo), color 2.4s var(--ease-out-expo);
 }
 
+/* ── In-page anchor transition (fade-out → arrive → fade-in) ─────
+   When the user clicks an in-page anchor (Nav → FAQ, Hero CTA, etc.),
+   ScrollTransition.tsx toggles this attribute on <main> in three
+   phases: "fading-out" (opacity 1 → 0), a single-frame hold during
+   which the scroll position is updated invisibly, then "fading-in"
+   (opacity 0 → 1). The user experiences a soft fade to background
+   and a gentle reveal of the destination — no blur-during-scroll,
+   no abrupt jump. */
+main {
+  transition: opacity 0.32s var(--ease-out-expo);
+  will-change: opacity;
+}
+main[data-nav-transition="fading-out"] {
+  opacity: 0;
+}
+main[data-nav-transition="fading-in"] {
+  /* Slightly longer fade-in so the destination reveals at a calmer
+     pace than the fade-out ushered the previous view away. */
+  transition: opacity 0.5s var(--ease-out-expo);
+  opacity: 1;
+}
+
+/* While the page is mid-transition, force scroll-behavior: auto so
+   the instant scrollTo() in ScrollTransition isn't double-animated
+   by the CSS smooth-scroll rule that's on by default. */
+html:has(main[data-nav-transition]) {
+  scroll-behavior: auto;
+}
+
+/* ── Suppress iOS Safari's grey tap-highlight on interactive
+   elements. By default Safari paints a faint translucent grey
+   rectangle/circle on the bounds of a tapped button or anchor for
+   ~300ms after the tap, which looks like a "residual circle" on
+   our rounded-full controls (theme toggle, burger menu) and a
+   ghost rectangle on text links. Globally clearing it gives the
+   site a cleaner native-app feel without affecting hover/focus
+   styles. */
+button,
+a,
+[role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── Paragraph orphan prevention ───────────────────────────────────
+   `text-wrap: pretty` tells the browser to lay out paragraphs so the
+   last line never ends with a single short word — it borrows a word
+   from the second-to-last line when one would otherwise orphan.
+   Applied to every <p> by default so the rule travels with the markup
+   wherever a paragraph lives.
+
+   Components that explicitly want `text-wrap: balance` (headings
+   already do, via inline style) override this thanks to specificity:
+   inline style beats stylesheet rule. */
+p {
+  text-wrap: pretty;
+}
+
 /* Universal theme-toggle ripple. ThemeWave.tsx adds the
    `data-theme-transition` attribute on <html> for a few seconds when
    the dark class flips. Main + footer briefly bump and blur — a tiny
@@ -372,6 +429,13 @@ html[data-theme-transition="active"] body > footer {
 
 .industry-belt {
   overflow: hidden;
+  /* 1px vertical breathing room so the tile's 1px border doesn't get
+     sub-pixel-clipped by the overflow:hidden boundary on rows where
+     the belt happens to land on a half-pixel y-position. Without this,
+     certain belts (typically alternating ones) read with a noticeably
+     thinner bottom edge — most obvious on hovered tiles where the
+     border is the darker ink-faint instead of the calmer rule colour. */
+  padding-block: 1px;
   /* Width of the soft fade on each edge. Bump this if the copy column
      gets wider or if you want tiles to disappear further from the edge. */
   --industry-fade-w: 72px;
@@ -418,7 +482,14 @@ html[data-theme-transition="active"] body > footer {
   }
 }
 
-.industry-belt:hover .industry-track {
+.industry-belt:hover .industry-track,
+.industry-belt[data-paused="true"] .industry-track {
+  /* Pause the marquee when:
+       – the user hovers the belt (pointer / desktop)
+       – or a tile in the belt is currently selected via tap. The
+         IndustryBelt component sets data-paused="true" on this
+         element whenever its `selected` state is non-null, which
+         covers touch devices where :hover isn't reliable. */
   animation-play-state: paused;
 }
 
