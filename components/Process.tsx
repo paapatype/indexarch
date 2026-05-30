@@ -325,16 +325,20 @@ function LaunchIllustration() {
   return (
     // Responsive orbit radius via CSS variable, read by the
     // @keyframes below as var(--orbit-r).
-    //   – below lg: a small fixed 38px. Below lg the Process grid is
-    //     a SINGLE column, so the cell is full page-width — a
-    //     percentage radius there would be hundreds of px and fling
-    //     the devices out of the section. Fixed 38px + the parent's
-    //     overflow-hidden keeps them neatly inside the cell.
+    //   – below lg: a fixed 84px. Below lg the Process grid is a
+    //     SINGLE column, so a percentage radius would be hundreds of
+    //     px and fling the devices out of the section. The central
+    //     iPhone is 70px tall (±35 from centre) and the orbiting
+    //     devices are wide (desktop 56px); 84px keeps a comfortable
+    //     gap to the phone outline at every rotation angle (earlier
+    //     64/76px left the wide desktop only a few px clear on its
+    //     diagonal pass). Stays inside the h-60 cell via the parent's
+    //     overflow-hidden.
     //   – lg and up: 36% of the cell width. Only at lg does the grid
-    //     become 3 columns (~380px cells), so 36% ≈ 137px spreads the
+    //     become 3 columns (~300px cells), so 36% ≈ 108px spreads the
     //     devices into the cream gutters between columns the way the
     //     live indexarch.com desktop layout does.
-    <div className="relative w-full h-full [--orbit-r:38px] lg:[--orbit-r:36%]">
+    <div className="relative w-full h-full [--orbit-r:84px] lg:[--orbit-r:36%]">
       {/* Center: iPhone */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
         <svg width="36" height="70" viewBox="0 0 36 70" fill="none" className="text-ink-muted">
@@ -498,7 +502,7 @@ export default function Process() {
                   – lg and up: overflow-visible + the % orbit so the
                     devices spread into the cream gutters between the
                     3 columns the way the live desktop site does. */}
-              <div className="h-36 sm:h-40 lg:h-48 mb-8 text-ink-faint overflow-hidden lg:overflow-visible">
+              <div className="h-60 lg:h-48 mb-8 text-ink-faint overflow-hidden lg:overflow-visible">
                 {illustrations[i]}
               </div>
 
