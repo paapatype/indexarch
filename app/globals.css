@@ -103,6 +103,13 @@
      the whole lens out to solid white — so light mode stays neutral
      (1.0). The dark-mode block below overrides this to 1.8. */
   --lens-brightness: 1;
+
+  /* Pricing slider thumb — light mode: white centre + soft beige
+     outline (a solid black knob read as heavy on the cream bar). The
+     dark-mode block overrides to a cream knob visible on the near-
+     black bar. */
+  --slider-thumb-bg: #ffffff;
+  --slider-thumb-border: #c4b49e;
 }
 
 /* ── Dark Theme Overrides ──
@@ -182,6 +189,11 @@ html.dark {
      the cream text pops against the black backing (the look tuned in
      the lens lab). Light mode stays at the 1.0 default above. */
   --lens-brightness: 1.8;
+
+  /* Slider thumb — dark mode: cream centre + subtle warm outline so
+     the knob stays visible against the near-black slider bar. */
+  --slider-thumb-bg: #f2ede5;
+  --slider-thumb-border: #5c5249;
 }
 
 /* ── Base Styles ── */

@@ -152,7 +152,7 @@ export default function Pricing() {
                 no separate label rows or tick rows are needed. A small
                 hint above makes it clear the bars are draggable. */}
             <div className="flex flex-col gap-2.5 p-4 lg:p-5">
-              <p className="flex items-center gap-2 font-mono text-[10px] tracking-widest uppercase text-ink-faint">
+              <p className="flex items-center justify-center gap-2 font-mono text-[10px] tracking-widest uppercase text-ink-faint">
                 <span aria-hidden>↔</span> Drag the sliders to your numbers
               </p>
               <SliderField
@@ -280,8 +280,12 @@ function SliderField({
           style={{ width: `${pct}%` }}
         />
         <div
-          className="absolute top-1/2 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-ink shadow-sm ring-2 ring-surface-sunken"
-          style={{ left: `${pct}%` }}
+          className="absolute top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-[1.5px] shadow-sm"
+          style={{
+            left: `${pct}%`,
+            background: "var(--slider-thumb-bg)",
+            borderColor: "var(--slider-thumb-border)",
+          }}
         />
       </div>
 
