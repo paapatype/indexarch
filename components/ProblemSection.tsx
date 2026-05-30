@@ -1301,8 +1301,11 @@ function LostBuyerCard({ card }: { card: { title: string; description: string } 
 
   const lensRadius = 22; // 44px diameter
   const clip = `circle(${lensRadius}px at ${pos.x}px ${pos.y}px)`;
+  // brightness is theme-aware via --lens-brightness (1.8 dark / 1.0
+  // light) so the lens pops on black but doesn't blow the cream
+  // surface out to solid white in light mode.
   const lensFilter =
-    "url(#lostBuyersGlass) blur(3px) brightness(1.8)";
+    "url(#lostBuyersGlass) blur(3px) brightness(var(--lens-brightness, 1))";
 
   const move = (clientX: number, clientY: number) => {
     if (!cardRef.current) return;
