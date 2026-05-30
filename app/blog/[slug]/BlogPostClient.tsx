@@ -16,6 +16,7 @@ import {
   ThreeDDecisionGrid,
 } from "@/components/ui/BlogBento";
 import type { BlogPost } from "@/lib/constants";
+import { asset } from "@/lib/asset";
 
 function Figure({
   src,
@@ -30,7 +31,7 @@ function Figure({
     <figure className="my-12">
       <div className="relative aspect-[1440/900] w-full border border-rule bg-surface-sunken overflow-hidden">
         <Image
-          src={src}
+          src={asset(src)}
           alt={alt}
           fill
           sizes="(min-width: 1024px) 768px, 100vw"
@@ -224,7 +225,7 @@ export default function BlogPostClient({
           >
             <div className="relative aspect-[16/8] w-full overflow-hidden border border-rule bg-surface-raised">
               <Image
-                src={post.coverImage.src}
+                src={asset(post.coverImage.src)}
                 alt={post.coverImage.alt}
                 fill
                 sizes="(min-width: 1024px) 1024px, 100vw"
