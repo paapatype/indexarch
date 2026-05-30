@@ -325,13 +325,16 @@ function LaunchIllustration() {
   return (
     // Responsive orbit radius via CSS variable, read by the
     // @keyframes below as var(--orbit-r).
-    //   – mobile: a small fixed 38px so the devices stay inside the
-    //     cell's overflow-hidden bounds (set on the parent above).
-    //   – sm: and up: 36% of container width — the original live-
-    //     site value. The parent flips to overflow:visible at sm:
-    //     so the devices can spread freely into the cream surface
-    //     surrounding the cell, the way it looks on indexarch.com.
-    <div className="relative w-full h-full [--orbit-r:38px] sm:[--orbit-r:36%]">
+    //   – below lg: a small fixed 38px. Below lg the Process grid is
+    //     a SINGLE column, so the cell is full page-width — a
+    //     percentage radius there would be hundreds of px and fling
+    //     the devices out of the section. Fixed 38px + the parent's
+    //     overflow-hidden keeps them neatly inside the cell.
+    //   – lg and up: 36% of the cell width. Only at lg does the grid
+    //     become 3 columns (~380px cells), so 36% ≈ 137px spreads the
+    //     devices into the cream gutters between columns the way the
+    //     live indexarch.com desktop layout does.
+    <div className="relative w-full h-full [--orbit-r:38px] lg:[--orbit-r:36%]">
       {/* Center: iPhone */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
         <svg width="36" height="70" viewBox="0 0 36 70" fill="none" className="text-ink-muted">
@@ -486,16 +489,16 @@ export default function Process() {
               }`}
             >
               {/* Animated illustration.
-                  – Mobile: overflow-hidden + a small fixed orbit
-                    radius (set on LaunchIllustration via --orbit-r)
-                    keeps the Go Live devices inside the cell so they
-                    don't punch above the cell's top hairline on
-                    narrow viewports.
-                  – sm: and up: overflow-visible + the original
-                    percentage-based orbit (translateX(36%)) so the
-                    devices spread out into the surrounding cream
-                    surface the same way they do on the live site. */}
-              <div className="h-36 sm:h-40 lg:h-48 mb-8 text-ink-faint overflow-hidden sm:overflow-visible">
+                  – Below lg: overflow-hidden + a small fixed orbit
+                    radius keeps the Go Live devices inside the cell.
+                    Below lg the grid is single-column (full-width
+                    cell), so allowing overflow + a % radius there
+                    flung the devices out across the section and over
+                    the text below — the bug this fixes.
+                  – lg and up: overflow-visible + the % orbit so the
+                    devices spread into the cream gutters between the
+                    3 columns the way the live desktop site does. */}
+              <div className="h-36 sm:h-40 lg:h-48 mb-8 text-ink-faint overflow-hidden lg:overflow-visible">
                 {illustrations[i]}
               </div>
 
