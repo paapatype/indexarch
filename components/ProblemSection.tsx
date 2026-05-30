@@ -1387,7 +1387,13 @@ function LostBuyerCard({ card }: { card: { title: string; description: string } 
         </div>
       )}
 
-      {/* Lens frame — ring + inner ring + diagonal handle */}
+      {/* Lens frame — ring + inner ring + diagonal handle.
+          Coloured with currentColor (the wrapper is text-ink-muted),
+          NOT hardcoded white. ink-muted is theme-aware — graphite
+          (#666) on the cream light surface, warm grey (#9C9388) on
+          black — so the lens outline is visible in BOTH modes. The
+          previous rgba(255,255,255,…) was invisible on the cream
+          light-mode card, which made the lens look broken in light. */}
       {active && (
         <div
           className="pointer-events-none absolute text-ink-muted"
@@ -1398,8 +1404,7 @@ function LostBuyerCard({ card }: { card: { title: string; description: string } 
               width: lensRadius * 2,
               height: lensRadius * 2,
               borderRadius: "50%",
-              border: "1.5px solid rgba(255,255,255,0.5)",
-              boxShadow: "inset 0 0 8px rgba(255,255,255,0.06)",
+              border: "1.5px solid currentColor",
             }}
           />
           <div
@@ -1410,7 +1415,8 @@ function LostBuyerCard({ card }: { card: { title: string; description: string } 
               width: lensRadius * 2 - 6,
               height: lensRadius * 2 - 6,
               borderRadius: "50%",
-              border: "0.5px solid rgba(255,255,255,0.35)",
+              border: "0.5px solid currentColor",
+              opacity: 0.5,
             }}
           />
           <div
@@ -1421,7 +1427,8 @@ function LostBuyerCard({ card }: { card: { title: string; description: string } 
               width: 26,
               height: 2,
               borderRadius: 2,
-              background: "rgba(255,255,255,0.5)",
+              background: "currentColor",
+              opacity: 0.75,
               transform: "rotate(45deg)",
               transformOrigin: "left center",
             }}
