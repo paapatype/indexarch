@@ -285,6 +285,7 @@ function StaticAccentBorder() {
   );
 }
 
+
 // ─── Section ─────────────────────────────────────────────────────────
 
 export default function Methodology() {
@@ -447,23 +448,26 @@ export default function Methodology() {
     <section
       ref={sectionRef}
       id="how-it-works"
-      className="relative py-section-sm lg:py-section hairline-top"
+      className="relative py-12 lg:py-16 hairline-top"
     >
       <div className="mx-auto max-w-[var(--max-width)] px-6 lg:px-8">
         {/* Header — asymmetric: heading on the left (col-span-7), the
-            3-paragraph subtitle on the right (col-span-5). */}
+            3-paragraph subtitle on the right (col-span-5).
+            Bottom margin tightened so the 4-step card row fits inside
+            the same desktop viewport as the headline without cutting
+            cards off below the fold. */}
         <motion.div
-          className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-16 mb-16 lg:mb-20 items-start"
+          className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 mb-10 lg:mb-12 items-start"
           variants={staggerContainer}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-80px" }}
         >
           <motion.div variants={fadeUp} className="lg:col-span-7 text-center lg:text-left">
-            <span className="block font-mono text-xs tracking-widest uppercase text-ink-faint mb-4">
+            <span className="block font-mono text-xs tracking-widest uppercase text-ink-faint mb-3">
               {METHODOLOGY.eyebrow}
             </span>
-            <h2 className="font-serif text-[2rem] sm:text-4xl lg:text-5xl text-ink leading-[1.18] lg:leading-[1.15]">
+            <h2 className="font-serif text-[1.85rem] sm:text-4xl lg:text-[2.5rem] text-ink leading-[1.18] lg:leading-[1.15]">
               {/* Mobile heading: 2 cleaner lines — "We don't replace
                   your catalogue," / "we unpack it." Desktop keeps the
                   original split where each lg:col-span-7 line fits
@@ -483,7 +487,7 @@ export default function Methodology() {
 
           <motion.div
             variants={fadeUp}
-            className="lg:col-span-5 lg:pt-[2.1rem] text-base lg:text-lg text-ink-muted leading-relaxed space-y-2 max-w-md mx-auto lg:mx-0 text-center lg:text-left"
+            className="lg:col-span-5 lg:pt-3 text-base lg:text-base text-ink-muted leading-relaxed space-y-2 max-w-md mx-auto lg:mx-0 text-center lg:text-left"
             style={{ textWrap: "pretty" as never }}
           >
             <p>{METHODOLOGY.subtitleIntro}</p>
@@ -530,10 +534,11 @@ export default function Methodology() {
               // minimal. Same on every card so the inside layout
               // reads as one consistent editorial system. `relative`
               // anchors the absolute TrailingBorder overlay.
-              // Mobile centres the step number + title (and body)
-              // for editorial balance under the centred section
-              // heading; desktop keeps the left-aligned grid.
-              className="relative bg-surface p-8 lg:p-12 lg:min-h-[460px] flex flex-col text-center lg:text-left items-center lg:items-stretch"
+              // Padding tightened (p-6 / lg:p-8) and the previous
+              // lg:min-h-[460px] dropped so cards size to content;
+              // the result is the 4-card row + the section heading
+              // fit inside a single desktop viewport.
+              className="relative bg-surface p-6 lg:p-8 flex flex-col text-center lg:text-left items-center lg:items-stretch"
             >
               {/* Split-trace perimeter overlay — two trails launch
                   from the left-centre and sweep around in opposite
@@ -549,7 +554,7 @@ export default function Methodology() {
                 />
               )}
 
-              <span className="block font-mono text-xs tracking-widest uppercase text-ink-faint mb-6">
+              <span className="block font-mono text-xs tracking-widest uppercase text-ink-faint mb-4">
                 Step {beat.number.replace(/^0+/, "")}
               </span>
               {/* Title lines are explicit — split on "\n" so all four
@@ -559,7 +564,7 @@ export default function Methodology() {
                   lines. Font size is set so the longest segment fits
                   inside the card's content width. */}
               <h3
-                className="font-serif text-xl lg:text-[1.4rem] text-ink leading-snug mb-8 min-h-[3lh]"
+                className="font-serif text-lg lg:text-xl text-ink leading-snug mb-5 min-h-[3lh]"
               >
                 {beat.title.split("\n").map((line, j) => (
                   <span key={j} className="block whitespace-nowrap">
@@ -568,7 +573,7 @@ export default function Methodology() {
                 ))}
               </h3>
               <p
-                className="text-base text-ink-muted leading-relaxed"
+                className="text-sm text-ink-muted leading-relaxed"
                 style={{ textWrap: "pretty" as never }}
               >
                 {beat.description}

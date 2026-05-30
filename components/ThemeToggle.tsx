@@ -31,7 +31,18 @@ export default function ThemeToggle({ className = "" }: { className?: string }) 
       type="button"
       onClick={toggle}
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-      className={`relative inline-flex h-9 w-9 items-center justify-center rounded-full text-ink-muted transition-colors hover:text-ink hover:bg-sand-100 cursor-pointer ${className}`}
+      // Suppress two visual artifacts that show up after tapping the
+      // toggle:
+      //   1. The browser's default focus ring — a thick black circle
+      //      that lingers around the button on Chrome / Safari after
+      //      the click (until focus moves elsewhere). focus:outline-
+      //      none hides the focus ring on click, focus-visible: still
+      //      shows it for keyboard users so a11y is preserved.
+      //   2. iOS Safari's grey tap-highlight overlay — appears as a
+      //      faint dark circle on the rounded-full button bounds for
+      //      ~300ms after a tap. [-webkit-tap-highlight-color] kills
+      //      it without affecting hover/focus states.
+      className={`relative inline-flex h-9 w-9 items-center justify-center rounded-full text-ink-muted transition-colors hover:text-ink hover:bg-sand-100 cursor-pointer focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent [-webkit-tap-highlight-color:transparent] ${className}`}
     >
       <AnimatePresence mode="wait" initial={false}>
         {theme && (

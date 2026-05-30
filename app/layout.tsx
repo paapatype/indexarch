@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Libre_Baskerville, DM_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import ThemeWave from "@/components/ThemeWave";
+import ScrollTransition from "@/components/ScrollTransition";
 
 const libreBaskerville = Libre_Baskerville({
   subsets: ["latin"],
@@ -75,6 +76,7 @@ export default function RootLayout({
       </head>
       <body>
         <ThemeWave />
+        <ScrollTransition />
         {children}
       </body>
     </html>
