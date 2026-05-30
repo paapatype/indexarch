@@ -1243,29 +1243,25 @@ function SymptomCard({
   );
 }
 
-function LostBuyerCard({ card }: { card: { title: string; description: string } }) {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [hovered, setHovered] = useState(false);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const lensRadius = 20;
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
-  };
-
+// Shared card content so the sharp base layer and the magnified
+// duplicate layer render identical markup (guarantees the clipped
+// reveal stays pixel-aligned with what's underneath). The static
+// magnifier icon fades out while the cursor is over the card — the
+// moving lens takes its place. opacity (not display:none) keeps the
+// icon's layout box so both layers stay aligned.
+function LostBuyerContent({
+  card,
+  hideIcon = false,
+}: {
+  card: { title: string; description: string };
+  hideIcon?: boolean;
+}) {
   return (
-    <motion.div
-      ref={cardRef}
-      variants={fadeUp}
-      className="flex flex-col items-center text-center p-10 lg:p-12 relative overflow-hidden"
-      style={{ cursor: hovered ? "none" : "default" }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onMouseMove={handleMouseMove}
-    >
-      <div className="h-14 w-14 shrink-0 text-ink-faint mb-6">
+    <>
+      <div
+        className="h-14 w-14 shrink-0 text-ink-faint mb-6"
+        style={{ opacity: hideIcon ? 0 : 1, transition: "opacity 0.2s ease" }}
+      >
         <MagnifyingGlassIcon />
       </div>
       <h3 className="font-sans text-base font-semibold text-ink mb-2">
@@ -1277,46 +1273,133 @@ function LostBuyerCard({ card }: { card: { title: string; description: string } 
       >
         {card.description}
       </p>
+    </>
+  );
+}
 
-      {hovered && (
+// Lost Buyers magnifier — duplicate-content glass lens.
+//
+// Why this technique (not backdrop-filter): backdrop-filter:blur() —
+// the deployed approach — silently fails to composite inside an
+// overflow:hidden parent on iOS Safari, so the lens never blurred on
+// phones. Instead we render the card content twice: a sharp base
+// layer, and a duplicate that is magnified + blurred + glass-distorted
+// and clipped to a circle that tracks the cursor. The duplicate has an
+// OPAQUE card-coloured background (var(--color-surface)) so the sharp
+// base underneath is fully hidden — otherwise the sharp text bleeds
+// through the translucent blur and the effect disappears.
+//
+// The look (blur 3 / magnify 1.85 / brightness 1.8 / SVG glass
+// distortion scale 20) was dialled in interactively and transcribed
+// here. The SVG feTurbulence + feDisplacementMap filter is applied via
+// `filter: url(#...)` (NOT backdrop-filter: url(), which is
+// Chrome-only) so the glass warp works cross-browser including Safari.
+function LostBuyerCard({ card }: { card: { title: string; description: string } }) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [active, setActive] = useState(false);
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+
+  const lensRadius = 22; // 44px diameter
+  const clip = `circle(${lensRadius}px at ${pos.x}px ${pos.y}px)`;
+  const lensFilter =
+    "url(#lostBuyersGlass) blur(3px) brightness(1.8)";
+
+  const move = (clientX: number, clientY: number) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    setPos({ x: clientX - rect.left, y: clientY - rect.top });
+  };
+
+  return (
+    <motion.div
+      ref={cardRef}
+      variants={fadeUp}
+      className="flex flex-col items-center text-center p-10 lg:p-12 relative overflow-hidden"
+      style={{ cursor: active ? "none" : "default" }}
+      onMouseEnter={(e) => {
+        setActive(true);
+        move(e.clientX, e.clientY);
+      }}
+      onMouseLeave={() => setActive(false)}
+      onMouseMove={(e) => move(e.clientX, e.clientY)}
+      onTouchStart={(e) => {
+        const t = e.touches[0];
+        if (!t) return;
+        setActive(true);
+        move(t.clientX, t.clientY);
+      }}
+      onTouchMove={(e) => {
+        const t = e.touches[0];
+        if (!t) return;
+        move(t.clientX, t.clientY);
+      }}
+      onTouchEnd={() => setActive(false)}
+      onTouchCancel={() => setActive(false)}
+    >
+      {/* SVG glass-distortion filter — Perlin noise (feTurbulence)
+          drives feDisplacementMap to warp the magnified text like
+          real refracting glass. */}
+      <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden>
+        <filter id="lostBuyersGlass" x="-30%" y="-30%" width="160%" height="160%">
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency={0.015}
+            numOctaves={2}
+            seed={4}
+            result="noise"
+          />
+          <feDisplacementMap
+            in="SourceGraphic"
+            in2="noise"
+            scale={20}
+            xChannelSelector="R"
+            yChannelSelector="G"
+          />
+        </filter>
+      </svg>
+
+      {/* Base (sharp) layer — icon hidden while the lens is active */}
+      <LostBuyerContent card={card} hideIcon={active} />
+
+      {/* Magnified glass duplicate, clipped to the lens circle. The
+          clip lives on the WRAPPER so the magnify scale on the inner
+          layer doesn't enlarge the lens itself. */}
+      {active && (
         <div
-          className="pointer-events-none absolute"
-          style={{
-            left: mousePos.x - lensRadius,
-            top: mousePos.y - lensRadius,
-            zIndex: 20,
-          }}
+          className="pointer-events-none absolute inset-0"
+          style={{ clipPath: clip, WebkitClipPath: clip, zIndex: 10 }}
         >
           <div
-            className="text-ink-muted"
+            className="absolute inset-0 flex flex-col items-center text-center p-10 lg:p-12"
+            style={{
+              background: "var(--color-surface)",
+              filter: lensFilter,
+              WebkitFilter: lensFilter,
+              transform: "scale(1.85)",
+              transformOrigin: `${pos.x}px ${pos.y}px`,
+            }}
+          >
+            <LostBuyerContent card={card} hideIcon />
+          </div>
+        </div>
+      )}
+
+      {/* Lens frame — ring + inner ring + diagonal handle */}
+      {active && (
+        <div
+          className="pointer-events-none absolute text-ink-muted"
+          style={{ left: pos.x - lensRadius, top: pos.y - lensRadius, zIndex: 20 }}
+        >
+          <div
             style={{
               width: lensRadius * 2,
               height: lensRadius * 2,
               borderRadius: "50%",
-              backdropFilter: "blur(5px)",
-              WebkitBackdropFilter: "blur(5px)",
-              border: "1.5px solid currentColor",
-              background: "transparent",
-              boxShadow: "inset 0 0 8px rgba(255,255,255,0.08)",
+              border: "1.5px solid rgba(255,255,255,0.5)",
+              boxShadow: "inset 0 0 8px rgba(255,255,255,0.06)",
             }}
           />
           <div
-            className="text-ink-muted"
-            style={{
-              position: "absolute",
-              left: lensRadius + lensRadius * 0.7,
-              top: lensRadius + lensRadius * 0.7,
-              width: lensRadius * 0.9,
-              height: 2.5,
-              background: "currentColor",
-              borderRadius: 2,
-              transform: "rotate(45deg)",
-              transformOrigin: "0 0",
-              opacity: 0.75,
-            }}
-          />
-          <div
-            className="text-ink-faint"
             style={{
               position: "absolute",
               left: 3,
@@ -1324,8 +1407,20 @@ function LostBuyerCard({ card }: { card: { title: string; description: string } 
               width: lensRadius * 2 - 6,
               height: lensRadius * 2 - 6,
               borderRadius: "50%",
-              border: "0.5px solid currentColor",
-              opacity: 0.5,
+              border: "0.5px solid rgba(255,255,255,0.35)",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              left: lensRadius + lensRadius * 0.707,
+              top: lensRadius + lensRadius * 0.707,
+              width: 26,
+              height: 2,
+              borderRadius: 2,
+              background: "rgba(255,255,255,0.5)",
+              transform: "rotate(45deg)",
+              transformOrigin: "left center",
             }}
           />
         </div>
