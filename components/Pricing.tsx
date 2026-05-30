@@ -149,8 +149,12 @@ export default function Pricing() {
           <motion.div variants={fadeUp} className="flex flex-col">
             {/* Two compact in-bar sliders with a small gap between
                 them — each bar carries its own label + live value, so
-                no separate label rows or tick rows are needed. */}
+                no separate label rows or tick rows are needed. A small
+                hint above makes it clear the bars are draggable. */}
             <div className="flex flex-col gap-2.5 p-4 lg:p-5">
+              <p className="flex items-center gap-2 font-mono text-[10px] tracking-widest uppercase text-ink-faint">
+                <span aria-hidden>↔</span> Drag the sliders to your numbers
+              </p>
               <SliderField
                 id={orderId}
                 label="Average order value"
@@ -184,15 +188,15 @@ export default function Pricing() {
                 result off-screen. */}
             <div className="mt-auto border-t border-rule grid grid-cols-3 gap-px bg-rule">
               <ResultCard
-                label="Extra revenue / year"
+                lines={["Extra", "revenue per year"]}
                 figure={fmtUSD(extraAnnual)}
               />
               <ResultCard
-                label="Pays for itself after"
+                lines={["Pays for", "itself after"]}
                 figure={`${paybackDeals} ${paybackDeals === 1 ? "deal" : "deals"}`}
               />
               <ResultCard
-                label="First-year return"
+                lines={["First-year", "return"]}
                 figure={`${firstYearReturn}×`}
               />
             </div>
@@ -255,27 +259,32 @@ function SliderField({
 }: SliderFieldProps) {
   const pct = ((value - min) / (max - min)) * 100;
   return (
-    <div className="relative h-[52px] select-none overflow-hidden rounded-md bg-surface-sunken">
-      {/* Fill — subtle tint growing from the left to show position. */}
-      <div
-        className="pointer-events-none absolute inset-y-0 left-0 bg-ink/[0.07]"
-        style={{ width: `${pct}%` }}
-      />
-      {/* Handle — thin vertical line at the fill's leading edge. */}
-      <div
-        className="pointer-events-none absolute inset-y-2 w-px bg-ink/40"
-        style={{ left: `calc(${pct}% - 0.5px)` }}
-      />
-      {/* Label (left) + value (right), overlaid inside the bar. */}
-      <span className="pointer-events-none absolute left-4 top-1/2 z-10 -translate-y-1/2 font-mono text-[11px] tracking-widest uppercase text-ink-muted">
+    <div className="relative h-[58px] select-none overflow-hidden rounded-md bg-surface-sunken">
+      {/* Label (top-left) + live value (top-right), inside the bar. */}
+      <span className="pointer-events-none absolute left-4 top-3 z-10 font-mono text-[11px] tracking-widest uppercase text-ink-muted">
         {label}
       </span>
       <span
-        className="pointer-events-none absolute right-4 top-1/2 z-10 -translate-y-1/2 font-mono text-base text-ink tabular-nums"
+        className="pointer-events-none absolute right-4 top-[9px] z-10 font-mono text-base text-ink tabular-nums"
         aria-hidden
       >
         {displayValue}
       </span>
+
+      {/* Visible track + thumb along the bottom of the bar. The full-
+          width groove + round knob make it unmistakably a slider even
+          at the minimum (where a fill-only bar looked empty/static). */}
+      <div className="pointer-events-none absolute inset-x-4 bottom-[14px] h-1 rounded-full bg-ink/15">
+        <div
+          className="absolute inset-y-0 left-0 rounded-full bg-ink/40"
+          style={{ width: `${pct}%` }}
+        />
+        <div
+          className="absolute top-1/2 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-ink shadow-sm ring-2 ring-surface-sunken"
+          style={{ left: `${pct}%` }}
+        />
+      </div>
+
       {/* Transparent native range across the whole bar — drives value,
           handles drag/click/keyboard, announces aria-valuetext. */}
       <label htmlFor={id} className="sr-only">
@@ -302,21 +311,25 @@ function SliderField({
 // screen readers hear updates without spam.
 
 interface ResultCardProps {
-  label: string;
+  // Two explicit label lines so every card's label is exactly 2 lines.
+  // That keeps the gap between label and figure identical across all
+  // three cards (a 1-line label left a big uneven gap under
+  // "First-year return"). It also lets us control the wording — e.g.
+  // "revenue per year" instead of "revenue / year".
+  lines: [string, string];
   figure: string;
 }
 
-function ResultCard({ label, figure }: ResultCardProps) {
+function ResultCard({ lines, figure }: ResultCardProps) {
   return (
-    // 3-across on every viewport now, so the card has to be compact
-    // enough that even the widest value ("$6,000,000", 10 chars at
-    // max sliders) fits a ~109px mobile column. Figure scales up with
-    // viewport; tabular-nums + tracking-tight keep it tight. The label
-    // uses smaller tracking on mobile so "EXTRA REVENUE / YEAR" wraps
-    // to ~2 readable lines instead of clipping.
+    // 3-across on every viewport, so the card stays compact enough that
+    // even the widest value ("$6,000,000") fits a ~109px mobile column.
+    // The label is forced to exactly 2 lines (one block span each) for
+    // consistent height; the figure scales up with viewport.
     <div className="bg-surface-raised px-2 py-4 lg:px-5 lg:py-5 min-h-[5.5rem] lg:min-h-[6rem] flex flex-col items-center justify-between text-center">
-      <span className="block font-mono text-[8.5px] sm:text-[10px] tracking-wide sm:tracking-widest uppercase text-ink-muted leading-tight">
-        {label}
+      <span className="font-mono text-[8.5px] sm:text-[10px] tracking-wide sm:tracking-widest uppercase text-ink-muted leading-tight">
+        <span className="block">{lines[0]}</span>
+        <span className="block">{lines[1]}</span>
       </span>
       <span
         className="block mt-2 font-mono text-base sm:text-xl lg:text-[1.15rem] text-ink leading-none tabular-nums tracking-tight"
