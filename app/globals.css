@@ -94,6 +94,15 @@
      so they stay readable on black. */
   --color-verdict-yes: #2F7D3F;
   --color-verdict-no: #B5402A;
+
+  /* Lost Buyers magnifier — interior brightness. The lens magnifies a
+     duplicate of the card content over an opaque surface-coloured
+     backing. On DARK mode the backing is black, so brightening (1.8)
+     makes the cream text pop without blowing anything out. On LIGHT
+     mode the backing is cream (#FAF8F5) — brightening it would blow
+     the whole lens out to solid white — so light mode stays neutral
+     (1.0). The dark-mode block below overrides this to 1.8. */
+  --lens-brightness: 1;
 }
 
 /* ── Dark Theme Overrides ──
@@ -168,6 +177,11 @@ html.dark {
   /* Verdict colours — lifted saturations for readability on black. */
   --color-verdict-yes: #6BC07E;
   --color-verdict-no: #E78A78;
+
+  /* Lost Buyers magnifier — dark mode brightens the lens interior so
+     the cream text pops against the black backing (the look tuned in
+     the lens lab). Light mode stays at the 1.0 default above. */
+  --lens-brightness: 1.8;
 }
 
 /* ── Base Styles ── */
