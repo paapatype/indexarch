@@ -3,10 +3,18 @@ import type { NextConfig } from "next";
 // GitHub Pages needs static export + repo basePath. Vercel doesn't.
 // The GitHub Actions workflow opts in by setting GITHUB_PAGES=true.
 const isPages = process.env.GITHUB_PAGES === "true";
+const basePath = isPages ? "/indexarch" : "";
 
 const nextConfig: NextConfig = {
   output: isPages ? "export" : undefined,
-  basePath: isPages ? "/indexarch" : "",
+  basePath,
+  // Exposed to the client (inlined at build) so components can prefix
+  // public-folder asset URLs (e.g. /kayu-kov/page-1.png) with the
+  // basePath. next/image does NOT auto-prefix basePath onto public
+  // asset src, so on GitHub Pages those images 404'd ("/kayu-kov/…"
+  // instead of "/indexarch/kayu-kov/…"). The asset() helper in
+  // lib/asset.ts reads this. Empty string locally → no-op.
+  env: { NEXT_PUBLIC_BASE_PATH: basePath },
   trailingSlash: true,
   // Always unoptimized — not just on Pages. With trailingSlash:true the
   // Next.js image optimizer endpoint (/_next/image?url=…) gets 308

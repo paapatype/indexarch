@@ -6,6 +6,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import { fadeUp, staggerContainer } from "@/lib/animations";
 import { BEFORE_AFTER } from "@/lib/constants";
+import { asset } from "@/lib/asset";
 import LiveDemo, { DemoGuide } from "./LiveDemo";
 
 const PDF_PAGES = [1, 2, 3, 4] as const;
@@ -63,7 +64,7 @@ function PdfModal({ page, onClose, onSetPage }: PdfModalProps) {
           >
             <div className="relative aspect-[1241/1754] h-[88vh] max-w-[90vw] bg-surface-raised border border-rule shadow-card-hover overflow-hidden">
               <Image
-                src={`/kayu-kov/page-${page}.png`}
+                src={asset(`/kayu-kov/page-${page}.png`)}
                 alt={`Kayu & Kov PDF — page ${page}`}
                 fill
                 sizes="90vw"
@@ -187,7 +188,7 @@ function PdfCarousel({ onExpand }: PdfCarouselProps) {
             style={{ opacity: n === page ? 1 : 0 }}
           >
             <Image
-              src={`/kayu-kov/page-${n}.png`}
+              src={asset(`/kayu-kov/page-${n}.png`)}
               alt={`Kayu & Kov original PDF — page ${n}`}
               fill
               sizes="(min-width: 1024px) 420px, 90vw"
