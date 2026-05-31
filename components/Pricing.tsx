@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useMemo, useState } from "react";
+import { useId, useMemo, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { fadeUp, staggerContainer } from "@/lib/animations";
 
@@ -228,11 +228,12 @@ export default function Pricing() {
 // the old stacked label-row + track + min/max-tick layout (~110px),
 // so both sliders + the 3 result cards fit one phone screen.
 //
-// Interaction + a11y come from a real <input type="range"> overlaid
-// transparently across the whole bar: dragging (mouse + touch),
-// click-to-position, keyboard arrows, and screen-reader value
-// announcements (aria-valuetext) all work for free. The visible bar
-// (fill + label + value + handle line) is driven by the same value.
+// Interaction is driven by the Pointer Events API (pointerdown +
+// pointermove with setPointerCapture), NOT a native <input type=range>.
+// A transparent native range overlay refused to drag on mobile Safari
+// even with touch-action:none; pointer events behave identically for
+// mouse, touch, and pen. Accessibility is provided explicitly via
+// role="slider" + aria-value* + arrow/Home/End keyboard handling.
 
 interface SliderFieldProps {
   id: string;
@@ -257,9 +258,74 @@ function SliderField({
   displayValue,
   valueText,
 }: SliderFieldProps) {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const dragging = useRef(false);
   const pct = ((value - min) / (max - min)) * 100;
+
+  const clamp = (n: number) => Math.min(max, Math.max(min, n));
+
+  // Map a pointer's clientX to a stepped value, measured against the
+  // visible track (so the thumb sits exactly under the finger).
+  const valueFromX = (clientX: number) => {
+    const el = trackRef.current;
+    if (!el) return value;
+    const r = el.getBoundingClientRect();
+    const ratio = r.width > 0 ? (clientX - r.left) / r.width : 0;
+    const raw = min + Math.min(1, Math.max(0, ratio)) * (max - min);
+    return clamp(Math.round(raw / step) * step);
+  };
+
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    dragging.current = true;
+    e.currentTarget.setPointerCapture(e.pointerId);
+    onChange(valueFromX(e.clientX));
+  };
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragging.current) return;
+    onChange(valueFromX(e.clientX));
+  };
+  const endDrag = (e: React.PointerEvent<HTMLDivElement>) => {
+    dragging.current = false;
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {
+      /* pointer already released */
+    }
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    let next = value;
+    if (e.key === "ArrowLeft" || e.key === "ArrowDown") next = value - step;
+    else if (e.key === "ArrowRight" || e.key === "ArrowUp") next = value + step;
+    else if (e.key === "Home") next = min;
+    else if (e.key === "End") next = max;
+    else if (e.key === "PageUp") next = value + step * 5;
+    else if (e.key === "PageDown") next = value - step * 5;
+    else return;
+    e.preventDefault();
+    onChange(clamp(next));
+  };
+
   return (
-    <div className="relative h-[58px] select-none overflow-hidden rounded-md bg-surface-sunken">
+    <div
+      id={id}
+      role="slider"
+      aria-label={label}
+      aria-valuemin={min}
+      aria-valuemax={max}
+      aria-valuenow={value}
+      aria-valuetext={valueText}
+      tabIndex={0}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={endDrag}
+      onPointerCancel={endDrag}
+      onKeyDown={onKeyDown}
+      // touch-none = touch-action:none so touch drags adjust the slider
+      // instead of scrolling the page. cursor-pointer + select-none for
+      // the drag feel; focus-visible ring for keyboard users.
+      className="relative h-[58px] cursor-pointer touch-none select-none overflow-hidden rounded-md bg-surface-sunken focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/30"
+    >
       {/* Label (top-left) + live value (top-right), inside the bar. */}
       <span className="pointer-events-none absolute left-4 top-3 z-10 font-mono text-[11px] tracking-widest uppercase text-ink-muted">
         {label}
@@ -271,10 +337,14 @@ function SliderField({
         {displayValue}
       </span>
 
-      {/* Visible track + thumb along the bottom of the bar. The full-
-          width groove + round knob make it unmistakably a slider even
-          at the minimum (where a fill-only bar looked empty/static). */}
-      <div className="pointer-events-none absolute inset-x-4 bottom-[14px] h-1 rounded-full bg-ink/15">
+      {/* Visible track + thumb along the bottom of the bar. The groove +
+          round knob make it unmistakably a slider even at the minimum.
+          pointer-events-none so the bar (not the track) owns the
+          gesture; trackRef is only used to measure the geometry. */}
+      <div
+        ref={trackRef}
+        className="pointer-events-none absolute inset-x-4 bottom-[14px] h-1 rounded-full bg-ink/15"
+      >
         <div
           className="absolute inset-y-0 left-0 rounded-full bg-ink/40"
           style={{ width: `${pct}%` }}
@@ -288,29 +358,6 @@ function SliderField({
           }}
         />
       </div>
-
-      {/* Transparent native range across the whole bar — drives value,
-          handles drag/click/keyboard, announces aria-valuetext. */}
-      <label htmlFor={id} className="sr-only">
-        {label}
-      </label>
-      <input
-        id={id}
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        aria-valuetext={valueText}
-        // touch-none (touch-action: none) so a drag that starts on the
-        // bar is captured by the range instead of being swallowed as a
-        // page scroll gesture — that's why dragging did nothing on
-        // mobile. z-20 puts the input above the z-10 label/value spans
-        // so it's unambiguously the touch target. m-0 cancels the UA's
-        // default range margin so the full bar is the hit area.
-        className="absolute inset-0 z-20 m-0 h-full w-full cursor-pointer touch-none opacity-0"
-      />
     </div>
   );
 }
