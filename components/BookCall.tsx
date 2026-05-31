@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import { fadeUp, staggerContainer } from "@/lib/animations";
 import Button from "./ui/Button";
 import TileGrid from "./TileGrid";
+import { mailto } from "@/lib/constants";
 
 // ─── Content ───────────────────────────────────────────────────────
 // Standalone CTA — sits between the Pricing section and the Contact
@@ -22,9 +23,11 @@ const COPY = {
   body:
     "There’s no buy button — and there shouldn’t be. We spend 30 minutes on your range and your buyers. We find where deals are leaking, then scope the project. You’ll have a clear number before anything starts.",
   button: "Book a 30-minute call",
-  // Same destination the Nav's "Get Started" primary CTA uses — the
-  // ContactForm section just below is the booking experience.
-  href: "#contact",
+  // Opens a pre-addressed email to info@indexarch.com to book the call.
+  href: mailto(
+    "Booking a 30-minute call",
+    "Hi IndexArch team,\n\nI'd like to book a 30-minute call.\n\nCompany:\nWhat we make:\nBest times to reach me:\n"
+  ),
 };
 
 // ─── Section ───────────────────────────────────────────────────────

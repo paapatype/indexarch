@@ -1,3 +1,20 @@
+// ── Contact ──
+// Single source of truth for the inbox every enquiry / CTA routes to.
+// Used by the contact form (mailto compose), the nav + book-a-call
+// CTAs, and the footer.
+export const CONTACT_EMAIL = "info@indexarch.com";
+
+// Build a mailto: href with an optional prefilled subject + body.
+export function mailto(subject?: string, body?: string): string {
+  const params = [
+    subject ? `subject=${encodeURIComponent(subject)}` : "",
+    body ? `body=${encodeURIComponent(body)}` : "",
+  ]
+    .filter(Boolean)
+    .join("&");
+  return `mailto:${CONTACT_EMAIL}${params ? `?${params}` : ""}`;
+}
+
 // ── Navigation ──
 
 export const NAV_LINKS = [

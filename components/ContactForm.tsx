@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 import { fadeUp, staggerContainer } from "@/lib/animations";
 import Button from "./ui/Button";
 import TileGrid from "./TileGrid";
-import { CONTACT } from "@/lib/constants";
+import { CONTACT, CONTACT_EMAIL } from "@/lib/constants";
 
 interface FormData {
   company: string;
@@ -52,6 +52,36 @@ export default function ContactForm() {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
+
+    // Static site (no backend), so the enquiry is delivered by opening
+    // the visitor's mail client with a pre-filled message addressed to
+    // CONTACT_EMAIL (info@indexarch.com). All form fields are packed
+    // into the subject + body so the enquiry arrives complete.
+    const products =
+      form.products === "Other" ? form.productsCustom : form.products;
+    const industry =
+      form.industry === "Other" ? form.industryCustom : form.industry;
+
+    const subject = `Demo request — ${form.company || form.name}`;
+    const body = [
+      `Company: ${form.company}`,
+      `Name: ${form.name}`,
+      `Email: ${form.email}`,
+      form.phone ? `Phone: ${form.phone}` : null,
+      products ? `Number of products: ${products}` : null,
+      industry ? `Industry: ${industry}` : null,
+      "",
+      form.message ? `Message:\n${form.message}` : null,
+    ]
+      .filter((line): line is string => line !== null)
+      .join("\n");
+
+    const href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
+      subject
+    )}&body=${encodeURIComponent(body)}`;
+
+    // Open the mail client, then show the confirmation state.
+    window.location.href = href;
     setSubmitted(true);
   };
 
@@ -78,11 +108,19 @@ export default function ContactForm() {
           >
             <span className="block font-mono text-6xl mb-6 text-signal">&#10003;</span>
             <h2 className="font-serif text-4xl text-ink mb-4">
-              We&apos;ll be in touch soon.
+              Almost there — hit send.
             </h2>
             <p className="text-ink-muted">
-              Thanks for your interest. We&apos;ll review your catalog details and
-              reach out within 24 hours with your free demo plan.
+              Your email to {CONTACT_EMAIL} just opened in your mail app with
+              your details filled in. Send it and we&apos;ll reply within 24
+              hours with your free demo plan. (Or write us directly at{" "}
+              <a
+                href={`mailto:${CONTACT_EMAIL}`}
+                className="text-ink underline underline-offset-4 decoration-rule hover:decoration-ink transition-colors"
+              >
+                {CONTACT_EMAIL}
+              </a>
+              .)
             </p>
           </motion.div>
         </div>

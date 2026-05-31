@@ -6,7 +6,13 @@ import { motion, AnimatePresence } from "motion/react";
 import Logo from "./Logo";
 import Button from "./ui/Button";
 import ThemeToggle from "./ThemeToggle";
-import { NAV_LINKS } from "@/lib/constants";
+import { NAV_LINKS, mailto } from "@/lib/constants";
+
+// All "Get Started" CTAs open a pre-addressed email to info@indexarch.com.
+const GET_STARTED_HREF = mailto(
+  "Getting started with IndexArch",
+  "Hi IndexArch team,\n\nWe'd like to get started. A bit about us:\n\nCompany:\nWhat we make:\nWebsite / catalogue:\n"
+);
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
@@ -77,7 +83,7 @@ export default function Nav() {
                 </a>
               )
             )}
-            <Button variant="primary" href="#contact" className="text-sm px-5 py-2.5">
+            <Button variant="primary" href={GET_STARTED_HREF} className="text-sm px-5 py-2.5">
               Get Started
             </Button>
             <ThemeToggle />
@@ -175,7 +181,7 @@ export default function Nav() {
               >
                 <Button
                   variant="primary"
-                  href="#contact"
+                  href={GET_STARTED_HREF}
                   onClick={() => setMobileOpen(false)}
                 >
                   Get Started
