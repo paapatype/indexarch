@@ -303,7 +303,13 @@ function SliderField({
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
         aria-valuetext={valueText}
-        className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+        // touch-none (touch-action: none) so a drag that starts on the
+        // bar is captured by the range instead of being swallowed as a
+        // page scroll gesture — that's why dragging did nothing on
+        // mobile. z-20 puts the input above the z-10 label/value spans
+        // so it's unambiguously the touch target. m-0 cancels the UA's
+        // default range margin so the full bar is the hit area.
+        className="absolute inset-0 z-20 m-0 h-full w-full cursor-pointer touch-none opacity-0"
       />
     </div>
   );
