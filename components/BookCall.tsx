@@ -1,10 +1,22 @@
 "use client";
 
+import { useEffect } from "react";
 import { motion } from "motion/react";
 import { fadeUp, staggerContainer } from "@/lib/animations";
 import Button from "./ui/Button";
 import TileGrid from "./TileGrid";
 import { mailto } from "@/lib/constants";
+
+// Calendly event link (Calendly → event type → Share → Copy link),
+// e.g. "https://calendly.com/your-handle/30min". When set, the
+// "Book a 30-minute call" button opens Calendly as a popup overlay
+// on the page. While empty, it falls back to a mailto compose so the
+// button always works.
+const CALENDLY_URL = "https://calendly.com/sankalp-indexarch/30min";
+
+type CalendlyGlobal = {
+  initPopupWidget: (opts: { url: string }) => void;
+};
 
 // ─── Content ───────────────────────────────────────────────────────
 // Standalone CTA — sits between the Pricing section and the Contact
@@ -33,6 +45,36 @@ const COPY = {
 // ─── Section ───────────────────────────────────────────────────────
 
 export default function BookCall() {
+  // Lazy-load the Calendly popup widget assets once, only when a URL
+  // is configured. Idempotent — guards against double injection.
+  useEffect(() => {
+    if (!CALENDLY_URL || typeof document === "undefined") return;
+    if (!document.querySelector("link[data-calendly]")) {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = "https://assets.calendly.com/assets/external/widget.css";
+      link.setAttribute("data-calendly", "");
+      document.head.appendChild(link);
+    }
+    if (!document.querySelector("script[data-calendly]")) {
+      const s = document.createElement("script");
+      s.src = "https://assets.calendly.com/assets/external/widget.js";
+      s.async = true;
+      s.setAttribute("data-calendly", "");
+      document.body.appendChild(s);
+    }
+  }, []);
+
+  // Open Calendly as a popup overlay. If the widget hasn't loaded yet
+  // (or no URL is set), fall back to the mailto compose so the button
+  // never dead-ends.
+  const openCalendly = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const C = (window as unknown as { Calendly?: CalendlyGlobal }).Calendly;
+    if (C && CALENDLY_URL) C.initPopupWidget({ url: CALENDLY_URL });
+    else window.location.href = COPY.href;
+  };
+
   return (
     <section className="relative overflow-hidden py-section-sm lg:py-0 lg:min-h-screen lg:flex lg:items-center">
       {/* Same TileGrid texture that anchors the Hero and Contact
@@ -87,9 +129,15 @@ export default function BookCall() {
             {COPY.body}
           </motion.p>
           <motion.div variants={fadeUp} className="mt-8 lg:mt-10">
-            <Button variant="primary" href={COPY.href}>
-              {COPY.button}
-            </Button>
+            {CALENDLY_URL ? (
+              <Button type="button" variant="primary" onClick={openCalendly}>
+                {COPY.button}
+              </Button>
+            ) : (
+              <Button variant="primary" href={COPY.href}>
+                {COPY.button}
+              </Button>
+            )}
           </motion.div>
         </motion.div>
       </div>
