@@ -31,10 +31,24 @@ const initial: FormData = {
   message: "",
 };
 
+// Formspree form endpoint. Paste the URL from your Formspree form here
+// (looks like "https://formspree.io/f/abcdwxyz"); set the form's
+// notification recipient to info@indexarch.com inside Formspree.
+// While this is empty, the form falls back to a mailto: compose so the
+// live form never breaks — once the endpoint is set, submissions POST
+// to Formspree and you get the email automatically (no mail app).
+const FORMSPREE_ENDPOINT = "https://formspree.io/f/xeedbzqq";
+
 export default function ContactForm() {
   const [form, setForm] = useState<FormData>(initial);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
+
+  // True once a Formspree endpoint is configured — drives both the
+  // submit path and the confirmation copy.
+  const hasBackend = FORMSPREE_ENDPOINT.length > 0;
 
   const validate = (): boolean => {
     const errs: Partial<Record<keyof FormData, string>> = {};
@@ -49,20 +63,62 @@ export default function ContactForm() {
     return Object.keys(errs).length === 0;
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
 
-    // Static site (no backend), so the enquiry is delivered by opening
-    // the visitor's mail client with a pre-filled message addressed to
-    // CONTACT_EMAIL (info@indexarch.com). All form fields are packed
-    // into the subject + body so the enquiry arrives complete.
     const products =
       form.products === "Other" ? form.productsCustom : form.products;
     const industry =
       form.industry === "Other" ? form.industryCustom : form.industry;
-
     const subject = `Demo request — ${form.company || form.name}`;
+
+    // ── Real submission path: POST to Formspree → emails the team.
+    if (hasBackend) {
+      setSubmitting(true);
+      setSubmitError(null);
+      try {
+        const res = await fetch(FORMSPREE_ENDPOINT, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            company: form.company,
+            name: form.name,
+            email: form.email,
+            phone: form.phone,
+            products,
+            industry,
+            message: form.message,
+            _subject: subject,
+          }),
+        });
+        if (res.ok) {
+          setSubmitted(true);
+        } else {
+          const data = (await res.json().catch(() => null)) as
+            | { errors?: { message?: string }[] }
+            | null;
+          setSubmitError(
+            data?.errors?.[0]?.message ||
+              `Something went wrong. Please email us directly at ${CONTACT_EMAIL}.`
+          );
+        }
+      } catch {
+        setSubmitError(
+          `Couldn't send right now. Please email us directly at ${CONTACT_EMAIL}.`
+        );
+      } finally {
+        setSubmitting(false);
+      }
+      return;
+    }
+
+    // ── Fallback (no backend yet): compose a pre-filled email so the
+    // form still works. Replaced by the Formspree path above as soon as
+    // FORMSPREE_ENDPOINT is set.
     const body = [
       `Company: ${form.company}`,
       `Name: ${form.name}`,
@@ -75,13 +131,9 @@ export default function ContactForm() {
     ]
       .filter((line): line is string => line !== null)
       .join("\n");
-
-    const href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
+    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
       subject
     )}&body=${encodeURIComponent(body)}`;
-
-    // Open the mail client, then show the confirmation state.
-    window.location.href = href;
     setSubmitted(true);
   };
 
@@ -108,19 +160,31 @@ export default function ContactForm() {
           >
             <span className="block font-mono text-6xl mb-6 text-signal">&#10003;</span>
             <h2 className="font-serif text-4xl text-ink mb-4">
-              Almost there — hit send.
+              {hasBackend
+                ? "We've got your details."
+                : "Almost there — hit send."}
             </h2>
             <p className="text-ink-muted">
-              Your email to {CONTACT_EMAIL} just opened in your mail app with
-              your details filled in. Send it and we&apos;ll reply within 24
-              hours with your free demo plan. (Or write us directly at{" "}
-              <a
-                href={`mailto:${CONTACT_EMAIL}`}
-                className="text-ink underline underline-offset-4 decoration-rule hover:decoration-ink transition-colors"
-              >
-                {CONTACT_EMAIL}
-              </a>
-              .)
+              {hasBackend ? (
+                <>
+                  Thanks — your enquiry is on its way to us. We&apos;ll reply
+                  within 24 hours with your free demo plan. (Or reach us
+                  directly at{" "}
+                  <a
+                    href={`mailto:${CONTACT_EMAIL}`}
+                    className="text-ink underline underline-offset-4 decoration-rule hover:decoration-ink transition-colors"
+                  >
+                    {CONTACT_EMAIL}
+                  </a>
+                  .)
+                </>
+              ) : (
+                <>
+                  Your email to {CONTACT_EMAIL} just opened in your mail app
+                  with your details filled in. Send it and we&apos;ll reply
+                  within 24 hours with your free demo plan.
+                </>
+              )}
             </p>
           </motion.div>
         </div>
@@ -334,9 +398,17 @@ export default function ContactForm() {
               </div>
 
               <div className="mt-8">
-                <Button type="submit" variant="primary" className="w-full sm:w-auto justify-center">
-                  {CONTACT.submitLabel}
+                <Button
+                  type="submit"
+                  variant="primary"
+                  disabled={submitting}
+                  className="w-full sm:w-auto justify-center disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {submitting ? "Sending…" : CONTACT.submitLabel}
                 </Button>
+                {submitError && (
+                  <p className="mt-3 text-sm text-red-500">{submitError}</p>
+                )}
               </div>
             </form>
           </motion.div>
