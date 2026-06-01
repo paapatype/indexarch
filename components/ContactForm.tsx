@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { motion } from "motion/react";
 import { fadeUp, staggerContainer } from "@/lib/animations";
 import Button from "./ui/Button";
@@ -46,6 +46,29 @@ export default function ContactForm() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
 
+  // Optional catalogue-PDF attachment.
+  const [file, setFile] = useState<File | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
+  const [dragging, setDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const MAX_FILE_MB = 10;
+
+  const acceptFile = (f: File | undefined | null) => {
+    if (!f) return;
+    const isPdf =
+      f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf");
+    if (!isPdf) {
+      setFileError("Please upload a PDF file.");
+      return;
+    }
+    if (f.size > MAX_FILE_MB * 1024 * 1024) {
+      setFileError(`That PDF is over ${MAX_FILE_MB}MB — email it to us instead.`);
+      return;
+    }
+    setFileError(null);
+    setFile(f);
+  };
+
   // True once a Formspree endpoint is configured — drives both the
   // submit path and the confirmation copy.
   const hasBackend = FORMSPREE_ENDPOINT.length > 0;
@@ -74,26 +97,29 @@ export default function ContactForm() {
     const subject = `Demo request — ${form.company || form.name}`;
 
     // ── Real submission path: POST to Formspree → emails the team.
+    // Sent as multipart/form-data (FormData) so an optional PDF
+    // attachment rides along. Note: file attachments require a paid
+    // Formspree plan; text fields submit fine on any plan. Do NOT set
+    // Content-Type — the browser sets the multipart boundary.
     if (hasBackend) {
       setSubmitting(true);
       setSubmitError(null);
       try {
+        const fd = new FormData();
+        fd.append("company", form.company);
+        fd.append("name", form.name);
+        fd.append("email", form.email);
+        fd.append("phone", form.phone);
+        fd.append("products", products);
+        fd.append("industry", industry);
+        fd.append("message", form.message);
+        fd.append("_subject", subject);
+        if (file) fd.append("catalogue", file, file.name);
+
         const res = await fetch(FORMSPREE_ENDPOINT, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify({
-            company: form.company,
-            name: form.name,
-            email: form.email,
-            phone: form.phone,
-            products,
-            industry,
-            message: form.message,
-            _subject: subject,
-          }),
+          headers: { Accept: "application/json" },
+          body: fd,
         });
         if (res.ok) {
           setSubmitted(true);
@@ -395,6 +421,104 @@ export default function ContactForm() {
                   className={`${inputClass("message")} resize-vertical min-h-[80px]`}
                   placeholder="Tell us about your project, timeline, or any specific requirements..."
                 />
+              </div>
+
+              {/* Catalogue PDF upload — drag/drop or click. Sent as a
+                  Formspree attachment. */}
+              <div className="mt-5">
+                <label htmlFor="catalogue" className="block font-mono text-xs text-ink-muted tracking-wide uppercase mb-2">
+                  Send us your catalogue (PDF, optional)
+                </label>
+                <input
+                  ref={fileInputRef}
+                  id="catalogue"
+                  type="file"
+                  accept=".pdf,application/pdf"
+                  className="sr-only"
+                  onChange={(e) => acceptFile(e.target.files?.[0])}
+                />
+                {!file ? (
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      setDragging(true);
+                    }}
+                    onDragLeave={() => setDragging(false)}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setDragging(false);
+                      acceptFile(e.dataTransfer.files?.[0]);
+                    }}
+                    className={`flex w-full flex-col items-center justify-center gap-1.5 border border-dashed px-4 py-6 text-center transition-colors ${
+                      dragging
+                        ? "border-ink bg-surface-sunken"
+                        : "border-rule hover:border-ink-faint bg-surface-raised"
+                    }`}
+                  >
+                    <svg
+                      className="h-5 w-5 text-ink-faint"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M12 16V4" />
+                      <path d="m7 9 5-5 5 5" />
+                      <path d="M5 20h14" />
+                    </svg>
+                    <span className="font-sans text-sm text-ink-muted">
+                      Drag your PDF here, or{" "}
+                      <span className="text-ink underline underline-offset-4 decoration-rule">
+                        browse
+                      </span>
+                    </span>
+                    <span className="font-mono text-[10px] tracking-wide uppercase text-ink-faint">
+                      PDF · up to {MAX_FILE_MB}MB
+                    </span>
+                  </button>
+                ) : (
+                  <div className="flex items-center justify-between gap-3 border border-rule bg-surface-raised px-4 py-3">
+                    <span className="flex items-center gap-2 min-w-0">
+                      <svg
+                        className="h-4 w-4 shrink-0 text-ink-faint"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <path d="M14 2v6h6" />
+                      </svg>
+                      <span className="truncate font-sans text-sm text-ink">
+                        {file.name}
+                      </span>
+                      <span className="shrink-0 font-mono text-[10px] text-ink-faint">
+                        {(file.size / 1024 / 1024).toFixed(1)}MB
+                      </span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFile(null);
+                        setFileError(null);
+                        if (fileInputRef.current) fileInputRef.current.value = "";
+                      }}
+                      aria-label="Remove file"
+                      className="shrink-0 font-mono text-xs text-ink-muted hover:text-ink transition-colors cursor-pointer"
+                    >
+                      Remove ✕
+                    </button>
+                  </div>
+                )}
+                {fileError && (
+                  <p className="mt-1 text-xs text-red-500">{fileError}</p>
+                )}
               </div>
 
               <div className="mt-8">
