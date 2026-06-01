@@ -6,13 +6,11 @@ import { motion, AnimatePresence } from "motion/react";
 import Logo from "./Logo";
 import Button from "./ui/Button";
 import ThemeToggle from "./ThemeToggle";
-import { NAV_LINKS, mailto } from "@/lib/constants";
+import { NAV_LINKS } from "@/lib/constants";
 
-// All "Get Started" CTAs open a pre-addressed email to info@indexarch.com.
-const GET_STARTED_HREF = mailto(
-  "Getting started with IndexArch",
-  "Hi IndexArch team,\n\nWe'd like to get started. A bit about us:\n\nCompany:\nWhat we make:\nWebsite / catalogue:\n"
-);
+// "Get Started" leads to the contact / enquiry form (scrolls to
+// #contact via the fade nav transition), not a direct mail compose.
+const GET_STARTED_HREF = "#contact";
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
