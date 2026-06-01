@@ -17,6 +17,7 @@ interface FormData {
   industry: string;
   industryCustom: string;
   message: string;
+  catalogueUrl: string;
 }
 
 const initial: FormData = {
@@ -29,6 +30,7 @@ const initial: FormData = {
   industry: "",
   industryCustom: "",
   message: "",
+  catalogueUrl: "",
 };
 
 // Formspree form endpoint. Paste the URL from your Formspree form here
@@ -113,6 +115,7 @@ export default function ContactForm() {
         fd.append("products", products);
         fd.append("industry", industry);
         fd.append("message", form.message);
+        if (form.catalogueUrl) fd.append("catalogue_link", form.catalogueUrl);
         fd.append("_subject", subject);
         if (file) fd.append("catalogue", file, file.name);
 
@@ -152,6 +155,7 @@ export default function ContactForm() {
       form.phone ? `Phone: ${form.phone}` : null,
       products ? `Number of products: ${products}` : null,
       industry ? `Industry: ${industry}` : null,
+      form.catalogueUrl ? `Catalogue link: ${form.catalogueUrl}` : null,
       "",
       form.message ? `Message:\n${form.message}` : null,
     ]
@@ -423,12 +427,33 @@ export default function ContactForm() {
                 />
               </div>
 
-              {/* Catalogue PDF upload — drag/drop or click. Sent as a
-                  Formspree attachment. */}
+              {/* Catalogue — link it OR upload the PDF (both optional). */}
               <div className="mt-5">
-                <label htmlFor="catalogue" className="block font-mono text-xs text-ink-muted tracking-wide uppercase mb-2">
-                  Send us your catalogue (PDF, optional)
+                <label htmlFor="catalogueUrl" className="block font-mono text-xs text-ink-muted tracking-wide uppercase mb-2">
+                  Send us your catalogue (optional)
                 </label>
+
+                {/* Option A — paste a link (works on any plan). */}
+                <input
+                  id="catalogueUrl"
+                  type="url"
+                  inputMode="url"
+                  value={form.catalogueUrl}
+                  onChange={set("catalogueUrl")}
+                  className={inputClass("catalogueUrl")}
+                  placeholder="Paste a link — Google Drive, Dropbox, your website…"
+                />
+
+                {/* Divider */}
+                <div className="my-3 flex items-center gap-3">
+                  <span className="h-px flex-1 bg-rule" />
+                  <span className="font-mono text-[10px] tracking-widest uppercase text-ink-faint">
+                    or upload a PDF
+                  </span>
+                  <span className="h-px flex-1 bg-rule" />
+                </div>
+
+                {/* Option B — upload the PDF file (Formspree attachment). */}
                 <input
                   ref={fileInputRef}
                   id="catalogue"
