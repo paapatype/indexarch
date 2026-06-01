@@ -3,6 +3,7 @@ import { Libre_Baskerville, DM_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import ThemeWave from "@/components/ThemeWave";
 import ScrollTransition from "@/components/ScrollTransition";
+import PostHogProvider from "@/components/PostHogProvider";
 
 const libreBaskerville = Libre_Baskerville({
   subsets: ["latin"],
@@ -77,6 +78,7 @@ export default function RootLayout({
       <body>
         <ThemeWave />
         <ScrollTransition />
+        <PostHogProvider />
         {children}
       </body>
     </html>

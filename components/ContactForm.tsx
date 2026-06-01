@@ -6,6 +6,7 @@ import { fadeUp, staggerContainer } from "@/lib/animations";
 import Button from "./ui/Button";
 import TileGrid from "./TileGrid";
 import { CONTACT, CONTACT_EMAIL } from "@/lib/constants";
+import { track } from "./PostHogProvider";
 
 interface FormData {
   company: string;
@@ -125,6 +126,12 @@ export default function ContactForm() {
           body: fd,
         });
         if (res.ok) {
+          track("contact_submitted", {
+            products: products || undefined,
+            industry: industry || undefined,
+            has_catalogue_link: !!form.catalogueUrl,
+            has_catalogue_file: !!file,
+          });
           setSubmitted(true);
         } else {
           const data = (await res.json().catch(() => null)) as
