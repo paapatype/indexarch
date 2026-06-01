@@ -8,9 +8,10 @@ import posthog from "posthog-js";
 // PostHog project API key (phc_…). This is a *write-only ingest* key —
 // it's designed to live in client code, so it's safe to commit. While
 // empty, analytics stays completely off (no script, no events).
-const POSTHOG_KEY = "";
+const POSTHOG_KEY = "phc_sDTxEoBar7GMdmtGseCaRcrADXYn8G5mM4WQFqGM8Ybu";
 // Region host — US: "https://us.i.posthog.com", EU: "https://eu.i.posthog.com".
-const POSTHOG_HOST = "https://us.i.posthog.com";
+// This project lives in PostHog's EU Cloud (Region: "EU Cloud").
+const POSTHOG_HOST = "https://eu.i.posthog.com";
 
 const ENABLED = POSTHOG_KEY.length > 0;
 
