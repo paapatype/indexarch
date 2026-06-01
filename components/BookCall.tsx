@@ -7,16 +7,16 @@ import Button from "./ui/Button";
 import TileGrid from "./TileGrid";
 import { mailto } from "@/lib/constants";
 
-// Calendly event link (Calendly → event type → Share → Copy link),
-// e.g. "https://calendly.com/your-handle/30min". When set, the
-// "Book a 30-minute call" button opens Calendly as a popup overlay
-// on the page. While empty, it falls back to a mailto compose so the
-// button always works.
-const CALENDLY_URL = "https://calendly.com/sankalp-indexarch/30min";
-
-type CalendlyGlobal = {
-  initPopupWidget: (opts: { url: string }) => void;
-};
+// Cal.com booking link as "<username>/<event-slug>", e.g.
+// "sankalp-indexarch/30min" (NOT the full https URL). When set,
+// "Book a 30-minute call" opens the Cal.com scheduler as a popup
+// overlay, brand-coloured to match IndexArch. Empty → falls back to a
+// mailto compose so the button always works.
+const CAL_LINK = "sankalp-shetty-w7toii/30min";
+// Embed namespace + IndexArch brand colours for the scheduler chrome.
+const CAL_NAMESPACE = "indexarch-30min";
+const CAL_BRAND_LIGHT = "#1A1A1A"; // --color-ink (light)
+const CAL_BRAND_DARK = "#F2EDE5"; // --color-ink (dark)
 
 // ─── Content ───────────────────────────────────────────────────────
 // Standalone CTA — sits between the Pricing section and the Contact
@@ -45,35 +45,23 @@ const COPY = {
 // ─── Section ───────────────────────────────────────────────────────
 
 export default function BookCall() {
-  // Lazy-load the Calendly popup widget assets once, only when a URL
-  // is configured. Idempotent — guards against double injection.
+  // Boot the official Cal.com embed once (only when a link is set).
+  // We inject the canonical loader snippet verbatim as a <script> so we
+  // don't have to hand-type its untyped queue internals. It loads
+  // embed.js, initialises the namespace, and brand-colours the
+  // scheduler to match IndexArch. The embed then binds any element with
+  // matching data-cal-link / data-cal-namespace to open the popup.
   useEffect(() => {
-    if (!CALENDLY_URL || typeof document === "undefined") return;
-    if (!document.querySelector("link[data-calendly]")) {
-      const link = document.createElement("link");
-      link.rel = "stylesheet";
-      link.href = "https://assets.calendly.com/assets/external/widget.css";
-      link.setAttribute("data-calendly", "");
-      document.head.appendChild(link);
-    }
-    if (!document.querySelector("script[data-calendly]")) {
-      const s = document.createElement("script");
-      s.src = "https://assets.calendly.com/assets/external/widget.js";
-      s.async = true;
-      s.setAttribute("data-calendly", "");
-      document.body.appendChild(s);
-    }
+    if (!CAL_LINK || typeof document === "undefined") return;
+    if (document.getElementById("calcom-embed-boot")) return;
+    const boot = document.createElement("script");
+    boot.id = "calcom-embed-boot";
+    boot.text =
+      `(function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if (typeof namespace === "string") { cal.ns[namespace] = cal.ns[namespace] || api; p(cal.ns[namespace], ar); p(cal, ["initNamespace", namespace]); } else p(cal, ar); return; } p(cal, ar); }; })(window, "https://app.cal.com/embed/embed.js", "init");` +
+      `Cal("init", ${JSON.stringify(CAL_NAMESPACE)}, {origin:"https://cal.com"});` +
+      `Cal.ns[${JSON.stringify(CAL_NAMESPACE)}]("ui", {"cssVarsPerTheme":{"light":{"cal-brand":"${CAL_BRAND_LIGHT}"},"dark":{"cal-brand":"${CAL_BRAND_DARK}"}},"hideEventTypeDetails":false,"layout":"month_view"});`;
+    document.body.appendChild(boot);
   }, []);
-
-  // Open Calendly as a popup overlay. If the widget hasn't loaded yet
-  // (or no URL is set), fall back to the mailto compose so the button
-  // never dead-ends.
-  const openCalendly = (e: React.MouseEvent) => {
-    e.preventDefault();
-    const C = (window as unknown as { Calendly?: CalendlyGlobal }).Calendly;
-    if (C && CALENDLY_URL) C.initPopupWidget({ url: CALENDLY_URL });
-    else window.location.href = COPY.href;
-  };
 
   return (
     <section className="relative overflow-hidden py-section-sm lg:py-0 lg:min-h-screen lg:flex lg:items-center">
@@ -129,10 +117,20 @@ export default function BookCall() {
             {COPY.body}
           </motion.p>
           <motion.div variants={fadeUp} className="mt-8 lg:mt-10">
-            {CALENDLY_URL ? (
-              <Button type="button" variant="primary" onClick={openCalendly}>
+            {CAL_LINK ? (
+              // Plain <a> so the data-cal-* attributes are valid and the
+              // embed script can bind the click. href is a graceful
+              // fallback to the Cal.com booking page if the embed JS
+              // doesn't load. Styled to match Button's primary variant.
+              <a
+                href={`https://cal.com/${CAL_LINK}`}
+                data-cal-namespace={CAL_NAMESPACE}
+                data-cal-link={CAL_LINK}
+                data-cal-config='{"layout":"month_view"}'
+                className="inline-flex items-center justify-center font-sans font-medium transition-all duration-300 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent bg-ink text-sand-50 px-7 py-3.5 text-sm tracking-wide hover:bg-ink-light active:scale-[0.98]"
+              >
                 {COPY.button}
-              </Button>
+              </a>
             ) : (
               <Button variant="primary" href={COPY.href}>
                 {COPY.button}
