@@ -317,7 +317,7 @@ export default function ContactForm() {
                     value={form.name}
                     onChange={set("name")}
                     className={inputClass("name")}
-                    placeholder="Rajesh Kumar"
+                    placeholder="James Carter"
                   />
                   {errors.name && (
                     <p className="mt-1 text-xs text-red-500">{errors.name}</p>
@@ -336,7 +336,7 @@ export default function ContactForm() {
                     value={form.email}
                     onChange={set("email")}
                     className={inputClass("email")}
-                    placeholder="rajesh@company.com"
+                    placeholder="james@company.com"
                   />
                   {errors.email && (
                     <p className="mt-1 text-xs text-red-500">{errors.email}</p>
