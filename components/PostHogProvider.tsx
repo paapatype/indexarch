@@ -9,9 +9,24 @@ import posthog from "posthog-js";
 // it's designed to live in client code, so it's safe to commit. While
 // empty, analytics stays completely off (no script, no events).
 const POSTHOG_KEY = "phc_sDTxEoBar7GMdmtGseCaRcrADXYn8G5mM4WQFqGM8Ybu";
-// Region host — US: "https://us.i.posthog.com", EU: "https://eu.i.posthog.com".
+
 // This project lives in PostHog's EU Cloud (Region: "EU Cloud").
-const POSTHOG_HOST = "https://eu.i.posthog.com";
+// Ingest host (US: "https://us.i.posthog.com", EU: "https://eu.i.posthog.com").
+const POSTHOG_EU_INGEST = "https://eu.i.posthog.com";
+
+// Where events are actually sent:
+//   • Vercel (indexarch.com): "/ingest" — a first-party reverse proxy
+//     (see next.config.ts rewrites) so ad blockers that block
+//     *.posthog.com don't drop analytics.
+//   • GitHub Pages (static export, basePath="/indexarch"): no server to
+//     proxy, so we hit PostHog EU directly.
+// NEXT_PUBLIC_BASE_PATH is "" on Vercel and "/indexarch" on Pages — it's
+// the cleanest build-time signal for which target we're on.
+const ON_PAGES = (process.env.NEXT_PUBLIC_BASE_PATH ?? "").length > 0;
+const POSTHOG_API_HOST = ON_PAGES ? POSTHOG_EU_INGEST : "/ingest";
+// ui_host lets the PostHog toolbar / in-app links resolve to the real EU
+// app when api_host is a relative proxy path.
+const POSTHOG_UI_HOST = "https://eu.posthog.com";
 
 const ENABLED = POSTHOG_KEY.length > 0;
 
@@ -44,7 +59,8 @@ export default function PostHogProvider() {
     if (!ENABLED || initialized || typeof window === "undefined") return;
     initialized = true;
     posthog.init(POSTHOG_KEY, {
-      api_host: POSTHOG_HOST,
+      api_host: POSTHOG_API_HOST,
+      ui_host: POSTHOG_UI_HOST,
       person_profiles: "identified_only",
       persistence: "memory",
       autocapture: true,

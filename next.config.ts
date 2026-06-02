@@ -24,6 +24,43 @@ const nextConfig: NextConfig = {
   // means next/image always emits a plain <img> with a direct,
   // basePath-correct src — no optimizer, no 308, consistent behaviour.
   images: { unoptimized: true },
+
+  // ── PostHog reverse proxy (Vercel only) ──────────────────────────────
+  // Route analytics through our own domain so ad blockers that block
+  // *.posthog.com (≈10–30% of visitors) don't silently drop events. The
+  // browser talks to https://indexarch.com/ingest/* (first-party, not
+  // blocked); Vercel's edge transparently proxies to PostHog EU.
+  //   • /ingest/static/* → eu-assets CDN  (surveys.js, recorder.js, …)
+  //   • /ingest/*        → eu.i.posthog.com (events /e/, /flags, and the
+  //                         /array/<token>/config.js remote config)
+  // PostHogProvider sets api_host:"/ingest" to match (Vercel build only).
+  //
+  // Gated to NON-Pages builds: GitHub Pages is a static export with no
+  // server, so rewrites can't run there (and Next warns if they're
+  // present alongside output:"export"). On Pages, PostHogProvider falls
+  // back to talking to PostHog EU directly.
+  //
+  // skipTrailingSlashRedirect: with our global trailingSlash:true, a
+  // PostHog request to a slashless endpoint would 308-redirect; skipping
+  // that keeps the proxied API requests intact (PostHog's documented
+  // requirement). Scoped to Vercel so the Pages export is untouched.
+  ...(isPages
+    ? {}
+    : {
+        skipTrailingSlashRedirect: true,
+        async rewrites() {
+          return [
+            {
+              source: "/ingest/static/:path*",
+              destination: "https://eu-assets.i.posthog.com/static/:path*",
+            },
+            {
+              source: "/ingest/:path*",
+              destination: "https://eu.i.posthog.com/:path*",
+            },
+          ];
+        },
+      }),
 };
 
 export default nextConfig;
