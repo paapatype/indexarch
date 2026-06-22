@@ -48,10 +48,14 @@ export default function ThemeToggle({ className = "" }: { className?: string }) 
         {theme && (
           <motion.span
             key={isDark ? "moon" : "sun"}
-            initial={{ rotate: -45, opacity: 0, scale: 0.8 }}
-            animate={{ rotate: 0, opacity: 1, scale: 1 }}
-            exit={{ rotate: 45, opacity: 0, scale: 0.8 }}
-            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            // Contextual icon animation (make-interfaces-feel-better #7):
+            // cross-fade with the skill's exact values — scale 0.25→1,
+            // opacity 0→1, blur 4px→0 — on a spring with bounce:0 (motion
+            // is installed). A small rotate keeps the sun/moon character.
+            initial={{ rotate: -30, opacity: 0, scale: 0.25, filter: "blur(4px)" }}
+            animate={{ rotate: 0, opacity: 1, scale: 1, filter: "blur(0px)" }}
+            exit={{ rotate: 30, opacity: 0, scale: 0.25, filter: "blur(4px)" }}
+            transition={{ type: "spring", duration: 0.3, bounce: 0 }}
             className="absolute inset-0 flex items-center justify-center"
             aria-hidden
           >

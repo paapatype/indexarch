@@ -906,7 +906,7 @@ export default function ProblemSection() {
                     type="button"
                     onClick={() => goTo(i)}
                     aria-label={`Go to problem ${i + 1}`}
-                    className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                    className={`h-1.5 rounded-full transition-[width,background-color] duration-300 cursor-pointer ${
                       i === active ? "w-6 bg-ink" : "w-1.5 bg-rule hover:bg-ink-faint"
                     }`}
                   />

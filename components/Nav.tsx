@@ -34,7 +34,7 @@ export default function Nav() {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-[background-color,box-shadow,backdrop-filter] duration-500 ${
           scrolled
             ? "bg-surface/90 backdrop-blur-md shadow-nav"
             : "bg-transparent"
@@ -107,17 +107,17 @@ export default function Nav() {
       >
         <div className="relative h-4 w-5">
           <span
-            className={`absolute left-0 h-px w-full bg-ink transition-all duration-300 ${
+            className={`absolute left-0 h-px w-full bg-ink transition-[top,transform,opacity] duration-300 ${
               mobileOpen ? "top-2 rotate-45" : "top-0"
             }`}
           />
           <span
-            className={`absolute left-0 top-2 h-px w-full bg-ink transition-all duration-300 ${
+            className={`absolute left-0 top-2 h-px w-full bg-ink transition-[top,transform,opacity] duration-300 ${
               mobileOpen ? "opacity-0" : "opacity-100"
             }`}
           />
           <span
-            className={`absolute left-0 h-px w-full bg-ink transition-all duration-300 ${
+            className={`absolute left-0 h-px w-full bg-ink transition-[top,transform,opacity] duration-300 ${
               mobileOpen ? "top-2 -rotate-45" : "top-4"
             }`}
           />
