@@ -11,16 +11,16 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const base =
-  "inline-flex items-center justify-center font-sans font-medium transition-all duration-300 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+  "inline-flex items-center justify-center font-sans font-medium transition-[color,background-color,transform] duration-300 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-ink text-sand-50 px-7 py-3.5 text-sm tracking-wide hover:bg-ink-light active:scale-[0.98]",
+    "bg-ink text-sand-50 px-7 py-3.5 text-sm tracking-wide hover:bg-ink-light active:scale-[0.96]",
   // Solid surface fill so the hero tile-grid doesn't show through the
   // button. The grid lines were visible behind a transparent outline
   // button — bg-surface masks them while keeping the outlined look.
   secondary:
-    "border border-ink bg-surface text-ink px-7 py-3.5 text-sm tracking-wide hover:bg-ink hover:text-sand-50 active:scale-[0.98]",
+    "border border-ink bg-surface text-ink px-7 py-3.5 text-sm tracking-wide hover:bg-ink hover:text-sand-50 active:scale-[0.96]",
   ghost:
     "text-ink-muted text-sm tracking-wide hover:text-ink underline underline-offset-4 decoration-rule hover:decoration-ink",
 };

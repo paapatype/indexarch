@@ -127,7 +127,7 @@ export default function BookCall() {
                 data-cal-namespace={CAL_NAMESPACE}
                 data-cal-link={CAL_LINK}
                 data-cal-config='{"layout":"month_view"}'
-                className="inline-flex items-center justify-center font-sans font-medium transition-all duration-300 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent bg-ink text-sand-50 px-7 py-3.5 text-sm tracking-wide hover:bg-ink-light active:scale-[0.98]"
+                className="inline-flex items-center justify-center font-sans font-medium transition-[background-color,transform] duration-300 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent bg-ink text-sand-50 px-7 py-3.5 text-sm tracking-wide hover:bg-ink-light active:scale-[0.96]"
               >
                 {COPY.button}
               </a>

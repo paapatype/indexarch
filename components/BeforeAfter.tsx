@@ -203,7 +203,7 @@ function PdfCarousel({ onExpand }: PdfCarouselProps) {
           type="button"
           onClick={prev}
           aria-label="Previous PDF page"
-          className="absolute left-2 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-surface-raised/85 backdrop-blur-sm border border-rule text-ink-muted transition-all duration-300 hover:text-ink hover:border-ink-faint opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
+          className="absolute left-2 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-surface-raised/85 backdrop-blur-sm border border-rule text-ink-muted transition-[color,border-color,opacity] duration-300 hover:text-ink hover:border-ink-faint opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
         >
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
             <line x1="11" y1="7" x2="3" y2="7" />
@@ -216,7 +216,7 @@ function PdfCarousel({ onExpand }: PdfCarouselProps) {
           type="button"
           onClick={next}
           aria-label="Next PDF page"
-          className="absolute right-2 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-surface-raised/85 backdrop-blur-sm border border-rule text-ink-muted transition-all duration-300 hover:text-ink hover:border-ink-faint opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
+          className="absolute right-2 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-surface-raised/85 backdrop-blur-sm border border-rule text-ink-muted transition-[color,border-color,opacity] duration-300 hover:text-ink hover:border-ink-faint opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
         >
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
             <line x1="3" y1="7" x2="11" y2="7" />
@@ -229,7 +229,7 @@ function PdfCarousel({ onExpand }: PdfCarouselProps) {
           type="button"
           onClick={() => onExpand(page)}
           aria-label="Expand PDF to full size"
-          className="absolute top-2 right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-surface-raised/90 backdrop-blur-sm border border-rule text-ink-muted transition-all duration-300 hover:text-ink hover:border-ink-faint opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
+          className="absolute top-2 right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-surface-raised/90 backdrop-blur-sm border border-rule text-ink-muted transition-[color,border-color,opacity] duration-300 hover:text-ink hover:border-ink-faint opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
         >
           <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
             <polyline points="3,6 3,3 6,3" />
@@ -247,7 +247,7 @@ function PdfCarousel({ onExpand }: PdfCarouselProps) {
               type="button"
               onClick={() => setPage(n)}
               aria-label={`Go to page ${n}`}
-              className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+              className={`h-1.5 rounded-full transition-[width,background-color] duration-300 cursor-pointer ${
                 n === page ? "w-5 bg-ink" : "w-1.5 bg-rule hover:bg-ink-faint"
               }`}
             />

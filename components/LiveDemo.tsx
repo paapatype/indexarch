@@ -61,7 +61,7 @@ export function DemoGuide() {
           <button
             key={i}
             onClick={() => goTo(i)}
-            className={`h-1.5 rounded-full transition-all duration-500 cursor-pointer ${
+            className={`h-1.5 rounded-full transition-[width,background-color] duration-500 cursor-pointer ${
               i === step ? "w-6 bg-ink" : "w-1.5 bg-rule hover:bg-ink-faint"
             }`}
             aria-label={`Step ${i + 1}`}
