@@ -709,7 +709,7 @@ export const FOOTER = {
   ],
   contact: {
     email: "info@indexarch.com",
-    phone: "+91 98765 43210",
+    phone: "+91 97400 17898",
     location: "Bangalore, India",
   },
   copyright: "© 2026 IndexArch. All rights reserved.",
