@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
+import { asset } from "@/lib/asset";
 
 const GUIDE_STEPS = [
   {
@@ -113,6 +115,54 @@ export function DemoGuide() {
   );
 }
 
+// The live catalogue is a Three.js / WebGL app (~650KB of JS + 3D models).
+// Loading it eagerly inside an iframe stalls phones, so it sits behind a
+// lightweight click-to-load poster (the "facade" pattern) — the iframe only
+// mounts once the visitor taps. POSTER is a 121KB JPEG (down from the 1.5MB
+// source screenshot) so the preview itself is cheap on mobile.
+const CATALOGUE_URL = "https://paapatype.github.io/kayu-kov-catalogue/";
+const POSTER_SRC = "/kayu-kov/shots/01-overview-poster.jpg";
+
+function DemoFacade({ onLoad }: { onLoad: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onLoad}
+      aria-label="Load the interactive Kayu & Kov catalogue"
+      className="group absolute inset-0 flex flex-col items-center justify-center overflow-hidden bg-surface-sunken cursor-pointer"
+    >
+      {/* Lightweight preview of the shipped catalogue. Lazy by default so it
+          never competes with the initial page load. */}
+      <Image
+        src={asset(POSTER_SRC)}
+        alt="Preview of the Kayu & Kov interactive catalogue"
+        fill
+        sizes="(min-width: 768px) 860px, 100vw"
+        className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.02]"
+      />
+      {/* Dim wash so the play affordance and label read clearly. */}
+      <span
+        className="absolute inset-0 bg-ink/35 transition-colors duration-300 group-hover:bg-ink/45"
+        aria-hidden
+      />
+      <span className="relative z-10 flex flex-col items-center gap-3 px-6 text-center">
+        <span className="flex h-16 w-16 items-center justify-center rounded-full bg-surface-raised/95 shadow-card transition-transform duration-300 group-hover:scale-105 group-active:scale-[0.96]">
+          {/* Play triangle nudged 1px right for optical centering. */}
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" className="ml-0.5 text-ink" aria-hidden>
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        </span>
+        <span className="font-sans text-sm font-medium text-sand-50">
+          Load the live catalogue
+        </span>
+        <span className="font-mono text-[10px] uppercase tracking-widest text-sand-50/80">
+          Interactive · loads on tap
+        </span>
+      </span>
+    </button>
+  );
+}
+
 interface LiveDemoProps {
   /**
    * CSS scale applied to the iframe content. < 1 makes the K&K page render
@@ -138,6 +188,10 @@ interface LiveDemoProps {
  * Live K&K catalogue embed. The iframe is rendered at a larger internal
  * viewport then scaled down via CSS transform so the visible window
  * shows ~3 columns × 3 rows of products at a comfortable size.
+ *
+ * The heavy WebGL iframe is deferred behind a click-to-load poster
+ * (DemoFacade). Desktop and mobile track their load state separately so
+ * only the variant actually on screen (and tapped) ever mounts an iframe.
  */
 export default function LiveDemo({
   scale = 0.78,
@@ -147,6 +201,8 @@ export default function LiveDemo({
 }: LiveDemoProps) {
   const displayWidth = internalWidth * scale;
   const displayHeight = internalHeight * scale;
+  const [loadedDesktop, setLoadedDesktop] = useState(false);
+  const [loadedMobile, setLoadedMobile] = useState(false);
 
   return (
     <div className={className}>
@@ -170,33 +226,41 @@ export default function LiveDemo({
           className="relative overflow-hidden mx-auto"
           style={{ width: `${displayWidth}px`, height: `${displayHeight}px`, maxWidth: "100%" }}
         >
-          <iframe
-            src="https://paapatype.github.io/kayu-kov-catalogue/"
-            title="Kayu &amp; Kov interactive catalogue — filtering and search"
-            loading="lazy"
-            sandbox="allow-scripts allow-same-origin"
-            style={{
-              width: `${internalWidth}px`,
-              height: `${internalHeight}px`,
-              transform: `scale(${scale})`,
-              transformOrigin: "top left",
-              border: 0,
-              display: "block",
-            }}
-          />
+          {loadedDesktop ? (
+            <iframe
+              src={CATALOGUE_URL}
+              title="Kayu &amp; Kov interactive catalogue — filtering and search"
+              loading="eager"
+              sandbox="allow-scripts allow-same-origin"
+              style={{
+                width: `${internalWidth}px`,
+                height: `${internalHeight}px`,
+                transform: `scale(${scale})`,
+                transformOrigin: "top left",
+                border: 0,
+                display: "block",
+              }}
+            />
+          ) : (
+            <DemoFacade onLoad={() => setLoadedDesktop(true)} />
+          )}
         </div>
       </div>
 
       {/* Mobile: direct iframe, no scaling */}
       <div className="md:hidden relative border border-rule bg-surface-raised rounded-lg overflow-hidden">
         <div className="relative w-full" style={{ height: "70vh" }}>
-          <iframe
-            src="https://paapatype.github.io/kayu-kov-catalogue/"
-            title="Kayu &amp; Kov interactive catalogue — mobile view"
-            className="absolute inset-0 w-full h-full"
-            loading="lazy"
-            sandbox="allow-scripts allow-same-origin"
-          />
+          {loadedMobile ? (
+            <iframe
+              src={CATALOGUE_URL}
+              title="Kayu &amp; Kov interactive catalogue — mobile view"
+              className="absolute inset-0 w-full h-full"
+              loading="eager"
+              sandbox="allow-scripts allow-same-origin"
+            />
+          ) : (
+            <DemoFacade onLoad={() => setLoadedMobile(true)} />
+          )}
         </div>
       </div>
     </div>
