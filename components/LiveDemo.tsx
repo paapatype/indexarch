@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
 import { asset } from "@/lib/asset";
@@ -115,24 +115,39 @@ export function DemoGuide() {
   );
 }
 
-// The live catalogue is a Three.js / WebGL app (~650KB of JS + 3D models).
-// Loading it eagerly inside an iframe stalls phones, so it sits behind a
-// lightweight click-to-load poster (the "facade" pattern) — the iframe only
-// mounts once the visitor taps. POSTER is a 121KB JPEG (down from the 1.5MB
-// source screenshot) so the preview itself is cheap on mobile.
+// The live catalogue is a Three.js / WebGL app: ~750KB cold, dominated by
+// three.min.js (603KB, cdnjs) plus OrbitControls / OBJLoader and the 3D
+// models. Two levers keep it feeling fast:
+//   1. Preconnect to the three origins it pulls from.
+//   2. On desktop, warm-load the iframe in the background once the section
+//      nears the viewport, so it's already downloaded by the time someone
+//      clicks. Mobile stays strictly tap-to-load to spare cellular data.
 const CATALOGUE_URL = "https://paapatype.github.io/kayu-kov-catalogue/";
 const POSTER_SRC = "/kayu-kov/shots/01-overview-poster.jpg";
 
-function DemoFacade({ onLoad }: { onLoad: () => void }) {
+function PrewarmLinks() {
+  // Rendered in the component tree; React hoists <link> to <head>. No
+  // crossOrigin — the catalogue's scripts/doc are loaded as classic
+  // (non-CORS) requests, so an anonymous preconnect would sit unused.
+  return (
+    <>
+      <link rel="preconnect" href="https://paapatype.github.io" />
+      <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+      <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+      <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com" />
+      <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+    </>
+  );
+}
+
+function PosterButton({ onClick }: { onClick: () => void }) {
   return (
     <button
       type="button"
-      onClick={onLoad}
+      onClick={onClick}
       aria-label="Load the interactive Kayu & Kov catalogue"
-      className="group absolute inset-0 flex flex-col items-center justify-center overflow-hidden bg-surface-sunken cursor-pointer"
+      className="group absolute inset-0 z-10 flex flex-col items-center justify-center overflow-hidden bg-surface-sunken cursor-pointer"
     >
-      {/* Lightweight preview of the shipped catalogue. Lazy by default so it
-          never competes with the initial page load. */}
       <Image
         src={asset(POSTER_SRC)}
         alt="Preview of the Kayu & Kov interactive catalogue"
@@ -140,7 +155,6 @@ function DemoFacade({ onLoad }: { onLoad: () => void }) {
         sizes="(min-width: 768px) 860px, 100vw"
         className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.02]"
       />
-      {/* Dim wash so the play affordance and label read clearly. */}
       <span
         className="absolute inset-0 bg-ink/35 transition-colors duration-300 group-hover:bg-ink/45"
         aria-hidden
@@ -160,6 +174,17 @@ function DemoFacade({ onLoad }: { onLoad: () => void }) {
         </span>
       </span>
     </button>
+  );
+}
+
+function LoadingVeil() {
+  return (
+    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-surface-sunken">
+      <span className="h-8 w-8 rounded-full border-2 border-rule border-t-ink animate-spin" aria-hidden />
+      <span className="font-mono text-[10px] uppercase tracking-widest text-ink-faint">
+        Loading the live catalogue…
+      </span>
+    </div>
   );
 }
 
@@ -185,13 +210,13 @@ interface LiveDemoProps {
 }
 
 /**
- * Live K&K catalogue embed. The iframe is rendered at a larger internal
- * viewport then scaled down via CSS transform so the visible window
- * shows ~3 columns × 3 rows of products at a comfortable size.
- *
- * The heavy WebGL iframe is deferred behind a click-to-load poster
- * (DemoFacade). Desktop and mobile track their load state separately so
- * only the variant actually on screen (and tapped) ever mounts an iframe.
+ * Live K&K catalogue embed with a fast-perceived load:
+ *   • Desktop warm-loads the (heavy) iframe in the background as the
+ *     section approaches the viewport, then reveals it instantly on click.
+ *   • Mobile mounts the iframe only on tap (saves cellular data), with a
+ *     loading veil for feedback.
+ * Desktop and mobile track state separately so only the on-screen variant
+ * ever mounts an iframe.
  */
 export default function LiveDemo({
   scale = 0.78,
@@ -201,13 +226,43 @@ export default function LiveDemo({
 }: LiveDemoProps) {
   const displayWidth = internalWidth * scale;
   const displayHeight = internalHeight * scale;
-  const [loadedDesktop, setLoadedDesktop] = useState(false);
-  const [loadedMobile, setLoadedMobile] = useState(false);
+
+  // Desktop: warm (iframe mounted + loading in background) → open (poster
+  // dismissed) → loaded (onLoad fired). Mobile: open (mounted on tap) →
+  // loaded.
+  const [dWarm, setDWarm] = useState(false);
+  const [dOpen, setDOpen] = useState(false);
+  const [dLoaded, setDLoaded] = useState(false);
+  const [mOpen, setMOpen] = useState(false);
+  const [mLoaded, setMLoaded] = useState(false);
+
+  const desktopRef = useRef<HTMLDivElement>(null);
+
+  // Warm-load the desktop iframe once the section is within ~1.5 screens
+  // of the viewport. The desktop wrapper is display:none on mobile, so the
+  // observer naturally never fires there — no cellular data is spent.
+  useEffect(() => {
+    const el = desktopRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setDWarm(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: "1200px 0px" }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   return (
     <div className={className}>
+      <PrewarmLinks />
+
       {/* Desktop: browser frame with scaled iframe inside */}
-      <div className="hidden md:block relative border border-rule bg-surface-raised">
+      <div ref={desktopRef} className="hidden md:block relative border border-rule bg-surface-raised">
         <div className="flex items-center gap-2 px-4 py-3 border-b border-rule bg-sand-100">
           <div className="flex gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-sand-300" />
@@ -221,17 +276,20 @@ export default function LiveDemo({
           </div>
         </div>
         {/* Outer clip with the visible-size dimensions; iframe rendered
-            at internalWidth × internalHeight, then transform-scaled. */}
+            at internalWidth × internalHeight, then transform-scaled. The
+            iframe loads behind the poster (warm-load) so revealing it on
+            click is instant. */}
         <div
           className="relative overflow-hidden mx-auto"
           style={{ width: `${displayWidth}px`, height: `${displayHeight}px`, maxWidth: "100%" }}
         >
-          {loadedDesktop ? (
+          {dWarm && (
             <iframe
               src={CATALOGUE_URL}
               title="Kayu &amp; Kov interactive catalogue — filtering and search"
               loading="eager"
               sandbox="allow-scripts allow-same-origin"
+              onLoad={() => setDLoaded(true)}
               style={{
                 width: `${internalWidth}px`,
                 height: `${internalHeight}px`,
@@ -241,26 +299,34 @@ export default function LiveDemo({
                 display: "block",
               }}
             />
-          ) : (
-            <DemoFacade onLoad={() => setLoadedDesktop(true)} />
+          )}
+          {dOpen && !dLoaded && <LoadingVeil />}
+          {!dOpen && (
+            <PosterButton
+              onClick={() => {
+                setDWarm(true);
+                setDOpen(true);
+              }}
+            />
           )}
         </div>
       </div>
 
-      {/* Mobile: direct iframe, no scaling */}
+      {/* Mobile: direct iframe, mounted only on tap */}
       <div className="md:hidden relative border border-rule bg-surface-raised rounded-lg overflow-hidden">
         <div className="relative w-full" style={{ height: "70vh" }}>
-          {loadedMobile ? (
+          {mOpen && (
             <iframe
               src={CATALOGUE_URL}
               title="Kayu &amp; Kov interactive catalogue — mobile view"
               className="absolute inset-0 w-full h-full"
               loading="eager"
               sandbox="allow-scripts allow-same-origin"
+              onLoad={() => setMLoaded(true)}
             />
-          ) : (
-            <DemoFacade onLoad={() => setLoadedMobile(true)} />
           )}
+          {mOpen && !mLoaded && <LoadingVeil />}
+          {!mOpen && <PosterButton onClick={() => setMOpen(true)} />}
         </div>
       </div>
     </div>
